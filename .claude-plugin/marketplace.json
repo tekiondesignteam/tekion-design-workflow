@@ -1,0 +1,16 @@
+{
+  "name": "tekion-design",
+  "description": "Plugins for Tekion product designers",
+  "owner": {
+    "name": "Tekion Design",
+    "email": "jrajan@tekion.com"
+  },
+  "plugins": [
+    {
+      "name": "tekion-design-workflow",
+      "description": "From brief to prototype - the full Tekion design workflow, phase by phase.",
+      "source": ".",
+      "category": "design"
+    }
+  ]
+}
