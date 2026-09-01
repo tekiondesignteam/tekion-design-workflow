@@ -9,7 +9,7 @@
     {
       "name": "tekion-design-workflow",
       "description": "From brief to prototype - the full Tekion design workflow, phase by phase.",
-      "source": "./tekion-design-workflow",
+      "source": ".",
       "category": "design"
     }
   ]
