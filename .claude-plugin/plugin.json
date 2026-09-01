@@ -1,9 +1,0 @@
-{
-  "name": "tekion-design-workflow",
-  "version": "0.5.0",
-  "description": "From brief to prototype - the full Tekion design workflow, phase by phase.",
-  "author": {
-    "name": "Tekion Design"
-  },
-  "keywords": ["design", "workflow", "tekion", "alloy", "spec", "wireframes", "prototype"]
-}
