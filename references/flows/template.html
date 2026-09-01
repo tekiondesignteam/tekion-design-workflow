@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Flows — Rebuilt</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--s2:#F8F9FA;--bd:#EDEEF0;--bds:#D4D5D6;
+  --t:#161616;--ts:#444F5C;--tm:#6B7280;--td:#9BA5B4;
+  --ok:#16A34A;--okbg:#DCFCE7;--err:#DC2626;--errbg:#FEF2F2;--errbd:#FECACA;
+  --font-body:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);color:var(--t);line-height:1.65;font-size:14px;background:#fff;font-weight:500}
+
+.sec-head{display:flex;align-items:center;gap:10px;margin:44px 0 14px;padding-bottom:10px;border-bottom:2px solid var(--t)}
+.sec-head:first-of-type{margin-top:0}
+.sec-head svg{flex-shrink:0;color:var(--t)}
+.sec-title{font-size:17px;font-weight:700;letter-spacing:-.1px;color:var(--t)}
+.sec-count{font-size:10px;font-weight:500;color:var(--td);background:var(--s2);padding:2px 8px;border-radius:20px;font-family:var(--font-mono);margin-left:auto}
+
+.flow-block{border:1.5px solid var(--bd);border-radius:12px;margin-bottom:32px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.flow-block-head{background:var(--s2);padding:16px 20px;border-bottom:1px solid var(--bd)}
+.flow-block-name{font-size:17px;font-weight:700;color:var(--t);display:flex;align-items:center;gap:10px}
+.flow-block-num{font-size:11px;font-weight:700;font-family:var(--font-mono);color:#fff;background:var(--t);border-radius:5px;padding:2px 8px;flex-shrink:0}
+.flow-block-desc{font-size:13.5px;color:var(--ts);margin-top:8px;line-height:1.55}
+.flow-block-body{padding:24px 20px}
+.flow-block-body .mermaid{display:flex;justify-content:center}
+
+.flow-legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px;padding-top:14px;border-top:1px dashed var(--bd)}
+.flow-legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tm)}
+.flow-legend-swatch{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+
+.not-specified{font-size:12.5px;color:var(--td);font-style:italic}
+
+.page-wrap{display:flex;gap:56px;align-items:flex-start;width:100%;padding:0 32px 140px}
+.page-main{flex:1;min-width:0;padding-top:28px}
+
+#sticky-header{position:fixed;top:0;left:0;right:0;background:rgba(255,255,255,.97);backdrop-filter:blur(6px);border-bottom:1px solid var(--bd);padding:14px 32px;font-size:14px;font-weight:700;color:var(--t);z-index:50;transform:translateY(-100%);transition:transform .18s ease;display:flex;align-items:center;gap:10px;height:53px}
+#sticky-header.vis{transform:translateY(0)}
+#sticky-header-sub{font-size:10px;font-weight:500;color:var(--td);font-family:var(--font-mono);margin-left:auto;text-align:right}
+
+.side-toc{width:210px;flex-shrink:0;position:sticky;top:65px;display:none;margin-top:98px}
+.side-toc-title{font-size:13px;font-weight:700;color:var(--t);margin-bottom:16px}
+.side-toc-list{position:relative;padding-left:16px;border-left:1px solid var(--bd)}
+.side-toc-list a{display:block;font-size:13px;color:var(--tm);text-decoration:none;padding:9px 0;line-height:1.3}
+.side-toc-list a.active{color:var(--t);font-weight:700}
+.side-toc-indicator{position:absolute;left:-1px;width:2px;background:var(--t);border-radius:1px;transition:top .2s ease,height .2s ease;top:0;height:0}
+
+@media (min-width: 900px){
+  .side-toc{display:block}
+  #toc-fab{display:none}
+}
+
+#toc-fab{position:fixed;right:24px;bottom:32px;z-index:40}
+#toc-menu{display:none;position:absolute;bottom:52px;right:0;min-width:230px;max-height:60vh;overflow-y:auto;background:#fff;border:1px solid var(--bd);border-radius:10px;box-shadow:0 10px 28px rgba(17,20,23,.14);padding:6px}
+#toc-menu.open{display:block}
+#toc-menu a{display:block;padding:8px 12px;font-size:12px;color:var(--t);text-decoration:none;border-radius:6px;white-space:nowrap}
+#toc-menu a:hover{background:var(--s2)}
+#toc-btn{width:44px;height:44px;border-radius:50%;background:var(--t);color:#fff;border:none;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center}
+[id^="sec-"]{scroll-margin-top:96px}
+
+.approval-banner{background:#EEF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:14px 16px;margin-bottom:8px;font-size:13px;color:#1D4ED8;line-height:1.6}
+</style>
+</head>
+<body>
+
+<!--
+  STRUCTURE-ONLY TEMPLATE for the flows agent's output (Phase 3).
+  One .flow-block per confirmed flow, in the same order the designer confirmed them in Gate 1
+  (the flow-list AskUserQuestion round). Bracketed content is illustrative only — the number of
+  flows and branches is whatever the brief + Gate 1 review produced, not a fixed count. Do not
+  copy bracketed text verbatim.
+
+  Each .flow-block-body contains a single <pre class="mermaid"> block holding the raw Mermaid
+  flowchart TD source for that flow — this IS the source of truth the spec agent will read later,
+  so it must be valid, complete Mermaid syntax, not a rendered image or paraphrase.
+
+  Mermaid conventions to follow when writing the source inside each <pre class="mermaid">:
+    - Start node: stadium shape  ([User lands on X])
+    - Action/step: rectangle     [User does X] / [System shows X]
+    - Decision / permission gate: diamond   {Condition?}   — branches labeled on arrows (e.g. a "Yes" branch)
+    - Error / edge-case state: rectangle, tagged with classDef errorNode (red-tinted) so it reads
+      distinctly from a normal step — see classDef block below.
+    - End node: stadium shape ([Flow complete]) — one per distinct terminal branch (success,
+      abandon, error-exit each get their own end node, never merged into one).
+    - Multi-persona flow: wrap each persona's steps in its own `subgraph "[Persona name]"` block
+      (a swimlane) — pull persona names straight from the brief's "People & their stakes" section, not
+      from knowledge/personas files. Single-persona flow: no subgraph, just a plain linear chain.
+    - Always include a classDef block per diagram for the error-state styling, e.g.:
+        classDef errorNode fill:#FEF2F2,stroke:#DC2626,color:#7F1D1D;
+        class ERR1,ERR2 errorNode;
+-->
+
+<div id="sticky-header">
+  <span>[Feature Name] — User Flows</span>
+  <span id="sticky-header-sub">[N] flows</span>
+</div>
+
+<div class="page-wrap">
+<div class="page-main">
+
+<div id="page-title" style="font-size:24px;font-weight:700;letter-spacing:-.3px;margin-bottom:6px">[Feature Name] — User Flows</div>
+<div style="font-size:11px;color:var(--td);font-family:var(--font-mono);margin-bottom:20px">[Product] &middot; [N] flows &middot; generated [Date]</div>
+
+<div class="approval-banner">
+  Review each flow below, then answer the question the flows agent asked you about approval — describe any add/edit/remove requests there. This page regenerates until you approve.
+</div>
+
+<div class="sec-head" id="sec-flows">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+  <span class="sec-title">User Flows</span>
+  <span class="sec-count">[N]</span>
+</div>
+
+<!-- FLOW 1: single-persona example (no swimlanes) -->
+<div class="flow-block" id="sec-flow-1">
+  <div class="flow-block-head">
+    <div class="flow-block-name"><span class="flow-block-num">1</span>[Flow name, e.g. "Set up two-factor authentication"]</div>
+    <div class="flow-block-desc">[One-line: what the user is trying to accomplish — same one-liner confirmed in Gate 1.]</div>
+  </div>
+  <div class="flow-block-body">
+    <pre class="mermaid">
+flowchart TD
+    A([User opens Security settings]) --> B[User taps Enable 2FA]
+    B --> C{Phone number on file?}
+    C -->|Yes| D[System sends 6-digit code via SMS]
+    C -->|No| E[ERR_NOPHONE: User prompted to add a phone number]
+    D --> F[User enters code]
+    F --> G{Code valid?}
+    G -->|Yes| H([2FA enabled])
+    G -->|No, retries remaining| I[ERR_INVALID: Show inline error, allow retry]
+    I --> F
+    G -->|No, retries exhausted| J([Locked out, contact support])
+    E --> K([Flow exits to Add Phone Number])
+    classDef errorNode fill:#FEF2F2,stroke:#DC2626,color:#7F1D1D;
+    class E,I errorNode;
+    </pre>
+  </div>
+</div>
+
+<!-- FLOW 2: multi-persona example (swimlanes via subgraph) -->
+<div class="flow-block" id="sec-flow-2">
+  <div class="flow-block-head">
+    <div class="flow-block-name"><span class="flow-block-num">2</span>[Flow name, e.g. "Manager approves expense request"]</div>
+    <div class="flow-block-desc">[One-line description.]</div>
+  </div>
+  <div class="flow-block-body">
+    <pre class="mermaid">
+flowchart TD
+    subgraph Dealer["[Dealer]"]
+      A([Dealer submits expense request]) --> B[Dealer attaches receipt]
+    end
+    subgraph Manager["[Manager]"]
+      B --> C{Manager reviews request}
+      C -->|Approve| D[Manager approves]
+      C -->|Reject| E[ERR_REJECTED: Manager enters rejection reason]
+    end
+    D --> F([Request approved, dealer notified])
+    E --> G([Request rejected, dealer notified])
+    classDef errorNode fill:#FEF2F2,stroke:#DC2626,color:#7F1D1D;
+    class E errorNode;
+    </pre>
+  </div>
+</div>
+<!-- Add one .flow-block per confirmed flow, in Gate 1 order. The count is whatever the designer confirmed, not a fixed number. -->
+
+<div id="toc-fab">
+  <div id="toc-menu">
+    <a href="#sec-flow-1">[Flow 1 name]</a>
+    <a href="#sec-flow-2">[Flow 2 name]</a>
+  </div>
+  <button id="toc-btn" onclick="document.getElementById('toc-menu').classList.toggle('open')" title="Jump to flow">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+  </button>
+</div>
+
+</div>
+
+<div class="side-toc">
+  <div class="side-toc-title">Jump to flow</div>
+  <div class="side-toc-list" id="side-toc-list">
+    <div class="side-toc-indicator" id="side-toc-indicator"></div>
+    <a href="#sec-flow-1" class="active">[Flow 1 name]</a>
+    <a href="#sec-flow-2">[Flow 2 name]</a>
+  </div>
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+  startOnLoad:true,
+  theme:'base',
+  themeVariables:{
+    fontFamily:'Manrope, sans-serif',
+    primaryColor:'#F8F9FA',
+    primaryBorderColor:'#161616',
+    primaryTextColor:'#161616',
+    lineColor:'#6B7280',
+    tertiaryColor:'#fff'
+  },
+  flowchart:{ curve:'basis', htmlLabels:true }
+});
+</script>
+
+<script>
+document.querySelectorAll('.side-toc-list a, #toc-menu a').forEach(function(a){
+  a.addEventListener('click',function(e){
+    e.preventDefault();
+    var target=document.querySelector(a.getAttribute('href'));
+    if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
+    var menu=document.getElementById('toc-menu');
+    if(menu)menu.classList.remove('open');
+  });
+});
+document.addEventListener('click',function(e){
+  if(!e.target.closest('#toc-fab')){
+    var menu=document.getElementById('toc-menu');
+    if(menu)menu.classList.remove('open');
+  }
+});
+
+(function(){
+  // Section ids must be regenerated to match the real flow count/ids when this template is filled in;
+  // this placeholder list covers the two example flows above.
+  var sectionIds=['sec-flow-1','sec-flow-2'];
+  var links=Array.from(document.querySelectorAll('.side-toc-list a'));
+  var indicator=document.getElementById('side-toc-indicator');
+  var listEl=document.getElementById('side-toc-list');
+  var REFERENCE_Y=110;
+
+  function setActive(id){
+    links.forEach(function(l){l.classList.toggle('active',l.getAttribute('href')==='#'+id);});
+    var activeLink=links.find(function(l){return l.getAttribute('href')==='#'+id;});
+    if(activeLink&&indicator&&listEl){
+      var listRect=listEl.getBoundingClientRect();
+      var linkRect=activeLink.getBoundingClientRect();
+      indicator.style.top=(linkRect.top-listRect.top)+'px';
+      indicator.style.height=linkRect.height+'px';
+    }
+  }
+
+  function onScroll(){
+    var atBottom=(window.innerHeight+window.scrollY)>=document.documentElement.scrollHeight-2;
+    if(atBottom){
+      setActive(sectionIds[sectionIds.length-1]);
+      return;
+    }
+    var current=sectionIds[0];
+    for(var i=0;i<sectionIds.length;i++){
+      var el=document.getElementById(sectionIds[i]);
+      if(!el)continue;
+      var top=el.getBoundingClientRect().top;
+      if(top<=REFERENCE_Y){
+        current=sectionIds[i];
+      } else {
+        break;
+      }
+    }
+    setActive(current);
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',onScroll);
+  onScroll();
+})();
+
+(function(){
+  var titleEl=document.getElementById('page-title');
+  var header=document.getElementById('sticky-header');
+  if(!titleEl||!header)return;
+  function check(){
+    var rect=titleEl.getBoundingClientRect();
+    header.classList.toggle('vis',rect.bottom<0);
+  }
+  window.addEventListener('scroll',check,{passive:true});
+  window.addEventListener('resize',check);
+  check();
+})();
+</script>
+
+</body>
+</html>

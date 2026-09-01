@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concepts — Rebuilt</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--s2:#F8F9FA;--bd:#EDEEF0;--bds:#D4D5D6;
+  --t:#161616;--ts:#444F5C;--tm:#6B7280;--td:#9BA5B4;
+  --ok:#16A34A;--okbg:#DCFCE7;
+  --font-body:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);color:var(--t);line-height:1.65;font-size:14px;background:#fff;font-weight:500;padding:32px;max-width:920px;margin:0 auto}
+
+/* ---- Sticky header on scroll — same pattern as intake/spec/wireframes templates ---- */
+#sticky-header{position:fixed;top:0;left:0;right:0;background:rgba(255,255,255,.97);backdrop-filter:blur(6px);border-bottom:1px solid var(--bd);padding:14px 32px;font-size:14px;font-weight:700;color:var(--t);z-index:50;transform:translateY(-100%);transition:transform .18s ease;display:flex;align-items:center;gap:10px;height:53px}
+#sticky-header.vis{transform:translateY(0)}
+#sticky-header-sub{font-size:10px;font-weight:500;color:var(--td);font-family:var(--font-mono);margin-left:auto;text-align:right}
+
+.hdr{margin-bottom:6px;font-size:22px;font-weight:700;letter-spacing:-.3px}
+.sub{font-size:12px;color:var(--td);font-family:var(--font-mono);margin-bottom:18px}
+.kept-note{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:12px 16px;font-size:12.5px;color:var(--ts);line-height:1.6;margin-bottom:28px}
+
+/* ---- Segmented control — switches which single direction is shown, full width ---- */
+.segment-row{display:flex;gap:4px;background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:4px;margin-bottom:24px}
+.segment-btn{flex:1;border:none;background:transparent;color:var(--tm);font-size:12.5px;font-weight:700;font-family:var(--font-body);padding:9px 10px;border-radius:7px;cursor:pointer;text-align:center}
+.segment-btn.active{background:#fff;color:var(--t);box-shadow:0 1px 3px rgba(17,20,23,.12)}
+
+/* ---- One full-width direction panel at a time ---- */
+.direction-panel{display:none;flex-direction:column}
+.direction-panel.active{display:flex}
+.direction-label{font-size:15px;font-weight:700;color:var(--t);margin-bottom:4px}
+.direction-rationale{font-size:13px;color:var(--tm);line-height:1.5;margin-bottom:16px;max-width:640px}
+
+.thumb{border:1.5px dashed var(--bds);border-radius:10px;background:var(--s2);padding:20px;height:380px;display:flex;flex-direction:column;gap:14px;margin-bottom:16px}
+.thumb-block{border-radius:4px;background:var(--bds)}
+
+.select-btn{align-self:flex-start;border:1px solid var(--t);border-radius:8px;background:#fff;color:var(--t);font-size:13px;font-weight:700;font-family:var(--font-body);padding:10px 16px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.select-btn:active{background:var(--s2)}
+.select-status{font-size:12px;color:var(--ok);margin-top:8px;min-height:16px}
+
+/* ---- Actions: primary "select" action, then a visually separate "ask for a change" box ---- */
+.direction-actions{display:flex;flex-direction:column;gap:14px;margin-top:4px}
+.actions-divider{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--td);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.actions-divider::before,.actions-divider::after{content:'';flex:1;height:1px;background:var(--bd)}
+
+.comment-box{border:1px solid var(--bd);border-radius:10px;background:var(--s2);padding:12px}
+.comment-box-label{font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.03em;margin-bottom:8px}
+.comment-box textarea{width:100%;min-height:44px;max-height:110px;border:1px solid var(--bd);border-radius:8px;padding:8px 10px;font-family:var(--font-body);font-size:12.5px;resize:vertical;background:#fff}
+.comment-box-foot{display:flex;justify-content:flex-end;margin-top:8px}
+.comment-btn{border:1px solid var(--bds);border-radius:8px;background:#fff;color:var(--ts);font-size:12.5px;font-weight:700;font-family:var(--font-body);padding:8px 14px;cursor:pointer;white-space:nowrap}
+.comment-btn:active{background:var(--s2)}
+.comment-status{font-size:12px;color:var(--ok);margin-top:8px;min-height:16px}
+</style>
+</head>
+<body>
+
+<!--
+  STRUCTURE-ONLY TEMPLATE for an on-demand concept-exploration request (part of Phase 5, spawned
+  by the wireframes agent when a designer's feedback on wireframes-[slug].html asks for layout
+  alternatives on one specific task — see agents/wireframes.md Step 5). This is NOT a separate
+  command/agent — the wireframes agent generates this file directly, inline in its review loop.
+
+  One of these gets written per concept-request, filename concepts-[slug]-task[N].html. It is
+  KEPT PERMANENTLY even after the designer picks a direction — never delete or overwrite it once
+  a selection is made. Mechanism and fields are already fixed by spec.md; every direction below
+  varies ONLY the spatial/layout treatment (single column vs. split-screen vs. modal vs.
+  progressive disclosure, etc.) — never a different set of fields or a different AC.
+
+  Carries the same fixed #sticky-header-on-scroll shell as the other Phase 5 templates
+  (intake/spec/wireframes) — a bar that stays hidden until the page title (#page-title) scrolls
+  past the top of the viewport, then slides in with the feature/task name. Do not remove it.
+
+  Each direction needs:
+    - A short label ("Direction A — standard stacked form")
+    - A one-line rationale (why this shape might fit)
+    - A .thumb abstract shape-thumbnail — proportion/hierarchy only, no field labels or copy
+      (see the three .thumb-block examples below — vary height/width/order to suggest the shape,
+      never add text inside a thumbnail)
+    - A dedicated "Select this direction" button, visually separate from (below) the comment box
+      — the two aren't peers in the same row, since picking a direction and asking for a tweak to
+      one are different actions with different consequences. Clicking it copies a structured,
+      labeled block (not a dense single line — easier for the wireframes agent to parse
+      reliably and for the designer to glance at before pasting):
+        [Concept Selection]
+        Feature: [Feature]
+        Task: [N] — [Task/Screen Name]
+        Direction: [Letter] — [direction label]
+      The wireframes agent parses that block, sets the task's chosen direction, and regenerates
+      wireframes-[slug].html in full — this file is left untouched afterward as a permanent
+      record of what was considered.
+    - A boxed "Ask for a change to this direction" comment area (textarea + "Copy comment"
+      button), separated from the select button by an "or" divider — NOT the click-to-annotate/
+      Copy Feedback component used elsewhere, since this is scoped to one direction on one
+      concept file, not the whole page. Clicking it copies:
+        [Concept Feedback]
+        Feature: [Feature]
+        Task: [N] — [Task/Screen Name]
+        Direction: [Letter]
+        Comment: [comment]
+      The wireframes agent parses that block and revises JUST that direction in place in this
+      same file (its rationale and/or .thumb arrangement per the comment) — it does NOT touch
+      wireframes-[slug].html, since no selection has been made yet. Re-render this file with the
+      revised direction and prompt the designer to look again.
+
+  Directions are shown ONE AT A TIME, full width, switched via the .segment-row pill control at
+  the top — not side-by-side small cards. A cramped multi-column layout made the abstract .thumb
+  shapes too small to actually judge, which defeats the point of a shape-comparison tool. Add one
+  .segment-btn per direction (label: "A", "B", "C"...) and one matching .direction-panel (only the
+  active one has the `active` class / is visible) — see switchDirection() below, which toggles
+  both in sync. The number of directions (2-4 typical) is whatever the designer asked for when the
+  wireframes agent prompted "how many directions?" — three below is illustrative, not fixed.
+-->
+
+<div id="sticky-header">
+  <span>[Feature Name] — Concepts</span>
+  <span id="sticky-header-sub">Task [N] &middot; [Task/Screen Name]</span>
+</div>
+
+<div class="hdr" id="page-title">Concepts for Task [N]: [Task/Screen Name]</div>
+<div class="sub">[Feature Name] &middot; [Product] &middot; generated [Date]</div>
+<div class="kept-note">Review the options above, then select the one you like — or leave a comment asking for changes.</div>
+
+<div class="segment-row">
+  <button class="segment-btn active" id="seg-A" onclick="switchDirection('A')">A &middot; Standard stacked form</button>
+  <button class="segment-btn" id="seg-B" onclick="switchDirection('B')">B &middot; Split-screen with brand panel</button>
+  <button class="segment-btn" id="seg-C" onclick="switchDirection('C')">C &middot; Progressive disclosure</button>
+</div>
+
+<div class="direction-panel active" id="panel-A">
+  <div class="direction-label">Direction A — Standard stacked form</div>
+  <div class="direction-rationale">Single centered column, fields stacked top to bottom. Familiar, low-risk default.</div>
+  <div class="thumb">
+    <div class="thumb-block" style="height:20px;width:30%"></div>
+    <div class="thumb-block" style="height:34px;opacity:.5;width:70%;align-self:center"></div>
+    <div class="thumb-block" style="height:34px;opacity:.5;width:70%;align-self:center"></div>
+    <div style="flex:1"></div>
+    <div class="thumb-block" style="height:36px;width:70%;align-self:center"></div>
+  </div>
+  <div class="direction-actions">
+    <button class="select-btn" onclick="selectDirection(this,'A','Standard stacked form')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      Select this direction
+    </button>
+    <div class="select-status"></div>
+    <div class="actions-divider">or</div>
+    <div class="comment-box">
+      <div class="comment-box-label">Ask for a change to this direction</div>
+      <textarea placeholder="e.g. &quot;move the button below the field&quot;"></textarea>
+      <div class="comment-box-foot">
+        <button class="comment-btn" onclick="sendConceptFeedback(this,'A')">Copy comment</button>
+      </div>
+      <div class="comment-status"></div>
+    </div>
+  </div>
+</div>
+
+<div class="direction-panel" id="panel-B">
+  <div class="direction-label">Direction B — Split-screen with brand panel</div>
+  <div class="direction-rationale">Form on one side, illustration/brand panel on the other. More visual weight, needs more horizontal space.</div>
+  <div class="thumb">
+    <div style="display:flex;gap:14px;height:100%">
+      <div class="thumb-block" style="flex:1"></div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:14px;justify-content:center">
+        <div class="thumb-block" style="height:20px;width:60%"></div>
+        <div class="thumb-block" style="height:34px;opacity:.5"></div>
+        <div class="thumb-block" style="height:34px;opacity:.5"></div>
+        <div class="thumb-block" style="height:36px"></div>
+      </div>
+    </div>
+  </div>
+  <div class="direction-actions">
+    <button class="select-btn" onclick="selectDirection(this,'B','Split-screen with brand panel')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      Select this direction
+    </button>
+    <div class="select-status"></div>
+    <div class="actions-divider">or</div>
+    <div class="comment-box">
+      <div class="comment-box-label">Ask for a change to this direction</div>
+      <textarea placeholder="e.g. &quot;move the button below the field&quot;"></textarea>
+      <div class="comment-box-foot">
+        <button class="comment-btn" onclick="sendConceptFeedback(this,'B')">Copy comment</button>
+      </div>
+      <div class="comment-status"></div>
+    </div>
+  </div>
+</div>
+
+<div class="direction-panel" id="panel-C">
+  <div class="direction-label">Direction C — Progressive disclosure</div>
+  <div class="direction-rationale">Email first, password revealed on a second step. Lower initial commitment, one extra tap.</div>
+  <div class="thumb">
+    <div class="thumb-block" style="height:20px;width:30%"></div>
+    <div class="thumb-block" style="height:34px;opacity:.5;width:70%;align-self:center"></div>
+    <div style="flex:1"></div>
+    <div class="thumb-block" style="height:36px;width:50%;align-self:center"></div>
+  </div>
+  <div class="direction-actions">
+    <button class="select-btn" onclick="selectDirection(this,'C','Progressive disclosure')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      Select this direction
+    </button>
+    <div class="select-status"></div>
+    <div class="actions-divider">or</div>
+    <div class="comment-box">
+      <div class="comment-box-label">Ask for a change to this direction</div>
+      <textarea placeholder="e.g. &quot;move the button below the field&quot;"></textarea>
+      <div class="comment-box-foot">
+        <button class="comment-btn" onclick="sendConceptFeedback(this,'C')">Copy comment</button>
+      </div>
+      <div class="comment-status"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var titleEl=document.getElementById('page-title');
+  var header=document.getElementById('sticky-header');
+  if(!titleEl||!header)return;
+  function check(){
+    var rect=titleEl.getBoundingClientRect();
+    header.classList.toggle('vis',rect.bottom<0);
+  }
+  window.addEventListener('scroll',check,{passive:true});
+  window.addEventListener('resize',check);
+  check();
+})();
+
+function switchDirection(letter){
+  document.querySelectorAll('.segment-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.direction-panel').forEach(function(p){ p.classList.remove('active'); });
+  var seg = document.getElementById('seg-' + letter);
+  var panel = document.getElementById('panel-' + letter);
+  if(seg) seg.classList.add('active');
+  if(panel) panel.classList.add('active');
+}
+
+function featureAndTask(){
+  // .sub holds "[Feature Name] · [Product] · generated [Date]"; .hdr holds "Concepts for Task [N]: [Name]"
+  var feature = document.querySelector('.sub').textContent.split('·')[0].trim();
+  var taskFull = document.querySelector('.hdr').textContent.replace(/^Concepts for /,''); // "Task [N]: [Name]"
+  var m = taskFull.match(/^Task\s*(\S+)\s*:\s*(.*)$/i);
+  return {
+    feature: feature,
+    taskNum: m ? m[1] : '?',
+    taskName: m ? m[2].trim() : taskFull
+  };
+}
+
+function copyText(text, statusEl){
+  function done(ok){
+    statusEl.textContent = ok ? 'Copied — paste it into chat.' : 'Could not copy automatically — select this text and press Cmd/Ctrl+C: ' + text;
+  }
+  function manualCopy(){
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try{ ok = document.execCommand('copy'); } catch(err){}
+    document.body.removeChild(ta);
+    done(ok);
+  }
+  // Always try navigator.clipboard first, but fall back to the execCommand path on ANY failure
+  // (permission denied, insecure/file:// context, etc.) instead of giving up — a clipboard.writeText
+  // rejection does not mean copying is impossible, just that this path didn't work.
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){ done(true); }).catch(manualCopy);
+  } else {
+    manualCopy();
+  }
+}
+
+function selectDirection(btn, letter, label){
+  var ft = featureAndTask();
+  var text = [
+    '[Concept Selection]',
+    'Feature: ' + ft.feature,
+    'Task: ' + ft.taskNum + ' — ' + ft.taskName,
+    'Direction: ' + letter + ' — ' + label
+  ].join('\n');
+  var panel = btn.closest('.direction-panel');
+  copyText(text, panel.querySelector('.select-status'));
+}
+
+function sendConceptFeedback(btn, letter){
+  var ft = featureAndTask();
+  var panel = btn.closest('.direction-panel');
+  var textarea = panel.querySelector('.comment-box textarea');
+  var comment = textarea.value.trim();
+  var statusEl = panel.querySelector('.comment-status');
+  if(!comment){
+    statusEl.textContent = 'Type a comment first.';
+    statusEl.style.color = 'var(--err, #DC2626)';
+    return;
+  }
+  statusEl.style.color = 'var(--ok)';
+  var text = [
+    '[Concept Feedback]',
+    'Feature: ' + ft.feature,
+    'Task: ' + ft.taskNum + ' — ' + ft.taskName,
+    'Direction: ' + letter,
+    'Comment: ' + comment
+  ].join('\n');
+  copyText(text, statusEl);
+}
+</script>
+
+</body>
+</html>

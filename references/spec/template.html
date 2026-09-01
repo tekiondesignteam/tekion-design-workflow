@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spec — Rebuilt</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--s2:#F8F9FA;--bd:#EDEEF0;--bds:#D4D5D6;
+  --t:#161616;--ts:#444F5C;--tm:#6B7280;--td:#9BA5B4;
+  --ok:#16A34A;--okbg:#DCFCE7;--warn:#D97706;--warnbg:#FEF3C7;--err:#DC2626;--errbg:#FEF2F2;--errbd:#FECACA;
+  --font-body:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);color:var(--t);line-height:1.65;font-size:14px;background:#fff;font-weight:500}
+
+.sec-head{display:flex;align-items:center;gap:10px;margin:44px 0 14px;padding-bottom:10px;border-bottom:2px solid var(--t)}
+.sec-head:first-of-type{margin-top:0}
+.sec-head svg{flex-shrink:0;color:var(--t)}
+.sec-title{font-size:17px;font-weight:700;letter-spacing:-.1px;color:var(--t)}
+.sec-count{font-size:10px;font-weight:500;color:var(--td);background:var(--s2);padding:2px 8px;border-radius:20px;font-family:var(--font-mono);margin-left:auto}
+
+.doc-section{margin-bottom:8px;font-size:13.5px;color:var(--ts);line-height:1.7}
+.doc-section p{margin-bottom:10px}
+.doc-section ul{padding-left:20px;margin-bottom:10px}
+.doc-section li{margin-bottom:4px}
+
+/* ---- Personas: persona-card + tension-row (same components as references/intake/template.html) ---- */
+.persona-card{border:1px solid var(--bd);border-radius:8px;padding:16px;margin-bottom:12px}
+.persona-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.persona-avatar{width:34px;height:34px;border-radius:50%;flex-shrink:0;image-rendering:pixelated;overflow:hidden}
+.persona-avatar svg{display:block;width:100%;height:100%}
+.persona-name{font-weight:700;font-size:15px}
+.persona-role{font-size:12.5px;color:var(--tm)}
+.tension-row{display:flex;gap:8px;font-size:13.5px;line-height:1.6;margin-top:9px}
+.tension-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--td);flex-shrink:0;width:100px;padding-top:2px}
+.tension-row span:last-child{color:var(--ts)}
+
+/* ---- Constraints / bullet lines (same as references/intake/template.html) ---- */
+.ref-item{font-size:13.5px;line-height:1.7;color:var(--ts);margin-bottom:8px;padding-left:14px;position:relative}
+.ref-item::before{content:'\2014';color:var(--td);position:absolute;left:0;top:0}
+
+/* ---- Out of Scope: amber callout (same as references/intake/template.html) ---- */
+.scope-nongoal{background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;padding:14px 16px}
+.scope-nongoal-body{font-size:13.5px;line-height:1.65;color:#78350F}
+
+/* ---- Context & environment / metric bullets (same as references/intake/template.html) ---- */
+.metric-item{display:flex;gap:8px;margin-bottom:9px;line-height:1.6;font-size:13.5px;color:var(--ts)}
+
+/* ---- How it works today, vs. with this (same as references/intake/template.html) ---- */
+.tvd-wrap{display:flex;flex-direction:column;border:1px solid var(--bd);border-radius:10px;overflow:hidden}
+.tvd-row{display:flex;gap:14px;padding:16px 18px;background:#fff}
+.tvd-row.today{background:var(--s2);border-bottom:1px solid var(--bd)}
+.tvd-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tvd-icon.today{background:#EDEEF0;color:var(--tm)}
+.tvd-icon.desired{background:var(--t);color:#fff}
+.tvd-body{flex:1}
+.tvd-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.tvd-label.today{color:var(--tm)}
+.tvd-label.desired{color:var(--t)}
+.tvd-list{list-style:none}
+.tvd-list li{font-size:12.5px;line-height:1.6;color:var(--ts);margin-bottom:8px;padding-left:14px;position:relative}
+.tvd-list li::before{content:'';position:absolute;left:0;top:7px;width:4px;height:4px;border-radius:50%;background:var(--td)}
+.tvd-list li:last-child{margin-bottom:0}
+.tvd-row.today .tvd-list li{color:var(--tm)}
+
+/* ---- Product surfaces: surface-block + step-list + scope-tier-list + surface-row-list (same as references/intake/template.html) ---- */
+.surface-block{border:1.5px solid var(--bd);border-radius:12px;margin-bottom:28px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.surface-block-head{background:var(--s2);padding:16px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px}
+.surface-block-num{font-size:11px;font-weight:700;font-family:var(--font-mono);color:#fff;background:var(--t);border-radius:5px;padding:2px 8px;flex-shrink:0}
+.surface-block-name{font-size:17px;font-weight:700;color:var(--t)}
+.surface-block-body{padding:20px}
+.surface-sub-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t);margin:26px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
+.surface-sub-title:first-child{margin-top:0}
+
+.step-list{display:flex;flex-direction:column}
+.step-row{display:flex;gap:10px;align-items:stretch}
+.step-col{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.step-circle{width:22px;height:22px;border-radius:50%;background:var(--t);color:#fff;font-size:10px;font-weight:700;font-family:var(--font-mono);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-line{width:1.5px;flex:1;min-height:20px;background:var(--bd);margin:4px 0}
+.step-body{flex:1;font-size:13.5px;line-height:1.6;color:var(--ts);padding-bottom:16px}
+.step-row:last-child .step-body{padding-bottom:0}
+.step-body b{color:var(--t);font-weight:700;font-size:13.5px;display:block;margin-bottom:3px}
+
+.scope-tier-list{display:flex;flex-direction:column}
+.scope-tier-row{display:flex;gap:14px;padding:9px 0;border-bottom:1px solid var(--bd);align-items:flex-start}
+.scope-tier-row:last-child{border-bottom:none}
+.scope-tier-badge{flex-shrink:0;width:96px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;border-radius:4px;padding:3px 8px;height:18px;display:flex;align-items:center;justify-content:center;white-space:nowrap;margin-top:1px}
+.scope-tier-badge.must{background:#F0FDF4;color:#166534;border:1px solid #BBF7D0}
+.scope-tier-badge.good{background:#EEF6FF;color:#1D4ED8;border:1px solid #BFDBFE}
+.scope-tier-badge.later{background:var(--s2);color:var(--tm);border:1px solid var(--bd)}
+.scope-tier-body{flex:1;font-size:13.5px;line-height:1.6;color:var(--ts)}
+
+.surface-row-tag{flex-shrink:0;font-size:9px;font-weight:700;font-family:var(--font-mono);color:#fff;background:var(--t);border-radius:4px;padding:2px 6px;height:18px;min-width:18px;display:flex;align-items:center;justify-content:center;white-space:nowrap;margin-top:1px}
+.surface-row-list{display:flex;flex-direction:column;gap:10px}
+.surface-row{display:flex;gap:10px}
+.surface-row-body{flex:1;font-size:13.5px;line-height:1.6;color:var(--ts)}
+.surface-row-body b{color:var(--t);font-weight:600}
+
+/* ---- Success metrics (same as references/intake/template.html) ---- */
+.success-group{margin-bottom:22px}
+.success-group:last-child{margin-bottom:0}
+.success-group-head{font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.success-row{display:flex;align-items:baseline;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd)}
+.success-row:last-child{border-bottom:none}
+.success-num{font-weight:700;color:var(--t);font-family:var(--font-mono);font-size:14px;flex-shrink:0;min-width:70px}
+.success-desc{font-size:13.5px;line-height:1.6;color:var(--ts)}
+
+.flow-block,.task-block{border:1.5px solid var(--bd);border-radius:12px;margin-bottom:32px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.flow-block-head,.task-block-head{background:var(--s2);padding:16px 20px;border-bottom:1px solid var(--bd)}
+.flow-block-name,.task-block-name{font-size:17px;font-weight:700;color:var(--t);display:flex;align-items:center;gap:10px}
+.flow-block-num,.task-block-num{font-size:11px;font-weight:700;font-family:var(--font-mono);color:#fff;background:var(--t);border-radius:5px;padding:2px 8px;flex-shrink:0}
+.flow-block-desc{font-size:13.5px;color:var(--ts);margin-top:8px;line-height:1.55}
+.flow-block-body,.task-block-body{padding:24px 20px}
+.flow-block-body .mermaid{display:flex;justify-content:center}
+
+.ac-list{list-style:none}
+.ac-list li{position:relative;padding-left:18px;margin-bottom:10px;font-size:13.5px;color:var(--ts);line-height:1.6}
+.ac-list li::before{content:'';position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%;background:var(--bds)}
+.ac-assumed{display:inline-block;font-size:10px;font-weight:700;font-family:var(--font-mono);color:var(--warn);background:var(--warnbg);border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:2px}
+
+.assumptions-list{list-style:none;counter-reset:assump}
+.assumptions-list li{counter-increment:assump;position:relative;padding-left:28px;margin-bottom:12px;font-size:13.5px;color:var(--ts);line-height:1.6}
+.assumptions-list li::before{content:counter(assump);position:absolute;left:0;top:0;width:18px;height:18px;border-radius:5px;background:var(--warnbg);color:var(--warn);font-family:var(--font-mono);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.assumptions-list b{color:var(--t)}
+
+.flow-legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px;padding-top:14px;border-top:1px dashed var(--bd)}
+.flow-legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tm)}
+.flow-legend-swatch{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+
+.not-specified{font-size:12.5px;color:var(--td);font-style:italic}
+
+.page-wrap{display:flex;gap:56px;align-items:flex-start;width:100%;padding:0 32px 160px}
+.page-main{flex:1;min-width:0;padding-top:28px}
+
+#sticky-header{position:fixed;top:0;left:0;right:0;background:rgba(255,255,255,.97);backdrop-filter:blur(6px);border-bottom:1px solid var(--bd);padding:14px 32px;font-size:14px;font-weight:700;color:var(--t);z-index:50;transform:translateY(-100%);transition:transform .18s ease;display:flex;align-items:center;gap:10px;height:53px}
+#sticky-header.vis{transform:translateY(0)}
+#sticky-header-sub{font-size:10px;font-weight:500;color:var(--td);font-family:var(--font-mono);margin-left:auto;text-align:right}
+
+.score-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;font-weight:700;border-radius:20px;padding:4px 10px}
+.score-high{background:var(--okbg);color:var(--ok)}
+.score-medium{background:var(--warnbg);color:var(--warn)}
+.score-low{background:var(--errbg);color:var(--err)}
+
+.side-toc{width:210px;flex-shrink:0;position:sticky;top:65px;display:none;margin-top:98px}
+.side-toc-title{font-size:13px;font-weight:700;color:var(--t);margin-bottom:16px}
+.side-toc-list{position:relative;padding-left:16px;border-left:1px solid var(--bd)}
+.side-toc-list a{display:block;font-size:13px;color:var(--tm);text-decoration:none;padding:9px 0;line-height:1.3}
+.side-toc-list a.active{color:var(--t);font-weight:700}
+.side-toc-list a.side-toc-sub{padding-left:16px;font-size:12px;color:var(--td)}
+.side-toc-list a.side-toc-sub.active{color:var(--t);font-weight:600}
+.side-toc-indicator{position:absolute;left:-1px;width:2px;background:var(--t);border-radius:1px;transition:top .2s ease,height .2s ease;top:0;height:0}
+
+@media (min-width: 900px){
+  .side-toc{display:block}
+  #toc-fab{display:none}
+}
+
+#toc-fab{position:fixed;right:24px;bottom:32px;z-index:40}
+#toc-menu{display:none;position:absolute;bottom:52px;right:0;min-width:230px;max-height:60vh;overflow-y:auto;background:#fff;border:1px solid var(--bd);border-radius:10px;box-shadow:0 10px 28px rgba(17,20,23,.14);padding:6px}
+#toc-menu.open{display:block}
+#toc-menu a{display:block;padding:8px 12px;font-size:12px;color:var(--t);text-decoration:none;border-radius:6px;white-space:nowrap}
+#toc-menu a:hover{background:var(--s2)}
+#toc-menu a.toc-sub{padding-left:26px;font-size:11.5px;color:var(--tm)}
+#toc-btn{width:44px;height:44px;border-radius:50%;background:var(--t);color:#fff;border:none;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center}
+[id^="sec-"]{scroll-margin-top:96px}
+
+.approval-banner{background:#EEF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:14px 16px;margin-bottom:8px;font-size:13px;color:#1D4ED8;line-height:1.6}
+.doc-footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--bd);text-align:center;font-size:12px;color:var(--td);font-style:italic}
+
+/* ---- Click-to-annotate + Copy Feedback (shared review component) ---- */
+.annot-mark{background:#FEF3C7;border-bottom:2px solid var(--warn);border-radius:2px;cursor:default;position:relative}
+.annot-mark sup{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--warn);margin-left:1px}
+
+#annot-btn{position:absolute;display:none;z-index:60;background:var(--t);color:#fff;border:none;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:700;font-family:var(--font-body);cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.22);align-items:center;gap:6px}
+#annot-btn.show{display:flex}
+#annot-btn svg{flex-shrink:0}
+
+#annot-popover{position:absolute;display:none;z-index:61;background:#fff;border:1px solid var(--bd);border-radius:10px;box-shadow:0 10px 28px rgba(17,20,23,.16);padding:12px;width:280px}
+#annot-popover.show{display:block}
+#annot-popover .annot-quote{font-size:11.5px;color:var(--tm);font-style:italic;margin-bottom:8px;max-height:60px;overflow-y:auto;border-left:2px solid var(--bd);padding-left:8px}
+#annot-popover textarea{width:100%;min-height:64px;border:1px solid var(--bd);border-radius:6px;padding:8px;font-family:var(--font-body);font-size:12.5px;resize:vertical}
+#annot-popover .annot-popover-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
+.annot-btn-sm{border:none;border-radius:6px;padding:6px 12px;font-size:11.5px;font-weight:700;font-family:var(--font-body);cursor:pointer}
+.annot-btn-save{background:var(--t);color:#fff}
+.annot-btn-cancel{background:var(--s2);color:var(--ts)}
+
+#feedback-fab{position:fixed;left:24px;bottom:32px;z-index:40;background:#fff;border:1.5px solid var(--t);border-radius:26px;padding:10px 16px;font-size:12.5px;font-weight:700;color:var(--t);cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.14);display:flex;align-items:center;gap:8px}
+#feedback-fab svg{flex-shrink:0}
+#feedback-fab .fb-count{background:var(--t);color:#fff;border-radius:12px;padding:1px 8px;font-family:var(--font-mono);font-size:11px}
+
+#feedback-panel{position:fixed;left:24px;bottom:82px;z-index:41;background:#fff;border:1px solid var(--bd);border-radius:12px;box-shadow:0 12px 32px rgba(17,20,23,.18);width:320px;max-height:50vh;display:none;flex-direction:column;overflow:hidden}
+#feedback-panel.open{display:flex}
+#feedback-panel-head{padding:12px 14px;border-bottom:1px solid var(--bd);font-size:12.5px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+#feedback-list{overflow-y:auto;padding:8px 14px;flex:1}
+.fb-item{border-bottom:1px dashed var(--bd);padding:10px 0;font-size:12px}
+.fb-item-loc{font-family:var(--font-mono);font-size:10px;color:var(--td);text-transform:uppercase;letter-spacing:.02em}
+.fb-item-quote{font-style:italic;color:var(--tm);margin:4px 0;font-size:11.5px}
+.fb-item-comment{color:var(--t)}
+.fb-item-del{float:right;color:var(--err);background:none;border:none;cursor:pointer;font-size:11px;font-weight:700}
+#feedback-panel-foot{padding:12px 14px;border-top:1px solid var(--bd)}
+#copy-feedback-btn{width:100%;background:var(--t);color:#fff;border:none;border-radius:8px;padding:10px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:var(--font-body)}
+.fb-empty{color:var(--td);font-size:12px;font-style:italic;padding:16px 0;text-align:center}
+
+</style>
+</head>
+<body>
+
+<!--
+  STRUCTURE-ONLY TEMPLATE for the spec agent's output (Phase 4).
+
+  Spec is built by merging the clarified brief with the approved flows — everything the brief
+  carries flows through into this doc, but NOT in the brief's own section order. The order below
+  is spec's own fixed sequence, chosen for this phase specifically (it deliberately does not
+  match references/intake/template.html's or the brief's ordering). The brief's rough
+  "Identified Flows" list is replaced by the approved Mermaid diagrams, moved next to Tasks & AC
+  since Tasks are derived straight from those diagrams' nodes. Tasks & Acceptance Criteria is the
+  one section authored fresh by this phase — every other section on the page is carried over.
+
+  Fill order (see agents/spec.md Step 6):
+    1. Header: feature title, one-paragraph summary, PRD score badge, generated date.
+    2. Overview — plain .doc-section paragraph, copied verbatim from the brief.
+    3. Context & environment (OPTIONAL) — .metric-item bullets. Include only if the brief has it.
+    4. Personas — one .persona-card per persona (the brief's "People & their stakes"), each with
+       a colored pixel-art .persona-avatar from the fixed 5-avatar library in agents/spec.md
+       Step 6 — reuse the same avatar the brief already assigned that persona. Never invent new
+       pixel coordinates.
+    5. How it works today, vs. with this (OPTIONAL) — .tvd-wrap. Include only if the brief has it.
+    6. Product surfaces (if still present at this phase) — one .surface-block per surface (How it
+       works → .step-list, Scope → .scope-tier-list if the brief's version has one, Edge cases &
+       states → .surface-row-list), each with its own id and an indented sub-nav link — same
+       mechanic as references/intake/template.html.
+    7. Content & data (OPTIONAL) — .ref-item bullets. Include only if the brief has it.
+    8. User Flows — one .flow-block per flow, SAME Mermaid source as the approved flows-[slug].md.
+       Do not re-derive these diagrams; Phase 3 already closed on them. This is the "Identified
+       Flows" slot from the brief, filled with the real diagrams instead of the rough list.
+    9. Tasks & Acceptance Criteria — one .task-block per Task, numbered per the deterministic
+       derivation in agents/spec.md Step 2. AC bullets that trace to a carried-forward assumption
+       get an inline <span class="ac-assumed">Assumed</span> tag. Spec's only fresh-authored
+       section — directly below the flows it derives from.
+    10. Constraints — .ref-item bullets, one per constraint, copied verbatim from the brief.
+    11. Out of Scope — the .scope-nongoal amber callout, copied verbatim from the brief.
+    12. Risks & Trade-offs (OPTIONAL) — .ref-item bullets. Include only if the brief has it.
+    13. Conflicts & Gaps (OPTIONAL) — .ref-item bullets. Include only if the clarified brief still
+        has unresolved entries here (most get folded away during /clarify).
+    14. Assumptions — the rolled-up list, one <li> per entry, format:
+        <b>Task N</b> — Assumed: [what] — Why: [rationale]
+    15. Success metrics (OPTIONAL) — .success-group/.success-row. Include only if the brief has
+        it. Deliberately last — a closing "here's what winning looks like" note.
+
+  Every OPTIONAL section (3, 5, 7, 12, 13, 15) follows the same rule as
+  references/intake/template.html: never fabricate one to fill a gap, and delete the section's
+  heading + content + its toc-fab/side-toc links + its sectionIds entry entirely if the brief
+  doesn't have it — don't leave a dangling empty section or a TOC link with nowhere to go.
+
+  Every top-level section AND every .persona-card / .surface-block / .flow-block / .task-block /
+  assumptions <li> carries a data-loc="..." attribute. The annotation script walks up to the
+  nearest ancestor with data-loc to fill the "Location" field in the Copy Feedback block — this is
+  what lets a designer's click or selection resolve to "Task 3" or "Flow 2" automatically. Keep
+  data-loc on every content block you add or this degrades to "Location: Document" for everything
+  inside it.
+
+  Update, to match the real content:
+    - #sticky-header-sub (PRD score text)
+    - .score-badge class (score-high / score-medium / score-low) + its text
+    - The side-toc list, #toc-menu, and the sectionIds array near the bottom — drop ids for any
+      OPTIONAL section the brief doesn't have, and list every per-surface id
+      (sec-surface-1, sec-surface-2, ...) right after 'sec-surfaces'.
+
+  The click-to-annotate + Copy Feedback component below (#annot-btn, #annot-popover,
+  #feedback-fab/#feedback-panel and their scripts) is fixed shell — same
+  rule as the Mermaid renderer, do not redesign it, just leave it as-is at the end of <body>.
+-->
+
+<div id="sticky-header">
+  <span>[Feature Name] — Spec</span>
+  <span id="sticky-header-sub">PRD Score: [X]% · [Low/Medium/High]</span>
+</div>
+
+<div class="page-wrap">
+<div class="page-main">
+
+<div id="page-title" style="font-size:24px;font-weight:700;letter-spacing:-.3px;margin-bottom:6px">[Feature Name]</div>
+<div style="font-size:13.5px;color:var(--ts);margin-bottom:10px;max-width:640px">[One-paragraph summary of the feature — carried from the header of the design brief / this doc's own summary line.]</div>
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+  <span class="score-badge score-high">PRD Score: [X]% — High</span>
+  <span style="font-size:11px;color:var(--td);font-family:var(--font-mono)">generated [Date]</span>
+</div>
+
+<div class="approval-banner">
+  Click-and-drag over any text below to annotate it, or use the <b>Copy Feedback</b> button (bottom-left) to consolidate your notes into a pasteable block. Reply in chat — describe changes, paste the feedback block, or say "approved" — this page regenerates until you approve. There is no approve button here on purpose.
+</div>
+
+<!-- ============ OVERVIEW ============ -->
+<div class="sec-head" id="sec-overview" data-loc="Overview">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+  <span class="sec-title">Overview</span>
+</div>
+<div class="doc-section">
+  <p>[Overview section, copied verbatim from the design brief.]</p>
+</div>
+
+<!-- ============ CONTEXT & ENVIRONMENT (OPTIONAL) ============ -->
+<!-- Include only if the clarified brief has this section. Delete the heading + items + its
+     toc-fab/side-toc links + its sectionIds entry if the brief doesn't have it — same optional
+     rule as references/intake/template.html, since this is carried over verbatim, not authored
+     fresh here. -->
+<div class="sec-head" id="sec-context" data-loc="Context & environment">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+  <span class="sec-title">Context &amp; environment</span>
+</div>
+<div class="metric-item"><span>&bull;</span><span>[Usage volume, SLA/performance number, or feasibility note, copied verbatim from the brief.]</span></div>
+<!-- One .metric-item per fact carried over from the brief. -->
+
+<!-- ============ PERSONAS ============ -->
+<div class="sec-head" id="sec-personas" data-loc="Personas">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  <span class="sec-title">Personas</span>
+</div>
+<!--
+  One .persona-card per persona, carried over verbatim from the brief's "People & their stakes."
+  Pick avatars from the fixed 5-avatar library in agents/spec.md Step 6, in the same order the
+  brief used them, cycling back to avatar 1 past the fifth. Never invent new pixel coordinates —
+  copy one of the five exactly. The example below uses avatar 1.
+-->
+<div class="persona-card" data-loc="Persona: [Name]">
+  <div class="persona-top">
+    <div class="persona-avatar">
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges">
+        <rect width="8" height="8" fill="#DBEAFE"/>
+        <rect x="2" y="1" width="4" height="1" fill="#1E3A8A"/>
+        <rect x="1" y="2" width="6" height="1" fill="#1E3A8A"/>
+        <rect x="1" y="3" width="1" height="2" fill="#1E3A8A"/>
+        <rect x="6" y="3" width="1" height="2" fill="#1E3A8A"/>
+        <rect x="2" y="3" width="4" height="3" fill="#FBCFA0"/>
+        <rect x="2" y="4" width="1" height="1" fill="#1E3A8A"/>
+        <rect x="5" y="4" width="1" height="1" fill="#1E3A8A"/>
+        <rect x="3" y="6" width="2" height="1" fill="#92400E"/>
+        <rect x="1" y="7" width="6" height="1" fill="#2563EB"/>
+      </svg>
+    </div>
+    <div>
+      <div class="persona-name">[Persona name]</div>
+      <div class="persona-role">[One-line role summary]</div>
+    </div>
+  </div>
+  <div class="tension-row"><span class="tension-label">Tasks</span><span>[What they do in this feature.]</span></div>
+  <div class="tension-row"><span class="tension-label">Priorities</span><span>[What they're optimizing for.]</span></div>
+  <div class="tension-row"><span class="tension-label">Pain points</span><span>[Why this feature matters to them.]</span></div>
+  <div class="tension-row"><span class="tension-label">Needs to see</span><span>[What information/state must be visible to them.]</span></div>
+</div>
+<!-- Add one .persona-card per persona from the brief, each with the next avatar in the library. -->
+
+<!-- ============ HOW IT WORKS TODAY, VS. WITH THIS (OPTIONAL) ============ -->
+<!-- Include only if the clarified brief has this section. -->
+<div class="sec-head" id="sec-tvd" data-loc="How it works today, vs. with this">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+  <span class="sec-title">How it works today, vs. with this</span>
+</div>
+<div class="tvd-wrap">
+  <div class="tvd-row today">
+    <div class="tvd-icon today"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+    <div class="tvd-body">
+      <div class="tvd-label today">Today</div>
+      <ul class="tvd-list"><li>[Carried over verbatim from the brief's "Today" list.]</li></ul>
+    </div>
+  </div>
+  <div class="tvd-row desired">
+    <div class="tvd-icon desired"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/></svg></div>
+    <div class="tvd-body">
+      <div class="tvd-label desired">With this</div>
+      <ul class="tvd-list"><li>[Carried over verbatim from the brief's "With this" list.]</li></ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PRODUCT SURFACES ============ -->
+<!--
+  Carried over verbatim from the brief's Product surfaces section (if still present at this
+  phase — a brief this lean by Phase 4 is rare but not disqualifying; if absent, drop this
+  section entirely per the OPTIONAL rule below). Same id/sub-nav mechanic as
+  references/intake/template.html: each .surface-block gets its own id (sec-surface-[slug]) with
+  a matching indented sub-link under "Product surfaces" in both #toc-menu (class toc-sub) and
+  .side-toc-list (class side-toc-sub), plus that id added to the sectionIds array right after
+  'sec-surfaces'.
+-->
+<div class="sec-head" id="sec-surfaces" data-loc="Product surfaces">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
+  <span class="sec-title">Product surfaces</span>
+  <span class="sec-count">[N]</span>
+</div>
+<div class="surface-block" id="sec-surface-1" data-loc="Surface: [Name]">
+  <div class="surface-block-head"><span class="surface-block-num">1</span><span class="surface-block-name">[Surface name]</span></div>
+  <div class="surface-block-body">
+
+    <div class="surface-sub-title">How it works</div>
+    <div class="step-list">
+      <div class="step-row">
+        <div class="step-col"><div class="step-circle">1</div><div class="step-line"></div></div>
+        <div class="step-body"><b>[Bold lead-in.]</b>[Detail, copied verbatim from the brief.]</div>
+      </div>
+      <div class="step-row">
+        <div class="step-col"><div class="step-circle">2</div></div>
+        <div class="step-body"><b>[Bold lead-in.]</b>[Detail.]</div>
+      </div>
+    </div>
+
+    <div class="surface-sub-title">Scope</div>
+    <div class="scope-tier-list">
+      <div class="scope-tier-row">
+        <div class="scope-tier-badge must">Must-have</div>
+        <div class="scope-tier-body">[Only if the brief's version of this surface has a Scope subsection.]</div>
+      </div>
+    </div>
+
+    <div class="surface-sub-title">Edge cases &amp; states</div>
+    <div class="surface-row-list">
+      <div class="surface-row">
+        <div class="surface-row-tag">1</div>
+        <div class="surface-row-body">[Specific named case, copied verbatim from the brief.]</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<!-- Add one .surface-block per surface carried over from the brief, each with the next id/sub-link. -->
+
+<!-- ============ CONTENT & DATA (OPTIONAL) ============ -->
+<!-- Include only if the clarified brief has this section. -->
+<div class="sec-head" id="sec-data" data-loc="Content & Data">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>
+  <span class="sec-title">Content &amp; Data</span>
+</div>
+<div class="ref-item">[Concrete copy/format/retention specific, copied verbatim from the brief.]</div>
+
+<!-- ============ USER FLOWS ============ -->
+<!-- This is the brief's "Identified Flows" slot, but with the approved flow diagrams substituted
+     in — /flows already turned that rough list into these Mermaid sources, so render those, not
+     the brief's one-line list. Placed directly above Tasks & AC since Tasks are derived straight
+     from these diagrams' nodes (Step 2) — keeping them adjacent makes that derivation visible. -->
+<div class="sec-head" id="sec-flows">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+  <span class="sec-title">User Flows</span>
+  <span class="sec-count">[N]</span>
+</div>
+
+<!-- One .flow-block per flow, same order + same Mermaid source as the approved flows-[slug].md -->
+<div class="flow-block" data-loc="Flow 1: [Name]">
+  <div class="flow-block-head">
+    <div class="flow-block-name"><span class="flow-block-num">1</span>[Flow name]</div>
+    <div class="flow-block-desc">[One-liner, identical to the approved flows doc.]</div>
+  </div>
+  <div class="flow-block-body">
+    <pre class="mermaid">
+flowchart TD
+    A([User opens Security settings]) --> B[User taps Enable 2FA]
+    B --> C{Phone number on file?}
+    C -->|Yes| D[System sends 6-digit code via SMS]
+    C -->|No| E[ERR_NOPHONE: User prompted to add a phone number]
+    D --> F([2FA enabled])
+    classDef errorNode fill:#FEF2F2,stroke:#DC2626,color:#7F1D1D;
+    class E errorNode;
+    </pre>
+  </div>
+</div>
+<!-- Add one .flow-block per approved flow. -->
+
+<!-- ============ TASKS & ACCEPTANCE CRITERIA ============ -->
+<!-- Spec's own derived content — the one section on this page not carried over from the brief. -->
+<div class="sec-head" id="sec-tasks">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+  <span class="sec-title">Tasks &amp; Acceptance Criteria</span>
+  <span class="sec-count">[N]</span>
+</div>
+
+<!-- One .task-block per Task, numbered per the deterministic node-derivation rules -->
+<div class="task-block" data-loc="Task 1: [Screen/State Name]">
+  <div class="task-block-head">
+    <div class="task-block-name"><span class="task-block-num">1</span>[Screen/State Name]</div>
+  </div>
+  <div class="task-block-body">
+    <ul class="ac-list">
+      <li>[AC bullet, sourced from the brief/persona/product knowledge/ALLOY manifest — functional phrasing where no exact spec exists.]</li>
+      <li>[AC bullet derived from a diamond branch on this screen.] <span class="ac-assumed">Assumed</span></li>
+    </ul>
+  </div>
+</div>
+<!-- Add one .task-block per derived Task, in derivation order. -->
+
+<!-- ============ CONSTRAINTS ============ -->
+<div class="sec-head" id="sec-constraints" data-loc="Constraints">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+  <span class="sec-title">Constraints</span>
+</div>
+<div class="ref-item">[Constraint, copied verbatim from the design brief's Constraints & Requirements section.]</div>
+<!-- One .ref-item per constraint carried over from the brief. -->
+
+<!-- ============ OUT OF SCOPE ============ -->
+<div class="sec-head" id="sec-outofscope" data-loc="Out of Scope">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+  <span class="sec-title">Out of Scope</span>
+</div>
+<div class="scope-nongoal">
+  <div class="scope-nongoal-body">[Out of Scope section, copied verbatim from the design brief.]</div>
+</div>
+
+<!-- ============ RISKS & TRADE-OFFS (OPTIONAL) ============ -->
+<!-- Include only if the clarified brief has this section. -->
+<div class="sec-head" id="sec-risks" data-loc="Risks & Trade-offs">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+  <span class="sec-title">Risks &amp; Trade-offs</span>
+</div>
+<div class="ref-item">[Risk or trade-off, copied verbatim from the brief.]</div>
+
+<!-- ============ CONFLICTS & GAPS (OPTIONAL) ============ -->
+<!-- Include only if the clarified brief still has unresolved entries here — /clarify folds
+     resolved ones directly into the affected section and removes them, so what's left by this
+     phase is whatever the designer deliberately chose to leave as an assumption. -->
+<div class="sec-head" id="sec-conflicts" data-loc="Conflicts & Gaps">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>
+  <span class="sec-title">Conflicts &amp; Gaps</span>
+</div>
+<div class="ref-item">[Unresolved conflict or gap, copied verbatim from the brief.]</div>
+
+<!-- ============ ASSUMPTIONS ============ -->
+<div class="sec-head" id="sec-assumptions">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L14.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+  <span class="sec-title">Assumptions</span>
+  <span class="sec-count">[N]</span>
+</div>
+<ol class="assumptions-list">
+  <li data-loc="Task 1"><b>Task 1</b> — Assumed: [what] — Why: [brief rationale]</li>
+  <!-- One <li> per rolled-up assumption. -->
+</ol>
+
+<!-- ============ SUCCESS METRICS (OPTIONAL) ============ -->
+<!-- Include only if the clarified brief has this section. Deliberately last on the page, after
+     Assumptions — a closing "here's what winning looks like" note rather than sitting mid-document. -->
+<div class="sec-head" id="sec-success" data-loc="Success metrics">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+  <span class="sec-title">Success metrics</span>
+</div>
+<div class="success-group">
+  <div class="success-group-head">[Category, e.g. "Speed"]</div>
+  <div class="success-row"><div class="success-num">[&le; N min]</div><div class="success-desc">[Copied verbatim from the brief.]</div></div>
+</div>
+
+<div class="doc-footer">Powered by Tekion Design</div>
+
+<div id="toc-fab">
+  <div id="toc-menu">
+    <a href="#sec-overview">Overview</a>
+    <a href="#sec-context">Context &amp; environment</a>
+    <a href="#sec-personas">Personas</a>
+    <a href="#sec-tvd">Today vs. with this</a>
+    <a href="#sec-surfaces">Product surfaces</a>
+    <a href="#sec-surface-1" class="toc-sub">[Surface 1 name]</a>
+    <!-- One toc-sub link per .surface-block, same order as the elements above. -->
+    <a href="#sec-data">Content &amp; Data</a>
+    <a href="#sec-flows">User Flows</a>
+    <a href="#sec-tasks">Tasks &amp; AC</a>
+    <a href="#sec-constraints">Constraints</a>
+    <a href="#sec-outofscope">Out of Scope</a>
+    <a href="#sec-risks">Risks &amp; Trade-offs</a>
+    <a href="#sec-conflicts">Conflicts &amp; Gaps</a>
+    <a href="#sec-assumptions">Assumptions</a>
+    <a href="#sec-success">Success metrics</a>
+  </div>
+  <button id="toc-btn" onclick="document.getElementById('toc-menu').classList.toggle('open')" title="Jump to section">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+  </button>
+</div>
+
+</div>
+
+<div class="side-toc">
+  <div class="side-toc-title">Jump to section</div>
+  <div class="side-toc-list" id="side-toc-list">
+    <div class="side-toc-indicator" id="side-toc-indicator"></div>
+    <a href="#sec-overview" class="active">Overview</a>
+    <a href="#sec-context">Context &amp; environment</a>
+    <a href="#sec-personas">Personas</a>
+    <a href="#sec-tvd">Today vs. with this</a>
+    <a href="#sec-surfaces">Product surfaces</a>
+    <a href="#sec-surface-1" class="side-toc-sub">[Surface 1 name]</a>
+    <!-- One side-toc-sub link per .surface-block, same order as the elements above. -->
+    <a href="#sec-data">Content &amp; Data</a>
+    <a href="#sec-flows">User Flows</a>
+    <a href="#sec-tasks">Tasks &amp; AC</a>
+    <a href="#sec-constraints">Constraints</a>
+    <a href="#sec-outofscope">Out of Scope</a>
+    <a href="#sec-risks">Risks &amp; Trade-offs</a>
+    <a href="#sec-conflicts">Conflicts &amp; Gaps</a>
+    <a href="#sec-assumptions">Assumptions</a>
+    <a href="#sec-success">Success metrics</a>
+  </div>
+</div>
+
+</div>
+
+<!-- ============ Click-to-annotate widgets ============ -->
+<button id="annot-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Add comment</button>
+
+<div id="annot-popover">
+  <div class="annot-quote" id="annot-popover-quote"></div>
+  <textarea id="annot-popover-input" placeholder="What should change here?"></textarea>
+  <div class="annot-popover-actions">
+    <button class="annot-btn-sm annot-btn-cancel" id="annot-cancel-btn">Cancel</button>
+    <button class="annot-btn-sm annot-btn-save" id="annot-save-btn">Save</button>
+  </div>
+</div>
+
+<div id="feedback-fab" onclick="toggleFeedbackPanel()">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+  <span>Feedback</span>
+  <span class="fb-count" id="fb-count">0</span>
+</div>
+
+<div id="feedback-panel">
+  <div id="feedback-panel-head">
+    <span>Feedback</span>
+    <button onclick="toggleFeedbackPanel()" style="background:none;border:none;cursor:pointer;color:var(--tm);display:flex;align-items:center;justify-content:center;padding:2px">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div id="feedback-list"><div class="fb-empty">No annotations yet. Select any text to add one.</div></div>
+  <div id="feedback-panel-foot">
+    <button id="copy-feedback-btn" onclick="copyFeedback()">Copy Feedback (0)</button>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+  startOnLoad:true,
+  theme:'base',
+  themeVariables:{
+    fontFamily:'Manrope, sans-serif',
+    primaryColor:'#F8F9FA',
+    primaryBorderColor:'#161616',
+    primaryTextColor:'#161616',
+    lineColor:'#6B7280',
+    tertiaryColor:'#fff'
+  },
+  flowchart:{ curve:'basis', htmlLabels:true }
+});
+</script>
+
+<script>
+document.querySelectorAll('.side-toc-list a, #toc-menu a').forEach(function(a){
+  a.addEventListener('click',function(e){
+    e.preventDefault();
+    var target=document.querySelector(a.getAttribute('href'));
+    if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
+    var menu=document.getElementById('toc-menu');
+    if(menu)menu.classList.remove('open');
+  });
+});
+document.addEventListener('click',function(e){
+  if(!e.target.closest('#toc-fab')){
+    var menu=document.getElementById('toc-menu');
+    if(menu)menu.classList.remove('open');
+  }
+});
+
+(function(){
+  // Regenerate this list to match the real doc when this template is filled in. Remove any
+  // OPTIONAL id (sec-context, sec-tvd, sec-success, sec-risks, sec-conflicts, sec-data) whose
+  // section isn't present in the clarified brief, and list every per-surface id (sec-surface-1,
+  // sec-surface-2, ...) right after 'sec-surfaces', in the same order as their .surface-block
+  // elements and their toc-sub/side-toc-sub links — same mechanic as references/intake/template.html.
+  var sectionIds=['sec-overview','sec-context','sec-personas','sec-tvd','sec-surfaces','sec-surface-1','sec-data','sec-flows','sec-tasks','sec-constraints','sec-outofscope','sec-risks','sec-conflicts','sec-assumptions','sec-success'];
+  var links=Array.from(document.querySelectorAll('.side-toc-list a'));
+  var indicator=document.getElementById('side-toc-indicator');
+  var listEl=document.getElementById('side-toc-list');
+  var REFERENCE_Y=110;
+
+  function setActive(id){
+    links.forEach(function(l){l.classList.toggle('active',l.getAttribute('href')==='#'+id);});
+    var activeLink=links.find(function(l){return l.getAttribute('href')==='#'+id;});
+    if(activeLink&&indicator&&listEl){
+      var listRect=listEl.getBoundingClientRect();
+      var linkRect=activeLink.getBoundingClientRect();
+      indicator.style.top=(linkRect.top-listRect.top)+'px';
+      indicator.style.height=linkRect.height+'px';
+    }
+  }
+
+  function onScroll(){
+    var atBottom=(window.innerHeight+window.scrollY)>=document.documentElement.scrollHeight-2;
+    if(atBottom){
+      setActive(sectionIds[sectionIds.length-1]);
+      return;
+    }
+    var current=sectionIds[0];
+    for(var i=0;i<sectionIds.length;i++){
+      var el=document.getElementById(sectionIds[i]);
+      if(!el)continue;
+      var top=el.getBoundingClientRect().top;
+      if(top<=REFERENCE_Y){
+        current=sectionIds[i];
+      } else {
+        break;
+      }
+    }
+    setActive(current);
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',onScroll);
+  onScroll();
+})();
+
+(function(){
+  var titleEl=document.getElementById('page-title');
+  var header=document.getElementById('sticky-header');
+  if(!titleEl||!header)return;
+  function check(){
+    var rect=titleEl.getBoundingClientRect();
+    header.classList.toggle('vis',rect.bottom<0);
+  }
+  window.addEventListener('scroll',check,{passive:true});
+  window.addEventListener('resize',check);
+  check();
+})();
+</script>
+
+<script>
+/* ============ Click-to-annotate + Copy Feedback ============
+   Shared review component (see agents/spec.md Notes — this is the reference implementation
+   the other review-bearing phases should eventually adopt). Fully self-contained: no external
+   dependency beyond the clipboard API, with a manual-copy fallback if that's unavailable
+   (common for file:// pages in some browsers). State is in-memory only for this review session —
+   it's meant to be copied out and pasted into chat immediately, not persisted across reloads.
+*/
+(function(){
+  var annotations = []; // {id, loc, quote, comment}
+  var nextId = 1;
+  var pendingRange = null;
+
+  var annotBtn = document.getElementById('annot-btn');
+  var popover = document.getElementById('annot-popover');
+  var popoverQuote = document.getElementById('annot-popover-quote');
+  var popoverInput = document.getElementById('annot-popover-input');
+  var pageMain = document.querySelector('.page-main');
+
+  function nearestLoc(node){
+    var el = node.nodeType === 3 ? node.parentElement : node;
+    while(el && el !== document.body){
+      if(el.hasAttribute && el.hasAttribute('data-loc')) return el.getAttribute('data-loc');
+      el = el.parentElement;
+    }
+    return 'Document';
+  }
+
+  function truncate(s, n){
+    s = s.trim().replace(/\s+/g,' ');
+    return s.length > n ? s.slice(0, n) + '…' : s;
+  }
+
+  document.addEventListener('mouseup', function(e){
+    if(e.target.closest('#annot-popover') || e.target.closest('#annot-btn')) return;
+    setTimeout(function(){
+      var sel = window.getSelection();
+      if(!sel || sel.isCollapsed || !sel.toString().trim()){
+        annotBtn.classList.remove('show');
+        return;
+      }
+      var anchorEl = sel.anchorNode && (sel.anchorNode.nodeType === 3 ? sel.anchorNode.parentElement : sel.anchorNode);
+      if(!anchorEl || !pageMain.contains(anchorEl)){
+        annotBtn.classList.remove('show');
+        return;
+      }
+      var range = sel.getRangeAt(0);
+      pendingRange = range.cloneRange();
+      var rect = range.getBoundingClientRect();
+      annotBtn.style.left = (window.scrollX + rect.left + rect.width/2 - 60) + 'px';
+      annotBtn.style.top = (window.scrollY + rect.top - 40) + 'px';
+      annotBtn.classList.add('show');
+    }, 10);
+  });
+
+  annotBtn.addEventListener('click', function(){
+    if(!pendingRange) return;
+    var rect = pendingRange.getBoundingClientRect();
+    popoverQuote.textContent = '"' + truncate(pendingRange.toString(), 200) + '"';
+    popoverInput.value = '';
+    popover.style.left = (window.scrollX + rect.left) + 'px';
+    popover.style.top = (window.scrollY + rect.bottom + 8) + 'px';
+    popover.classList.add('show');
+    annotBtn.classList.remove('show');
+    popoverInput.focus();
+  });
+
+  document.getElementById('annot-cancel-btn').addEventListener('click', function(){
+    popover.classList.remove('show');
+    pendingRange = null;
+  });
+
+  document.getElementById('annot-save-btn').addEventListener('click', function(){
+    if(!pendingRange) return;
+    var comment = popoverInput.value.trim();
+    if(!comment){ popoverInput.focus(); return; }
+
+    var quote = truncate(pendingRange.toString(), 200);
+    var loc = nearestLoc(pendingRange.commonAncestorContainer);
+    var id = nextId++;
+
+    try{
+      var mark = document.createElement('mark');
+      mark.className = 'annot-mark';
+      mark.dataset.annotId = id;
+      var sup = document.createElement('sup');
+      sup.textContent = id;
+      pendingRange.surroundContents(mark);
+      mark.appendChild(sup);
+    } catch(err){
+      // Selection crossed element boundaries — can't wrap cleanly. Record the annotation
+      // without a visual highlight rather than corrupting the DOM.
+    }
+
+    annotations.push({id: id, loc: loc, quote: quote, comment: comment});
+    renderFeedbackList();
+    popover.classList.remove('show');
+    pendingRange = null;
+    window.getSelection().removeAllRanges();
+  });
+
+  window.removeAnnotation = function(id){
+    annotations = annotations.filter(function(a){ return a.id !== id; });
+    var mark = document.querySelector('.annot-mark[data-annot-id="'+id+'"]');
+    if(mark){
+      var parent = mark.parentNode;
+      while(mark.firstChild && mark.firstChild.tagName === 'SUP') mark.removeChild(mark.firstChild);
+      while(mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+      parent.removeChild(mark);
+    }
+    renderFeedbackList();
+  };
+
+  function renderFeedbackList(){
+    var list = document.getElementById('feedback-list');
+    var countEls = [document.getElementById('fb-count')];
+    var copyBtn = document.getElementById('copy-feedback-btn');
+    countEls.forEach(function(el){ el.textContent = annotations.length; });
+    copyBtn.textContent = 'Copy Feedback (' + annotations.length + ')';
+
+    if(!annotations.length){
+      list.innerHTML = '<div class="fb-empty">No annotations yet. Select any text to add one.</div>';
+      return;
+    }
+    list.innerHTML = annotations.map(function(a, i){
+      return '<div class="fb-item">' +
+        '<button class="fb-item-del" onclick="removeAnnotation(' + a.id + ')">remove</button>' +
+        '<div class="fb-item-loc">' + (i+1) + '. ' + escapeHtml(a.loc) + '</div>' +
+        '<div class="fb-item-quote">"' + escapeHtml(a.quote) + '"</div>' +
+        '<div class="fb-item-comment">' + escapeHtml(a.comment) + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function escapeHtml(s){
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function buildFeedbackText(){
+    var lines = ['Feedback (' + annotations.length + ' items)', ''];
+    annotations.forEach(function(a, i){
+      lines.push((i+1) + '. Location: ' + a.loc);
+      lines.push('   Quote: "' + a.quote + '"');
+      lines.push('   Comment: ' + a.comment);
+      lines.push('');
+    });
+    return lines.join('\n').trim();
+  }
+
+  window.toggleFeedbackPanel = function(){
+    document.getElementById('feedback-panel').classList.toggle('open');
+  };
+
+  window.copyFeedback = function(){
+    var btn = document.getElementById('copy-feedback-btn');
+    if(!annotations.length){
+      btn.textContent = 'No annotations yet';
+      setTimeout(renderFeedbackList, 1400);
+      return;
+    }
+    var text = buildFeedbackText();
+
+    function settle(ok){
+      btn.textContent = ok ? 'Copied — paste it into chat' : 'Could not copy — select the list above and press Cmd/Ctrl+C';
+      setTimeout(renderFeedbackList, ok ? 1600 : 3000);
+    }
+
+    function manualCopy(){
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try{ ok = document.execCommand('copy'); } catch(err){}
+      document.body.removeChild(ta);
+      settle(ok);
+    }
+
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ settle(true); }).catch(manualCopy);
+    } else {
+      manualCopy();
+    }
+  };
+})();
+</script>
+
+</body>
+</html>

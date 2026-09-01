@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clarify — Rebuilt</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--s2:#F8F9FA;--bd:#EDEEF0;--bds:#D4D5D6;
+  --t:#161616;--ts:#444F5C;--tm:#6B7280;--td:#9BA5B4;
+  --ok:#16A34A;--okbg:#DCFCE7;--warn:#D97706;--warnbg:#FEF3C7;--err:#DC2626;--errbg:#FEF2F2;--errbd:#FECACA;
+  --font-body:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);color:var(--t);line-height:1.65;font-size:14px;background:#fff;font-weight:500}
+
+/* ---- Same shell as references/intake/template.html — sec-head, page-wrap/page-main/side-toc,
+   sticky-header, toc-fab/toc-menu — kept byte-for-byte consistent on purpose. ---- */
+.sec-head{display:flex;align-items:center;gap:10px;margin:44px 0 14px;padding-bottom:10px;border-bottom:2px solid var(--t)}
+.sec-head:first-of-type{margin-top:0}
+.sec-head svg{flex-shrink:0;color:var(--t)}
+.sec-title{font-size:17px;font-weight:700;letter-spacing:-.1px;color:var(--t)}
+.sec-count{font-size:10px;font-weight:500;color:var(--td);background:var(--s2);padding:2px 8px;border-radius:20px;font-family:var(--font-mono);margin-left:auto}
+
+.meta-line{font-size:11px;color:var(--td);font-family:var(--font-mono);margin-bottom:4px}
+.score-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;font-weight:700;border-radius:20px;padding:4px 10px;margin-left:auto}
+.score-high{background:var(--okbg);color:var(--ok)}
+.score-medium{background:var(--warnbg);color:var(--warn)}
+.score-low{background:var(--errbg);color:var(--err)}
+
+.approval-banner{background:#EEF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:14px 16px;margin-bottom:8px;font-size:13px;color:#1D4ED8;line-height:1.6}
+
+.page-wrap{display:flex;gap:56px;align-items:flex-start;width:100%;padding:0 32px 150px}
+.page-main{flex:1;min-width:0;padding-top:28px}
+
+#sticky-header{position:fixed;top:0;left:0;right:0;background:rgba(255,255,255,.97);backdrop-filter:blur(6px);border-bottom:1px solid var(--bd);padding:14px 32px;font-size:14px;font-weight:700;color:var(--t);z-index:50;transform:translateY(-100%);transition:transform .18s ease;display:flex;align-items:center;gap:10px;height:53px}
+#sticky-header.vis{transform:translateY(0)}
+#sticky-header-sub{font-size:10px;font-weight:500;color:var(--td);font-family:var(--font-mono);margin-left:auto;text-align:right}
+
+.side-toc{width:210px;flex-shrink:0;position:sticky;top:65px;display:none;margin-top:98px}
+.side-toc-title{font-size:13px;font-weight:700;color:var(--t);margin-bottom:16px}
+.side-toc-list{position:relative;padding-left:16px;border-left:1px solid var(--bd)}
+.side-toc-list a{display:block;font-size:13px;color:var(--tm);text-decoration:none;padding:9px 0;line-height:1.3}
+.side-toc-list a.active{color:var(--t);font-weight:700}
+.side-toc-indicator{position:absolute;left:-1px;width:2px;background:var(--t);border-radius:1px;transition:top .2s ease,height .2s ease;top:0;height:0}
+
+@media (min-width: 900px){
+  .side-toc{display:block}
+  #toc-fab{display:none}
+}
+
+#toc-fab{position:fixed;right:24px;bottom:32px;z-index:40}
+#toc-menu{display:none;position:absolute;bottom:52px;right:0;min-width:230px;max-height:60vh;overflow-y:auto;background:#fff;border:1px solid var(--bd);border-radius:10px;box-shadow:0 10px 28px rgba(17,20,23,.14);padding:6px}
+#toc-menu.open{display:block}
+#toc-menu a{display:block;padding:8px 12px;font-size:12px;color:var(--t);text-decoration:none;border-radius:6px;white-space:nowrap}
+#toc-menu a:hover{background:var(--s2)}
+#toc-btn{width:44px;height:44px;border-radius:50%;background:var(--t);color:#fff;border:none;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center}
+[id^="sec-"]{scroll-margin-top:96px}
+
+/* ---- Clarify-specific: question blocks ---- */
+.question-block{margin-bottom:36px}
+.question-block:last-child{margin-bottom:0}
+.question-head{display:flex;gap:12px;align-items:flex-start;margin-bottom:5px}
+.question-num{width:24px;height:24px;border-radius:50%;background:var(--t);color:#fff;font-size:11px;font-weight:700;font-family:var(--font-mono);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.question-text{font-size:15px;font-weight:700;color:var(--t);line-height:1.5;flex:1;padding-top:1px}
+.question-check{font-size:15px;color:var(--ok);flex-shrink:0;opacity:0;transition:opacity .15s ease;padding-top:2px}
+.question-block.answered .question-check{opacity:1}
+.question-kind{font-size:12px;color:var(--td);margin:0 0 12px 36px}
+.question-body{margin-left:36px}
+
+.hint-line{font-size:12px;color:var(--td);font-style:italic;margin-bottom:8px}
+
+.option-list{display:flex;flex-direction:column;gap:7px;margin-bottom:9px}
+.option-row{display:flex;align-items:center;gap:11px;background:var(--s2);border:1.5px solid transparent;border-radius:9px;padding:11px 14px;cursor:pointer;transition:all .12s ease}
+.option-row:hover{border-color:var(--bds)}
+.option-row.selected{background:#fff;border-color:var(--t)}
+.option-letter{width:20px;height:20px;border-radius:5px;background:#fff;border:1px solid var(--bd);color:var(--tm);font-size:10.5px;font-weight:700;font-family:var(--font-mono);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.option-row.selected .option-letter{background:var(--t);border-color:var(--t);color:#fff}
+.option-row-text{font-size:13.5px;color:var(--ts);line-height:1.5}
+.option-row.selected .option-row-text{color:var(--t);font-weight:600}
+
+.custom-answer-row{display:flex;gap:9px;margin-top:3px}
+.custom-answer-input{flex:1;border:1.5px solid var(--bd);border-radius:9px;padding:10px 13px;font-family:var(--font-body);font-size:13px}
+.custom-answer-input:focus{border-color:var(--t);outline:none}
+.custom-answer-add{width:40px;flex-shrink:0;border:1.5px solid var(--bd);border-radius:9px;background:#fff;cursor:pointer;font-size:16px;color:var(--t);display:flex;align-items:center;justify-content:center}
+.custom-answer-add:hover{border-color:var(--t)}
+
+.answer-textarea{width:100%;min-height:62px;border:1.5px solid var(--bd);border-radius:9px;padding:10px 13px;font-family:var(--font-body);font-size:13px;resize:vertical}
+.answer-textarea:focus{border-color:var(--t);outline:none}
+
+/* ---- Gaps & Assumptions: same ref-item voice as intake's Conflicts & Gaps, plus an optional
+   per-gap resolution input — leaving it blank is a valid choice, it just means the gap stays an
+   assumption, exactly as /intake's Conflicts & Gaps section already implied. ---- */
+.ref-item{font-size:13.5px;line-height:1.7;color:var(--ts);margin-bottom:6px;padding-left:14px;position:relative}
+.ref-item::before{content:'\2014';color:var(--td);position:absolute;left:0;top:0}
+.gap-item{margin-bottom:16px}
+.gap-item:last-child{margin-bottom:0}
+.gap-resolution-input{margin-left:14px;width:calc(100% - 14px);border:1px solid var(--bd);border-radius:8px;padding:8px 12px;font-family:var(--font-body);font-size:12.5px;margin-top:6px}
+.gap-resolution-input:focus{border-color:var(--t);outline:none}
+.gaps-empty{font-size:13px;color:var(--td);font-style:italic}
+
+.notes-block textarea{width:100%;min-height:60px;border:1.5px solid var(--bd);border-radius:9px;padding:10px 13px;font-family:var(--font-body);font-size:13px;resize:vertical}
+
+#progress-bar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:#fff;border-top:1px solid var(--bd);padding:12px 32px;display:flex;align-items:center;gap:16px;box-shadow:0 -6px 20px rgba(0,0,0,.06)}
+#progress-track{flex:1;height:6px;background:var(--s2);border-radius:4px;overflow:hidden;max-width:260px}
+#progress-fill{height:100%;background:var(--ok);border-radius:4px;width:0%;transition:width .2s ease}
+#progress-text{font-size:11.5px;font-weight:700;font-family:var(--font-mono);color:var(--ts);white-space:nowrap}
+#copy-answers-btn{margin-left:auto;background:var(--t);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:var(--font-body)}
+
+#copy-modal-overlay{position:fixed;inset:0;background:rgba(17,20,23,.4);z-index:70;display:none;align-items:center;justify-content:center}
+#copy-modal-overlay.open{display:flex}
+#copy-modal{background:#fff;border-radius:12px;padding:20px;width:min(560px,90vw);box-shadow:0 20px 50px rgba(0,0,0,.25)}
+#copy-modal h3{font-size:14px;margin-bottom:10px}
+#copy-modal textarea{width:100%;height:260px;font-family:var(--font-mono);font-size:11.5px;border:1px solid var(--bd);border-radius:8px;padding:10px;resize:vertical}
+#copy-modal-status{font-size:11.5px;color:var(--tm);margin-top:8px;min-height:16px}
+#copy-modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
+.annot-btn-sm{border:none;border-radius:6px;padding:6px 12px;font-size:11.5px;font-weight:700;font-family:var(--font-body);cursor:pointer}
+.annot-btn-save{background:var(--t);color:#fff}
+.annot-btn-cancel{background:var(--s2);color:var(--ts)}
+</style>
+</head>
+<body>
+
+<!--
+  STRUCTURE-ONLY TEMPLATE for the clarify agent's output (Phase 2) — a REAL ANSWER FORM, not the
+  click-to-annotate pattern used by intake/flows/spec. Uses the EXACT same page shell as
+  references/intake/template.html (sticky header, page-wrap/page-main + side-toc "Jump to
+  section", toc-fab/toc-menu, scrollspy) — do not reintroduce a centered narrow layout or a
+  bigger type scale than intake's. Two content sections, each its own .sec-head:
+  "Clarify Requirements" (the question list) and "Gaps & Assumptions" (a real bullet list with an
+  optional per-gap resolution input, not a one-line note).
+
+  Only rendered when there are NO critical gaps (critical gaps skip straight to a blocked return,
+  per agents/clarify.md Step 5 — this page never needs to represent that state).
+
+  Fill order (see agents/clarify.md):
+    1. Sticky header + page title: same pattern as intake — feature name, then a meta-line with
+       product + generated date. No "STEP 02" or similar phase-number eyebrow.
+    2. "Clarify Requirements" sec-head: score badge (current confidence, BEFORE this round) + a
+       question count. One .question-block per formulated question (max 12), in priority order:
+       - Single-select (bounded, one right answer): default .option-list behavior — selecting a
+         row deselects the others.
+       - Multi-select (bounded, more than one can legitimately apply): add
+         data-select="multi" on the .question-block and set .question-kind to "Choose all that
+         apply" — selecting a row toggles it independently, others stay selected.
+         Either way: one lettered .option-row per option (A, B, C...), plus the
+         .custom-answer-row (input + "+" button) beneath it. Clicking "+" appends the typed text
+         as a new, auto-selected .option-row with the next letter (added to the selection for
+         multi-select, or replacing it for single-select).
+       - Open-ended: delete .option-list and .custom-answer-row, keep .answer-textarea, and put
+         2-3 illustrative examples in .hint-line ("e.g. ...").
+    3. "Gaps & Assumptions" sec-head: one .gap-item per non-critical gap (reuse the brief's own
+       Conflicts & Gaps section from /intake where it overlaps, don't just repeat it blindly).
+       Each gap gets an optional single-line resolution input — leaving it blank is a legitimate
+       answer, it just means the gap stays an assumption. This is deliberately lighter-weight
+       than a full question: no options, no required answer, just a place to override an
+       assumption if the designer wants to. If there are genuinely no gaps, replace the list with
+       a single .gaps-empty line.
+    4. "General notes" sec-head + textarea at the bottom (optional, no number).
+
+  Give every .question-block a stable data-qid (e.g. "q1") and every .gap-item a data-loc (e.g.
+  "Gap 1") — buildAnswersText() in the script reads .question-text/data-select for questions and
+  .ref-item text + resolution input for gaps to assemble the Copy Answers block.
+-->
+
+<div id="sticky-header">
+  <span>[Feature Name] — Clarify</span>
+  <span id="sticky-header-sub">Score: [X]% &middot; [Low/Medium/High]</span>
+</div>
+
+<div class="page-wrap">
+<div class="page-main">
+
+<div id="page-title" style="font-size:24px;font-weight:700;letter-spacing:-.3px;margin-bottom:6px">[Feature Name] — Clarify</div>
+<div class="meta-line" style="margin-bottom:20px">Product: [ARC/Greenfield/GM/T1] &middot; generated [Date]</div>
+
+<div class="approval-banner">
+  AI reads your brief, surfaces gaps, and asks clarifying questions. Your answers shape the flows. Answer here, or use <b>Copy Answers</b> (bottom bar) to paste your responses into chat — either works.
+</div>
+
+<!-- ============ CLARIFY REQUIREMENTS ============ -->
+<div class="sec-head" id="sec-questions">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 1 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+  <span class="sec-title">Clarify Requirements</span>
+  <span class="score-badge score-high">Score: [X]% — [Low/Medium/High]</span>
+</div>
+
+<!-- Example: single-select question -->
+<div class="question-block" data-qid="q1">
+  <div class="question-head">
+    <span class="question-num">1</span>
+    <span class="question-text">[Question text, e.g. "What happens if the phone number is already 2FA-enrolled elsewhere?"]</span>
+    <span class="question-check">✓</span>
+  </div>
+  <div class="question-kind">Choose one</div>
+  <div class="question-body">
+    <div class="option-list">
+      <div class="option-row" data-value="[Option A]"><span class="option-letter">A</span><span class="option-row-text">[Option A]</span></div>
+      <div class="option-row" data-value="[Option B]"><span class="option-letter">B</span><span class="option-row-text">[Option B]</span></div>
+      <div class="option-row" data-value="[Option C]"><span class="option-letter">C</span><span class="option-row-text">[Option C]</span></div>
+    </div>
+    <div class="custom-answer-row">
+      <input type="text" class="custom-answer-input" placeholder="Add custom answer...">
+      <button class="custom-answer-add" type="button" title="Add as an answer option">+</button>
+    </div>
+  </div>
+</div>
+
+<!-- Example: multi-select question -->
+<div class="question-block" data-qid="q2" data-select="multi">
+  <div class="question-head">
+    <span class="question-num">2</span>
+    <span class="question-text">[Question text where more than one option can legitimately apply.]</span>
+    <span class="question-check">✓</span>
+  </div>
+  <div class="question-kind">Choose all that apply</div>
+  <div class="question-body">
+    <div class="option-list">
+      <div class="option-row" data-value="[Option A]"><span class="option-letter">A</span><span class="option-row-text">[Option A]</span></div>
+      <div class="option-row" data-value="[Option B]"><span class="option-letter">B</span><span class="option-row-text">[Option B]</span></div>
+      <div class="option-row" data-value="[Option C]"><span class="option-letter">C</span><span class="option-row-text">[Option C]</span></div>
+    </div>
+    <div class="custom-answer-row">
+      <input type="text" class="custom-answer-input" placeholder="Add custom answer...">
+      <button class="custom-answer-add" type="button" title="Add as an answer option">+</button>
+    </div>
+  </div>
+</div>
+
+<!-- Example: open-ended question -->
+<div class="question-block" data-qid="q3">
+  <div class="question-head">
+    <span class="question-num">3</span>
+    <span class="question-text">[Open-ended question text.]</span>
+    <span class="question-check">✓</span>
+  </div>
+  <div class="question-kind">Open-ended</div>
+  <div class="question-body">
+    <div class="hint-line">e.g. [illustrative example 1], [illustrative example 2]</div>
+    <textarea class="answer-textarea" placeholder="Your answer..."></textarea>
+  </div>
+</div>
+<!-- Add one .question-block per formulated question, max 12. -->
+
+<!-- ============ GAPS & ASSUMPTIONS ============ -->
+<div class="sec-head" id="sec-gaps">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L14.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+  <span class="sec-title">Gaps &amp; Assumptions</span>
+  <span class="sec-count" id="gaps-count">[N] noted</span>
+</div>
+
+<!-- One .gap-item per non-critical gap. If there are none, replace with: <div class="gaps-empty">No open gaps noted.</div> -->
+<div class="gap-item" data-loc="Gap 1">
+  <div class="ref-item">[Non-critical gap, in the same voice as /intake's Conflicts & Gaps section.]</div>
+  <input type="text" class="gap-resolution-input" placeholder="Add a resolution (optional) — leave blank to keep as an assumption">
+</div>
+
+<!-- ============ GENERAL NOTES ============ -->
+<div class="sec-head" id="sec-notes">
+  <span class="sec-title">General notes</span>
+</div>
+<div class="notes-block">
+  <textarea id="general-notes" placeholder="Anything else to flag that isn't covered above? (optional)"></textarea>
+</div>
+
+<div id="toc-fab">
+  <div id="toc-menu">
+    <a href="#sec-questions">Clarify Requirements</a>
+    <a href="#sec-gaps">Gaps &amp; Assumptions</a>
+    <a href="#sec-notes">General notes</a>
+  </div>
+  <button id="toc-btn" onclick="document.getElementById('toc-menu').classList.toggle('open')" title="Jump to section">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+  </button>
+</div>
+
+</div>
+
+<div class="side-toc">
+  <div class="side-toc-title">Jump to section</div>
+  <div class="side-toc-list" id="side-toc-list">
+    <div class="side-toc-indicator" id="side-toc-indicator"></div>
+    <a href="#sec-questions" class="active">Clarify Requirements</a>
+    <a href="#sec-gaps">Gaps &amp; Assumptions</a>
+    <a href="#sec-notes">General notes</a>
+  </div>
+</div>
+
+</div>
+
+<div id="progress-bar">
+  <span id="progress-text">0 of 0 answered</span>
+  <div id="progress-track"><div id="progress-fill"></div></div>
+  <button id="copy-answers-btn" onclick="openCopyModal()">Copy Answers</button>
+</div>
+
+<div id="copy-modal-overlay">
+  <div id="copy-modal">
+    <h3>Answers block — paste this into chat</h3>
+    <textarea id="copy-modal-text" readonly></textarea>
+    <div id="copy-modal-status"></div>
+    <div id="copy-modal-actions">
+      <button class="annot-btn-sm annot-btn-cancel" onclick="closeCopyModal()">Close</button>
+      <button class="annot-btn-sm annot-btn-save" onclick="doCopy()">Copy to clipboard</button>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.side-toc-list a, #toc-menu a').forEach(function(a){
+  a.addEventListener('click',function(e){
+    e.preventDefault();
+    var target=document.querySelector(a.getAttribute('href'));
+    if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
+    var menu=document.getElementById('toc-menu');
+    if(menu)menu.classList.remove('open');
+  });
+});
+document.addEventListener('click',function(e){
+  if(!e.target.closest('#toc-fab')){
+    var menu=document.getElementById('toc-menu');
+    if(menu)menu.classList.remove('open');
+  }
+});
+
+(function(){
+  var sectionIds=['sec-questions','sec-gaps','sec-notes'];
+  var links=Array.from(document.querySelectorAll('.side-toc-list a'));
+  var indicator=document.getElementById('side-toc-indicator');
+  var listEl=document.getElementById('side-toc-list');
+  var REFERENCE_Y=110;
+
+  function setActive(id){
+    links.forEach(function(l){l.classList.toggle('active',l.getAttribute('href')==='#'+id);});
+    var activeLink=links.find(function(l){return l.getAttribute('href')==='#'+id;});
+    if(activeLink&&indicator&&listEl){
+      var listRect=listEl.getBoundingClientRect();
+      var linkRect=activeLink.getBoundingClientRect();
+      indicator.style.top=(linkRect.top-listRect.top)+'px';
+      indicator.style.height=linkRect.height+'px';
+    }
+  }
+
+  function onScroll(){
+    var atBottom=(window.innerHeight+window.scrollY)>=document.documentElement.scrollHeight-2;
+    if(atBottom){
+      setActive(sectionIds[sectionIds.length-1]);
+      return;
+    }
+    var current=sectionIds[0];
+    for(var i=0;i<sectionIds.length;i++){
+      var el=document.getElementById(sectionIds[i]);
+      if(!el)continue;
+      var top=el.getBoundingClientRect().top;
+      if(top<=REFERENCE_Y){
+        current=sectionIds[i];
+      } else {
+        break;
+      }
+    }
+    setActive(current);
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',onScroll);
+  onScroll();
+})();
+
+(function(){
+  var titleEl=document.getElementById('page-title');
+  var header=document.getElementById('sticky-header');
+  if(!titleEl||!header)return;
+  function check(){
+    var rect=titleEl.getBoundingClientRect();
+    header.classList.toggle('vis',rect.bottom<0);
+  }
+  window.addEventListener('scroll',check,{passive:true});
+  window.addEventListener('resize',check);
+  check();
+})();
+</script>
+
+<script>
+(function(){
+  var LETTERS = 'ABCDEFGHIJ';
+  var blocks = Array.from(document.querySelectorAll('.question-block'));
+  var total = blocks.length;
+  var gapItems = Array.from(document.querySelectorAll('.gap-item'));
+
+  function isMulti(block){ return block.getAttribute('data-select') === 'multi'; }
+
+  function updateProgress(){
+    var answered = blocks.filter(function(b){ return b.classList.contains('answered'); }).length;
+    document.getElementById('progress-text').textContent = answered + ' of ' + total + ' answered';
+    document.getElementById('progress-fill').style.width = (total ? (answered/total*100) : 0) + '%';
+  }
+
+  function relabel(list){
+    Array.from(list.querySelectorAll('.option-row')).forEach(function(row, i){
+      row.querySelector('.option-letter').textContent = LETTERS[i] || '?';
+    });
+  }
+
+  blocks.forEach(function(block){
+    var list = block.querySelector('.option-list');
+    var textarea = block.querySelector('.answer-textarea');
+    var addBtn = block.querySelector('.custom-answer-add');
+    var customInput = block.querySelector('.custom-answer-input');
+    var multi = isMulti(block);
+
+    function markAnswered(has){
+      block.classList.toggle('answered', !!has);
+      updateProgress();
+    }
+
+    function activateRow(row){
+      if(multi){
+        row.classList.toggle('selected');
+      } else {
+        Array.from(list.querySelectorAll('.option-row')).forEach(function(r){ r.classList.remove('selected'); });
+        row.classList.add('selected');
+      }
+      var anySelected = list.querySelector('.option-row.selected') !== null;
+      markAnswered(anySelected);
+    }
+
+    if(list){
+      Array.from(list.querySelectorAll('.option-row')).forEach(function(row){
+        row.addEventListener('click', function(){ activateRow(row); });
+      });
+    }
+
+    if(addBtn && customInput && list){
+      addBtn.addEventListener('click', function(){
+        var val = customInput.value.trim();
+        if(!val) { customInput.focus(); return; }
+        var row = document.createElement('div');
+        row.className = 'option-row';
+        row.setAttribute('data-value', val);
+        row.innerHTML = '<span class="option-letter"></span><span class="option-row-text"></span>';
+        row.querySelector('.option-row-text').textContent = val;
+        row.addEventListener('click', function(){ activateRow(row); });
+        list.appendChild(row);
+        relabel(list);
+        activateRow(row);
+        customInput.value = '';
+      });
+      customInput.addEventListener('keydown', function(e){
+        if(e.key === 'Enter'){ e.preventDefault(); addBtn.click(); }
+      });
+    }
+
+    if(textarea){
+      textarea.addEventListener('input', function(){
+        markAnswered(textarea.value.trim().length > 0);
+      });
+    }
+  });
+
+  var gapTotal = gapItems.length;
+  gapItems.forEach(function(item){
+    var input = item.querySelector('.gap-resolution-input');
+    if(!input) return;
+    input.addEventListener('input', function(){
+      var resolved = gapItems.filter(function(g){
+        var i = g.querySelector('.gap-resolution-input');
+        return i && i.value.trim().length > 0;
+      }).length;
+      var badge = document.getElementById('gaps-count');
+      if(badge) badge.textContent = resolved + ' of ' + gapTotal + ' resolved';
+    });
+  });
+
+  function getAnswer(block){
+    var list = block.querySelector('.option-list');
+    var textarea = block.querySelector('.answer-textarea');
+    if(list){
+      var selected = Array.from(list.querySelectorAll('.option-row.selected'));
+      if(!selected.length) return '';
+      return selected.map(function(r){ return r.getAttribute('data-value'); }).join('; ');
+    }
+    if(textarea) return textarea.value.trim();
+    return '';
+  }
+
+  function buildAnswersText(){
+    var answered = blocks.filter(function(b){ return b.classList.contains('answered'); }).length;
+    var lines = ['Clarify Answers (' + answered + ' of ' + total + ' answered)', ''];
+    blocks.forEach(function(block, i){
+      var q = block.querySelector('.question-text').textContent.trim();
+      var a = getAnswer(block) || '(not answered)';
+      lines.push((i+1) + '. Q: ' + q);
+      lines.push('   A: ' + a);
+      lines.push('');
+    });
+
+    var resolvedGaps = gapItems.filter(function(g){
+      var i = g.querySelector('.gap-resolution-input');
+      return i && i.value.trim().length > 0;
+    });
+    if(resolvedGaps.length){
+      lines.push('Gap Resolutions (' + resolvedGaps.length + ' of ' + gapTotal + '):');
+      resolvedGaps.forEach(function(g, i){
+        var gapText = g.querySelector('.ref-item').textContent.trim();
+        var resolution = g.querySelector('.gap-resolution-input').value.trim();
+        lines.push((i+1) + '. Gap: ' + gapText);
+        lines.push('   Resolution: ' + resolution);
+      });
+      lines.push('');
+    }
+
+    var notes = document.getElementById('general-notes').value.trim();
+    if(notes){
+      lines.push('General notes: ' + notes);
+    }
+    return lines.join('\n').trim();
+  }
+
+  window.openCopyModal = function(){
+    document.getElementById('copy-modal-text').value = buildAnswersText();
+    document.getElementById('copy-modal-status').textContent = '';
+    document.getElementById('copy-modal-overlay').classList.add('open');
+  };
+
+  window.closeCopyModal = function(){
+    document.getElementById('copy-modal-overlay').classList.remove('open');
+  };
+
+  window.doCopy = function(){
+    var textarea = document.getElementById('copy-modal-text');
+    var status = document.getElementById('copy-modal-status');
+    var text = textarea.value;
+
+    function fallbackCopy(){
+      textarea.focus();
+      textarea.select();
+      try{
+        var ok = document.execCommand('copy');
+        status.textContent = ok ? 'Copied — paste it into chat.' : 'Could not copy automatically — the text is selected, press Cmd/Ctrl+C.';
+      } catch(err){
+        status.textContent = 'Could not copy automatically — the text is selected, press Cmd/Ctrl+C.';
+      }
+    }
+
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){
+        status.textContent = 'Copied — paste it into chat.';
+      }).catch(fallbackCopy);
+    } else {
+      fallbackCopy();
+    }
+  };
+
+  updateProgress();
+})();
+</script>
+
+</body>
+</html>

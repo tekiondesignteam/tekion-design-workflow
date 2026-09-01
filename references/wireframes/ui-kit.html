@@ -1,0 +1,2743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wireframe UI Kit</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .wireframe-grid {
+      background-size: 20px 20px;
+      background-image: linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+    }
+    
+    .image-placeholder {
+      position: relative;
+      background-color: #f8fafc;
+      overflow: hidden;
+    }
+    .image-placeholder::before, .image-placeholder::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+    }
+    .image-placeholder::before {
+      background: linear-gradient(to top right, transparent calc(50% - 1px), #cbd5e1 calc(50% - 0.5px), #cbd5e1 calc(50% + 0.5px), transparent calc(50% + 1px));
+    }
+    .image-placeholder::after {
+      background: linear-gradient(to top left, transparent calc(50% - 1px), #cbd5e1 calc(50% - 0.5px), #cbd5e1 calc(50% + 0.5px), transparent calc(50% + 1px));
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 h-screen flex flex-col overflow-hidden font-sans antialiased">
+
+  <header class="h-14 border-b border-slate-200 bg-white px-4 flex items-center justify-between shrink-0 z-30">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded bg-slate-900 text-white flex items-center justify-center font-mono text-[10px] font-bold">UI</div>
+      <span class="font-bold text-sm tracking-tight">Wireframe UI Kit</span>
+    </div>
+    <div class="flex items-center gap-2 text-xs text-slate-500 font-mono">
+      <span class="px-2 py-1 bg-slate-100 rounded border border-slate-200">v3.4.0-PRO</span>
+    </div>
+  </header>
+
+  <div class="flex-1 flex overflow-hidden">
+    
+    <aside class="w-72 border-r border-slate-200 bg-white flex flex-col shrink-0 z-20 overflow-y-auto">
+      <div class="p-3">
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 font-mono px-2">Atoms & Primitives</div>
+        <div class="space-y-0.5 text-xs font-medium">
+          <button onclick="switchTab('tab-btn-variants')" id="nav-tab-btn-variants" class="nav-btn w-full px-3 py-1.5 rounded bg-slate-100 text-slate-900 text-left font-semibold">1. Button Variants</button>
+          <button onclick="switchTab('tab-btn-groups')" id="nav-tab-btn-groups" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">2. Button Groups & Icons</button>
+          <button onclick="switchTab('tab-badges')" id="nav-tab-badges" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">3. Badges & Tags</button>
+          <button onclick="switchTab('tab-avatars')" id="nav-tab-avatars" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">4. Avatars & Identifiers</button>
+          <button onclick="switchTab('tab-placeholders')" id="nav-tab-placeholders" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">5. Media & Skeletons</button>
+          <button onclick="switchTab('tab-tooltips')" id="nav-tab-tooltips" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">6. Tooltips & Popovers</button>
+        </div>
+
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 mt-4 font-mono px-2">Forms & Inputs</div>
+        <div class="space-y-0.5 text-xs font-medium">
+          <button onclick="switchTab('tab-textfields')" id="nav-tab-textfields" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">7. Textfields & Affixes</button>
+          <button onclick="switchTab('tab-selects')" id="nav-tab-selects" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">8. Selects & Textareas</button>
+          <button onclick="switchTab('tab-toggles')" id="nav-tab-toggles" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">9. Toggles & Radios</button>
+          <button onclick="switchTab('tab-datepicker')" id="nav-tab-datepicker" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">10. Date Pickers</button>
+          <button onclick="switchTab('tab-sliders')" id="nav-tab-sliders" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">11. Range Sliders</button>
+          <button onclick="switchTab('tab-upload')" id="nav-tab-upload" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">12. Drag & Drop Upload</button>
+        </div>
+
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 mt-4 font-mono px-2">Navigation & Menus</div>
+        <div class="space-y-0.5 text-xs font-medium">
+          <button onclick="switchTab('tab-header')" id="nav-tab-header" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">13. App Header</button>
+          <button onclick="switchTab('tab-horizontal-tabs')" id="nav-tab-horizontal-tabs" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">14. Horizontal & Anchor Tabs</button>
+          <button onclick="switchTab('tab-vertical-anchor-tabs')" id="nav-tab-vertical-anchor-tabs" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">15. Vertical Anchor / Scroll Tabs</button>
+          <button onclick="switchTab('tab-vertical-tabs')" id="nav-tab-vertical-tabs" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">16. Vertical Tabs (Settings)</button>
+          <button onclick="switchTab('tab-steppers')" id="nav-tab-steppers" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">17. Steppers & Progress</button>
+          <button onclick="switchTab('tab-context-menu')" id="nav-tab-context-menu" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">18. Context Menu Specimen</button>
+        </div>
+
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 mt-4 font-mono px-2">Molecules & Cards</div>
+        <div class="space-y-0.5 text-xs font-medium">
+          <button onclick="switchTab('tab-kpi')" id="nav-tab-kpi" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">19. KPI Metric Card</button>
+          <button onclick="switchTab('tab-product')" id="nav-tab-product" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">20. Product/Part Card</button>
+          <button onclick="switchTab('tab-profile')" id="nav-tab-profile" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">21. Profile Card</button>
+          <button onclick="switchTab('tab-accordions')" id="nav-tab-accordions" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">22. Accordions & Panels</button>
+          <button onclick="switchTab('tab-empty-states')" id="nav-tab-empty-states" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">23. Empty States</button>
+        </div>
+
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 mt-4 font-mono px-2">Complex Displays & Scheduling</div>
+        <div class="space-y-0.5 text-xs font-medium">
+          <button onclick="switchTab('tab-table')" id="nav-tab-table" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">24. Data Table (Full)</button>
+          <button onclick="switchTab('tab-kanban')" id="nav-tab-kanban" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">25. Kanban Board</button>
+          <button onclick="switchTab('tab-calendar')" id="nav-tab-calendar" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">26. Appointment Calendar</button>
+          <button onclick="switchTab('tab-timeline')" id="nav-tab-timeline" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">27. Activity Timeline</button>
+        </div>
+
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 mt-4 font-mono px-2">Enterprise Modules</div>
+        <div class="space-y-0.5 text-xs font-medium">
+          <button onclick="switchTab('tab-filemanager')" id="nav-tab-filemanager" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">28. File Manager & Repository</button>
+          <button onclick="switchTab('tab-chat')" id="nav-tab-chat" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">29. Live Chat & Support Ticket</button>
+          <button onclick="switchTab('tab-sparkline')" id="nav-tab-sparkline" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">30. Analytics Sparkline & Charts</button>
+          <button onclick="switchTab('tab-rbac')" id="nav-tab-rbac" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">31. RBAC Permissions Matrix</button>
+          <button onclick="switchTab('tab-inbox')" id="nav-tab-inbox" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">32. Global Notification Inbox</button>
+        </div>
+
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 mt-4 font-mono px-2">Overlays & Shells</div>
+        <div class="space-y-0.5 text-xs font-medium pb-6">
+          <button onclick="switchTab('tab-banners')" id="nav-tab-banners" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">33. Notification Banners</button>
+          <button onclick="switchTab('tab-modal')" id="nav-tab-modal" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">34. Confirmation Modal</button>
+          <button onclick="switchTab('tab-drawer')" id="nav-tab-drawer" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">35. Slide-out Drawer</button>
+          <button onclick="switchTab('tab-command')" id="nav-tab-command" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">36. Command Palette</button>
+          <button onclick="switchTab('tab-shell')" id="nav-tab-shell" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">37. Tekion DMS Shell Wireframe</button>
+          <button onclick="switchTab('tab-ai-chat')" id="nav-tab-ai-chat" class="nav-btn w-full px-3 py-1.5 rounded text-slate-600 hover:bg-slate-50 text-left">38. AI Chat Assistant</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto p-8 wireframe-grid scroll-smooth relative flex items-start justify-center">
+      
+      <!-- ============================== ATOMS & PRIMITIVES ============================== -->
+      
+      <!-- 1. Button Variants -->
+      <div id="tab-btn-variants" class="tab-content w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">ATOM</span>
+              <span class="text-xs text-slate-400 font-mono">#01</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Button Variants</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Standardized interactive triggers across solid, outline, ghost, and destructive intents.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 space-y-4 shadow-sm">
+          <div class="space-y-4">
+            <div class="flex flex-wrap gap-2 items-center">
+              <button class="px-3 py-1.5 rounded-md bg-slate-900 text-white text-xs font-semibold">Primary Solid</button>
+              <button class="px-3 py-1.5 rounded-md border border-slate-300 text-slate-800 text-xs font-medium">Outline</button>
+              <button class="px-3 py-1.5 rounded-md text-slate-600 text-xs font-medium">Ghost</button>
+            </div>
+            <div class="flex flex-wrap gap-2 items-center">
+              <button class="px-3 py-1.5 rounded-md bg-slate-200 text-slate-700 text-xs font-medium">Subtle</button>
+              <button class="px-3 py-1.5 rounded-md border border-slate-800 text-slate-900 text-xs font-semibold">Destructive/Dark</button>
+              <button disabled class="px-3 py-1.5 rounded-md bg-slate-100 text-slate-400 text-xs font-medium cursor-not-allowed border border-slate-200">Disabled</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Button Groups & Icons -->
+      <div id="tab-btn-groups" class="tab-content hidden w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">ATOM</span>
+              <span class="text-xs text-slate-400 font-mono">#02</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Button Groups & Icon Actions</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Segmented controls and icon-based action toolbars.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 space-y-4 shadow-sm">
+          <div class="space-y-4">
+            <div class="inline-flex rounded-md shadow-sm border border-slate-300">
+              <button onclick="btnGroupSelectSegment(this)" class="btngroup-segment px-3 py-1.5 text-xs font-medium bg-slate-900 text-white rounded-l-md">Day</button>
+              <button onclick="btnGroupSelectSegment(this)" class="btngroup-segment px-3 py-1.5 text-xs font-medium border-l border-r border-slate-300 bg-white text-slate-700">Week</button>
+              <button onclick="btnGroupSelectSegment(this)" class="btngroup-segment px-3 py-1.5 text-xs font-medium bg-white text-slate-700 rounded-r-md">Month</button>
+            </div>
+            <div class="flex items-center gap-2 pt-2">
+              <button class="p-2 rounded-md border border-slate-300 text-slate-700"><i data-lucide="plus" class="w-4 h-4"></i></button>
+              <button class="p-2 rounded-md border border-slate-300 text-slate-700"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+              <button class="p-2 rounded-md border border-slate-300 text-slate-700"><i data-lucide="share-2" class="w-4 h-4"></i></button>
+              <button onclick="btnGroupToggleFilterPanel()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-slate-300 text-xs font-medium">
+                <i data-lucide="filter" class="w-3.5 h-3.5"></i> Filters
+              </button>
+            </div>
+            <div id="btngroup-filter-panel" class="hidden p-3 rounded-md border border-slate-200 bg-slate-50 space-y-2 text-xs max-w-xs">
+              <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="w-3.5 h-3.5 rounded border-slate-300" /> <span class="text-slate-700">Show Completed Only</span></label>
+              <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="w-3.5 h-3.5 rounded border-slate-300" /> <span class="text-slate-700">Show Overdue Only</span></label>
+              <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="w-3.5 h-3.5 rounded border-slate-300" /> <span class="text-slate-700">Include Archived</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Badges & Tags -->
+      <div id="tab-badges" class="tab-content hidden w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">ATOM</span>
+              <span class="text-xs text-slate-400 font-mono">#03</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Badges & Status Tags</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Entity labeling, operational status flags, and categorical counters.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 space-y-4 shadow-sm">
+          <div class="space-y-4">
+            <div class="flex flex-wrap gap-2 text-[11px] font-mono">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-bold">DEFAULT</span>
+              <span class="px-2 py-0.5 rounded border border-slate-300 bg-slate-50 text-slate-700">OUTLINE</span>
+              <span class="px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">PILL TAG</span>
+              <span class="px-2 py-0.5 rounded bg-slate-100 border border-slate-300 text-slate-800 font-bold">ONLINE</span>
+              <span class="px-2 py-0.5 rounded border border-dashed border-slate-400 text-slate-600">PENDING</span>
+            </div>
+            <div class="flex items-center gap-4 text-xs pt-2 border-t border-slate-100">
+              <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-slate-900"></span> Active</div>
+              <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full border border-slate-400"></span> Away</div>
+              <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-slate-300"></span> Offline</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Avatars & Identifiers -->
+      <div id="tab-avatars" class="tab-content hidden w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">ATOM</span>
+              <span class="text-xs text-slate-400 font-mono">#04</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Avatars & User Identifiers</h1>
+            <p class="text-xs text-slate-500 mt-0.5">User initials, profile images, and stacked avatar groups.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 space-y-4 shadow-sm">
+          <div class="space-y-4">
+            <div class="flex items-center gap-3">
+              <div class="w-6 h-6 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-[10px] font-mono">XS</div>
+              <div class="w-8 h-8 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-xs font-mono">SM</div>
+              <div class="w-10 h-10 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-sm font-mono font-bold">MD</div>
+              <div class="relative">
+                <div class="w-10 h-10 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs font-mono font-bold">JD</div>
+                <span class="w-2.5 h-2.5 rounded-full bg-white border-2 border-slate-800 absolute bottom-0 right-0"></span>
+              </div>
+            </div>
+            <div class="flex items-center -space-x-2 pt-2 border-t border-slate-100">
+              <div class="w-8 h-8 rounded-full bg-slate-900 text-white border-2 border-white flex items-center justify-center text-[10px] font-mono">A</div>
+              <div class="w-8 h-8 rounded-full bg-slate-700 text-white border-2 border-white flex items-center justify-center text-[10px] font-mono">B</div>
+              <div class="w-8 h-8 rounded-full bg-slate-500 text-white border-2 border-white flex items-center justify-center text-[10px] font-mono">C</div>
+              <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-700 border-2 border-white flex items-center justify-center text-[9px] font-mono font-bold">+4</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Media Placeholders & Skeletons -->
+      <div id="tab-placeholders" class="tab-content hidden w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">ATOM</span>
+              <span class="text-xs text-slate-400 font-mono">#05</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Media Placeholders & Skeletons</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Wireframe media boxes and text placeholder skeletons.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 space-y-4 shadow-sm">
+          <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+              <div class="h-20 rounded-md image-placeholder border border-slate-300 flex items-center justify-center text-[10px] font-mono text-slate-500 bg-white/70">
+                <span class="bg-white/80 px-1 rounded">16:9</span>
+              </div>
+              <div class="h-20 w-20 rounded-md image-placeholder border border-slate-300 flex items-center justify-center text-[10px] font-mono text-slate-500 bg-white/70">
+                <span class="bg-white/80 px-1 rounded">1:1</span>
+              </div>
+            </div>
+            <div class="space-y-2 pt-2 border-t border-slate-100">
+              <div class="h-2.5 bg-slate-200 rounded w-full"></div>
+              <div class="h-2.5 bg-slate-200 rounded w-4/5"></div>
+              <div class="h-2.5 bg-slate-200 rounded w-2/3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Tooltips & Popovers -->
+      <div id="tab-tooltips" class="tab-content hidden w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">ATOM</span>
+              <span class="text-xs text-slate-400 font-mono">#06</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Tooltips & Popovers</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Contextual floating overlays and hover information boxes.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 space-y-12 shadow-sm">
+          <div class="flex justify-center pt-8">
+            <div class="relative flex flex-col items-center group">
+              <div class="absolute bottom-full mb-2 px-2.5 py-1 bg-slate-900 text-white text-[10px] font-mono rounded shadow-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                Download PDF Report
+                <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></div>
+              </div>
+              <button class="px-4 py-2 border border-slate-300 rounded-md text-xs font-medium">Hover Me</button>
+            </div>
+          </div>
+
+          <div class="flex justify-center pb-8 border-t border-slate-100 pt-8">
+            <div class="relative flex flex-col items-center">
+              <button id="popover-trigger-btn" onclick="togglePopover(event)" class="px-4 py-2 bg-slate-900 text-white rounded-md text-xs font-medium">Click for Popover</button>
+              <div id="popover-panel" class="hidden absolute top-full mt-2 w-64 bg-white border border-slate-300 rounded-lg shadow-lg p-4 text-left z-10">
+                <div class="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-slate-300"></div>
+                <h4 class="font-bold text-xs mb-1 text-slate-900">Entity Details</h4>
+                <p class="text-[11px] text-slate-500 leading-relaxed">Popovers are ideal for displaying rich content, forms, or deeper metrics without leaving the current view context.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================== FORMS & INPUTS ============================== -->
+      
+      <!-- 7. Textfields & Affixes -->
+      <div id="tab-textfields" class="tab-content hidden w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">FORM</span>
+              <span class="text-xs text-slate-400 font-mono">#07</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Textfields & Affixes</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Input fields featuring leading icons, currency addons, and focus states.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 space-y-4 shadow-sm">
+          <div class="space-y-4 text-xs">
+            <div class="space-y-1.5">
+              <label class="font-medium text-slate-700">Standard Input</label>
+              <input type="text" placeholder="Enter placeholder..." class="w-full px-3 py-2 rounded-md border border-slate-300 bg-slate-50 focus:outline-none focus:ring-1 focus:ring-slate-900" />
+            </div>
+            <div class="space-y-1.5">
+              <label class="font-medium text-slate-700">Leading Icon Input</label>
+              <div class="relative">
+                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-slate-400"></i>
+                <input type="text" placeholder="Search parameters..." class="w-full pl-9 pr-3 py-2 rounded-md border border-slate-300 bg-slate-50 outline-none focus:ring-1 focus:ring-slate-900" />
+              </div>
+            </div>
+            <div class="space-y-1.5">
+              <label class="font-medium text-slate-700">Prefix Addon</label>
+              <div class="flex rounded-md shadow-sm">
+                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-slate-300 bg-slate-100 text-slate-500 font-mono text-[11px]">$</span>
+                <input type="number" placeholder="0.00" class="flex-1 px-3 py-2 rounded-r-md border border-slate-300 bg-slate-50 outline-none focus:ring-1 focus:ring-slate-900 font-mono" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. Selects & Textareas -->
+      <div id="tab-selects" class="tab-content hidden w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">FORM</span>
+              <span class="text-xs text-slate-400 font-mono">#08</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Selects & Textareas</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Dropdown selections, password fields, and multi-line descriptions.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 space-y-4 shadow-sm">
+          <div class="space-y-4 text-xs">
+            <div class="space-y-1.5">
+              <label class="font-medium text-slate-700">Dropdown Select</label>
+              <select class="w-full px-3 py-2 rounded-md border border-slate-300 bg-slate-50 outline-none focus:ring-1 focus:ring-slate-900">
+                <option>Select Option A</option>
+                <option>Option B</option>
+                <option>Option C</option>
+              </select>
+            </div>
+            <div class="space-y-1.5">
+              <label class="font-medium text-slate-700">Password Input</label>
+              <div class="relative">
+                <input id="selects-password-input" type="password" value="secretPass123" class="w-full pl-3 pr-9 py-2 rounded-md border border-slate-300 bg-slate-50 font-mono outline-none focus:ring-1 focus:ring-slate-900" />
+                <i id="selects-password-eye-icon" data-lucide="eye" onclick="togglePasswordVisibility()" class="w-4 h-4 absolute right-3 top-2.5 text-slate-400 cursor-pointer"></i>
+              </div>
+            </div>
+            <div class="space-y-1.5">
+              <label class="font-medium text-slate-700">Textarea Description</label>
+              <textarea rows="3" placeholder="Write specifications here..." class="w-full px-3 py-2 rounded-md border border-slate-300 bg-slate-50 outline-none focus:ring-1 focus:ring-slate-900"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 9. Toggles & Radios -->
+      <div id="tab-toggles" class="tab-content hidden w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">FORM</span>
+              <span class="text-xs text-slate-400 font-mono">#09</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Toggles, Checkboxes & Radios</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Binary switch toggles, multi-select checkboxes, and radio options.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 space-y-4 shadow-sm">
+          <div class="space-y-5 text-xs">
+            <div class="flex items-center justify-between p-3 rounded-lg border border-slate-200 bg-slate-50">
+              <span class="font-medium text-slate-700">Enable Configuration</span>
+              <div id="toggle-config-switch" onclick="toggleConfigSwitch()" class="w-9 h-5 bg-slate-900 rounded-full p-0.5 flex items-center justify-end cursor-pointer transition-colors">
+                <div class="w-4 h-4 bg-white rounded-full shadow-sm"></div>
+              </div>
+            </div>
+            <div class="space-y-2 border-t border-slate-100 pt-3">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked class="w-4 h-4 rounded border-slate-300 text-slate-900" />
+                <span class="text-slate-700">Accept Dealer Agreement</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-slate-900" />
+                <span class="text-slate-700">Receive SMS Alerts</span>
+              </label>
+            </div>
+            <div class="flex items-center gap-4 pt-3 border-t border-slate-100">
+              <label class="flex items-center gap-1.5 cursor-pointer">
+                <input type="radio" name="plan" checked class="w-3.5 h-3.5 text-slate-900 border-slate-300" />
+                <span class="text-slate-700">Standard Freight</span>
+              </label>
+              <label class="flex items-center gap-1.5 cursor-pointer">
+                <input type="radio" name="plan" class="w-3.5 h-3.5 text-slate-900 border-slate-300" />
+                <span class="text-slate-700">Expedited Air</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 10. Date Pickers -->
+      <div id="tab-datepicker" class="tab-content hidden w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">FORM</span>
+              <span class="text-xs text-slate-400 font-mono">#10</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Date Pickers</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Date range input and calendar matrix picker widgets.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 space-y-4 shadow-sm max-w-md">
+          <div class="space-y-1.5 text-xs">
+            <label class="font-medium text-slate-700">Date Range Selection</label>
+            <div class="relative">
+              <i data-lucide="calendar" class="w-4 h-4 absolute left-3 top-2.5 text-slate-400"></i>
+              <input id="datepicker-range-input" type="text" value="Sep 01, 2026 - Sep 30, 2026" class="w-full pl-9 pr-3 py-2 rounded-md border border-slate-300 bg-slate-50 outline-none focus:ring-1 focus:ring-slate-900 font-mono" readonly />
+            </div>
+          </div>
+          <div class="mt-2 border border-slate-300 rounded-lg bg-white shadow-sm p-4 w-full text-xs">
+            <div class="flex items-center justify-between mb-4">
+              <button onclick="datepickerNavClick(-1)" class="p-1 text-slate-400 hover:text-slate-700"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+              <span class="font-bold text-slate-900">September 2026</span>
+              <button onclick="datepickerNavClick(1)" class="p-1 text-slate-400 hover:text-slate-700"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+            </div>
+            <div class="grid grid-cols-7 gap-1 text-center font-mono text-[10px] text-slate-400 mb-2">
+              <div>SU</div><div>MO</div><div>TU</div><div>WE</div><div>TH</div><div>FR</div><div>SA</div>
+            </div>
+            <div id="datepicker-grid" class="grid grid-cols-7 gap-1 text-center text-[11px] font-medium">
+              <div class="p-1 text-slate-300">30</div><div class="p-1 text-slate-300">31</div>
+              <div class="datepicker-day p-1 bg-slate-900 text-white rounded cursor-pointer" onclick="datepickerSelectDay(this, 1)">1</div>
+              <div class="datepicker-day p-1 bg-slate-100 cursor-pointer" onclick="datepickerSelectDay(this, 2)">2</div><div class="datepicker-day p-1 bg-slate-100 cursor-pointer" onclick="datepickerSelectDay(this, 3)">3</div>
+              <div class="datepicker-day p-1 bg-slate-100 cursor-pointer" onclick="datepickerSelectDay(this, 4)">4</div><div class="datepicker-day p-1 bg-slate-100 cursor-pointer" onclick="datepickerSelectDay(this, 5)">5</div>
+              <div class="datepicker-day p-1 bg-slate-100 cursor-pointer" onclick="datepickerSelectDay(this, 6)">6</div><div class="datepicker-day p-1 bg-slate-100 cursor-pointer" onclick="datepickerSelectDay(this, 7)">7</div>
+              <div class="datepicker-day p-1 bg-slate-100 cursor-pointer" onclick="datepickerSelectDay(this, 8)">8</div><div class="datepicker-day p-1 bg-slate-100 cursor-pointer" onclick="datepickerSelectDay(this, 9)">9</div>
+              <div class="datepicker-day p-1 bg-slate-100 cursor-pointer" onclick="datepickerSelectDay(this, 10)">10</div><div class="datepicker-day p-1 bg-slate-100 cursor-pointer" onclick="datepickerSelectDay(this, 11)">11</div>
+              <div class="datepicker-day p-1 bg-slate-900 text-white rounded cursor-pointer" onclick="datepickerSelectDay(this, 12)">12</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 11. Range Sliders -->
+      <div id="tab-sliders" class="tab-content hidden w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">FORM</span>
+              <span class="text-xs text-slate-400 font-mono">#11</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Range Sliders</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Single and dual-handle range configuration sliders.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 space-y-4 shadow-sm">
+          <div class="space-y-8 text-xs pt-2">
+            <div class="space-y-3">
+              <div class="flex justify-between font-medium text-slate-700">
+                <label>Reorder Threshold</label>
+                <span id="slider-single-label" class="font-mono bg-slate-100 px-2 py-0.5 rounded border border-slate-200">50 Units</span>
+              </div>
+              <div id="slider-single-track" class="relative w-full h-1.5 bg-slate-200 rounded-full select-none">
+                <div id="slider-single-fill" class="absolute top-0 left-0 h-1.5 bg-slate-900 rounded-full" style="width:50%"></div>
+                <div id="slider-single-handle" class="absolute top-1/2 -mt-2 -ml-2 w-4 h-4 bg-white border-2 border-slate-900 rounded-full shadow cursor-pointer" style="left:50%"></div>
+              </div>
+            </div>
+            <div class="space-y-3 pt-4 border-t border-slate-100">
+              <div class="flex justify-between font-medium text-slate-700">
+                <label>Price Range</label>
+                <span id="slider-range-label" class="font-mono bg-slate-100 px-2 py-0.5 rounded border border-slate-200">$100 - $5,000</span>
+              </div>
+              <div id="slider-range-track" class="relative w-full h-1.5 bg-slate-200 rounded-full select-none">
+                <div id="slider-range-fill" class="absolute top-0 h-1.5 bg-slate-900 rounded-full" style="left:25%; width:50%"></div>
+                <div id="slider-range-handle-left" class="absolute top-1/2 -mt-2 -ml-2 w-4 h-4 bg-white border-2 border-slate-900 rounded-full shadow cursor-pointer" style="left:25%"></div>
+                <div id="slider-range-handle-right" class="absolute top-1/2 -mt-2 -ml-2 w-4 h-4 bg-white border-2 border-slate-900 rounded-full shadow cursor-pointer" style="left:75%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 12. Drag & Drop Upload -->
+      <div id="tab-upload" class="tab-content hidden w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">FORM</span>
+              <span class="text-xs text-slate-400 font-mono">#12</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Drag & Drop Upload Zone</h1>
+            <p class="text-xs text-slate-500 mt-0.5">File drop zones with progress state indicators.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 space-y-4 shadow-sm">
+          <div id="upload-dropzone" onclick="uploadDropzoneClick()" ondragover="uploadDragOver(event)" ondragleave="uploadDragLeave(event)" ondrop="uploadDrop(event)" class="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center flex flex-col items-center justify-center space-y-3 bg-slate-50 cursor-pointer">
+            <div class="w-12 h-12 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-slate-600">
+              <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+            </div>
+            <div class="text-xs font-semibold text-slate-800">
+              <span class="underline">Click to upload</span> <span class="font-normal text-slate-500">or drag and drop files</span>
+            </div>
+            <p class="text-[10px] text-slate-400 font-mono">PDF, DOCX, or CSV (max 25MB)</p>
+          </div>
+          <input type="file" id="upload-file-input" multiple class="hidden" onchange="uploadFilesSelected(this.files)" />
+          <div id="upload-file-list" class="space-y-2 pt-2">
+            <div class="upload-file-row flex items-center justify-between p-3 rounded-lg border border-slate-200 bg-slate-50 text-xs">
+              <div class="flex items-center gap-3">
+                <i data-lucide="file-text" class="w-5 h-5 text-slate-400"></i>
+                <div>
+                  <div class="font-semibold text-slate-800">catalog_import_v2.csv</div>
+                  <div class="text-[10px] text-slate-500 font-mono">1.2 MB</div>
+                </div>
+              </div>
+              <button onclick="this.closest('.upload-file-row').remove()" class="text-slate-400 hover:text-slate-900"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================== NAVIGATION & MENUS ============================== -->
+
+      <!-- 13. App Header -->
+      <div id="tab-header" class="tab-content hidden w-full max-w-4xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">NAV</span>
+              <span class="text-xs text-slate-400 font-mono">#13</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">App Header</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Top navigation bar specimen with brand, links, search, and user profile.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 shadow-sm">
+          <header class="w-full bg-white border border-slate-300 rounded-lg p-3 flex items-center justify-between shadow-sm">
+            <div class="flex items-center gap-6">
+              <div class="flex items-center gap-2 font-bold text-sm">
+                <div class="w-7 h-7 rounded bg-slate-900 text-white flex items-center justify-center font-mono text-[10px]">DMS</div>
+                <span class="font-mono tracking-tight uppercase text-xs">DealerOS</span>
+              </div>
+              <nav id="header-nav-links" class="hidden md:flex items-center gap-4 text-xs font-medium text-slate-600">
+                <a href="#" onclick="headerNavClick(event, this)" class="header-nav-link font-bold text-slate-900">Dashboard</a>
+                <a href="#" onclick="headerNavClick(event, this)" class="header-nav-link hover:text-slate-900">Orders</a>
+                <a href="#" onclick="headerNavClick(event, this)" class="header-nav-link hover:text-slate-900">Catalog</a>
+                <a href="#" onclick="headerNavClick(event, this)" class="header-nav-link hover:text-slate-900">Settings</a>
+              </nav>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-48 h-8 rounded-md border border-slate-300 bg-slate-50 flex items-center px-3 text-[11px] text-slate-400">
+                <i data-lucide="search" class="w-3.5 h-3.5 mr-2"></i>
+                <span>Search POs... ⌘K</span>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-[10px] font-mono font-bold text-slate-700">AR</div>
+            </div>
+          </header>
+        </div>
+      </div>
+
+      <!-- 14. Horizontal & Anchor Tabs -->
+      <div id="tab-horizontal-tabs" class="tab-content hidden w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">NAV</span>
+              <span class="text-xs text-slate-400 font-mono">#14</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Horizontal & Anchor Tabs</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Underline tab lists and pill anchor switchers.</p>
+          </div>
+        </div>
+        <div class="space-y-6">
+          <div class="bg-white border border-slate-300 rounded-xl p-6 space-y-4 shadow-sm">
+            <div class="font-bold text-xs text-slate-500 mb-2">Horizontal Underline Tabs</div>
+            <div class="flex items-center gap-6 border-b border-slate-200 text-xs" data-tabgroup="underline">
+              <button onclick="localTabGroupSelect(this)" class="local-tab-item pb-2 border-b-2 border-slate-900 font-bold text-slate-900">Overview</button>
+              <button onclick="localTabGroupSelect(this)" class="local-tab-item pb-2 text-slate-500 hover:text-slate-900 font-medium">Line Items</button>
+              <button onclick="localTabGroupSelect(this)" class="local-tab-item pb-2 text-slate-500 hover:text-slate-900 font-medium">Documents</button>
+              <button onclick="localTabGroupSelect(this)" class="local-tab-item pb-2 text-slate-500 hover:text-slate-900 font-medium">Fulfillment</button>
+            </div>
+          </div>
+          <div class="bg-white border border-slate-300 rounded-xl p-6 space-y-4 shadow-sm">
+            <div class="font-bold text-xs text-slate-500 mb-2">Pill / Anchor Tabs</div>
+            <div class="inline-flex items-center p-1 bg-slate-100 border border-slate-200 rounded-lg text-xs font-medium" data-tabgroup="pill">
+              <button onclick="localPillGroupSelect(this)" class="local-pill-item px-3 py-1.5 rounded-md bg-white text-slate-900 shadow-sm border border-slate-200">Active Deals</button>
+              <button onclick="localPillGroupSelect(this)" class="local-pill-item px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900">Historical</button>
+              <button onclick="localPillGroupSelect(this)" class="local-pill-item px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900">Archived</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 15. Vertical Anchor / Scroll Tabs -->
+      <div id="tab-vertical-anchor-tabs" class="tab-content hidden w-full max-w-4xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">NAV</span>
+              <span class="text-xs text-slate-400 font-mono">#15</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Vertical Anchor / Scroll Tabs</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Scroll-spy side navigation with a sliding active indicator and nested sub-section links, for long-form or multi-surface content.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 shadow-sm">
+          <div class="flex gap-8">
+
+            <!-- Side anchor nav -->
+            <div class="w-52 shrink-0">
+              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3 font-mono">Jump to section</div>
+              <div class="relative">
+                <div class="absolute left-0 top-0 bottom-0 w-px bg-slate-200"></div>
+                <div id="va-toc-indicator" class="absolute left-0 w-0.5 bg-slate-900 rounded-full transition-all duration-200 ease-out" style="top:0;height:0"></div>
+                <div id="va-toc-list" class="space-y-0.5 text-xs">
+                  <a href="#" data-target="va-sec-intake" onclick="vaSelectSection(this);return false;" class="va-toc-link block pl-4 py-2 font-bold text-slate-900">Service Intake</a>
+                  <a href="#" data-target="va-sec-diagnostics" onclick="vaSelectSection(this);return false;" class="va-toc-link block pl-4 py-2 font-medium text-slate-500 hover:text-slate-900">Diagnostics &amp; Estimate</a>
+                  <a href="#" data-target="va-sec-shop" onclick="vaSelectSection(this);return false;" class="va-toc-link block pl-4 py-2 font-medium text-slate-500 hover:text-slate-900">Shop Execution</a>
+                  <a href="#" data-target="va-sec-parts" onclick="vaSelectSection(this);return false;" class="va-toc-link va-toc-sub block pl-8 py-1.5 font-medium text-[11px] text-slate-400 hover:text-slate-700">Parts Requisition</a>
+                  <a href="#" data-target="va-sec-hydraulic" onclick="vaSelectSection(this);return false;" class="va-toc-link va-toc-sub block pl-8 py-1.5 font-medium text-[11px] text-slate-400 hover:text-slate-700">Hydraulic Assembly</a>
+                  <a href="#" data-target="va-sec-torque" onclick="vaSelectSection(this);return false;" class="va-toc-link va-toc-sub block pl-8 py-1.5 font-medium text-[11px] text-slate-400 hover:text-slate-700">Torque Calibration</a>
+                  <a href="#" data-target="va-sec-qa" onclick="vaSelectSection(this);return false;" class="va-toc-link block pl-4 py-2 font-medium text-slate-500 hover:text-slate-900">Quality &amp; Signoff</a>
+                  <a href="#" data-target="va-sec-delivery" onclick="vaSelectSection(this);return false;" class="va-toc-link block pl-4 py-2 font-medium text-slate-500 hover:text-slate-900">Delivery</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Anchored content panel -->
+            <div class="flex-1 min-w-0 border-l border-slate-100 pl-8 text-xs">
+
+              <div id="va-sec-intake" class="va-content-section space-y-3">
+                <h3 class="font-bold text-sm text-slate-900">Service Intake</h3>
+                <p class="text-slate-500 leading-relaxed">Client and vehicle verification steps completed before a repair order is opened.</p>
+                <div class="space-y-2">
+                  <div class="flex items-center gap-2 p-2.5 rounded border border-slate-200 bg-slate-50"><i data-lucide="check-circle" class="w-3.5 h-3.5 text-slate-700"></i><span class="font-medium text-slate-700">Client identity &amp; contact verified</span></div>
+                  <div class="flex items-center gap-2 p-2.5 rounded border border-slate-200 bg-slate-50"><i data-lucide="check-circle" class="w-3.5 h-3.5 text-slate-700"></i><span class="font-medium text-slate-700">Warranty status confirmed</span></div>
+                </div>
+              </div>
+
+              <div id="va-sec-diagnostics" class="va-content-section hidden space-y-3">
+                <h3 class="font-bold text-sm text-slate-900">Diagnostics &amp; Estimate</h3>
+                <p class="text-slate-500 leading-relaxed">Technician diagnostic findings and the resulting customer-facing estimate.</p>
+                <div class="p-3 rounded border border-slate-200 bg-slate-50 font-mono text-[11px] text-slate-600">4 diagnostic codes logged &middot; Estimate #EST-3391 pending approval</div>
+              </div>
+
+              <div id="va-sec-shop" class="va-content-section hidden space-y-3">
+                <h3 class="font-bold text-sm text-slate-900">Shop Execution</h3>
+                <p class="text-slate-500 leading-relaxed">Parent stage for all bay work. Expand the sub-sections on the left for the individual work orders below.</p>
+              </div>
+
+              <div id="va-sec-parts" class="va-content-section hidden space-y-3">
+                <div class="text-[10px] font-mono text-slate-400 uppercase">Shop Execution / Sub-section</div>
+                <h3 class="font-bold text-sm text-slate-900">Parts Requisition</h3>
+                <div class="flex items-center justify-between p-2.5 rounded border border-slate-200 bg-slate-50">
+                  <span class="font-mono text-[11px] text-slate-600">HYD-092-A &middot; Hydraulic Pump Assy</span>
+                  <span class="px-2 py-0.5 rounded border border-dashed border-slate-400 text-slate-600 font-mono text-[10px]">ORDERED</span>
+                </div>
+              </div>
+
+              <div id="va-sec-hydraulic" class="va-content-section hidden space-y-3">
+                <div class="text-[10px] font-mono text-slate-400 uppercase">Shop Execution / Sub-section</div>
+                <div class="flex items-center justify-between">
+                  <h3 class="font-bold text-sm text-slate-900">Hydraulic Assembly</h3>
+                  <span class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-900 text-white text-[10px] font-bold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> ACTIVE</span>
+                </div>
+                <p class="text-slate-500 leading-relaxed">Bay 3 &middot; assigned to J. Alvarez &middot; started 09:40 AM.</p>
+              </div>
+
+              <div id="va-sec-torque" class="va-content-section hidden space-y-3">
+                <div class="text-[10px] font-mono text-slate-400 uppercase">Shop Execution / Sub-section</div>
+                <h3 class="font-bold text-sm text-slate-900">Torque Calibration</h3>
+                <div class="p-3 rounded border border-slate-200 bg-slate-50 font-mono text-[11px] text-slate-600">Spec: 145 Nm &plusmn; 5 Nm &middot; Last calibrated Aug 29</div>
+              </div>
+
+              <div id="va-sec-qa" class="va-content-section hidden space-y-3">
+                <h3 class="font-bold text-sm text-slate-900">Quality &amp; Signoff</h3>
+                <div class="flex items-center gap-2 p-2.5 rounded border border-slate-200 bg-slate-50"><i data-lucide="clipboard-check" class="w-3.5 h-3.5 text-slate-700"></i><span class="font-medium text-slate-700">Awaiting QA technician signoff</span></div>
+              </div>
+
+              <div id="va-sec-delivery" class="va-content-section hidden space-y-3">
+                <h3 class="font-bold text-sm text-slate-900">Delivery</h3>
+                <p class="text-slate-500 leading-relaxed">Vehicle ready for customer pickup once invoicing is finalized.</p>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 16. Vertical Tabs (Settings Pattern) -->
+      <div id="tab-vertical-tabs" class="tab-content hidden w-full max-w-4xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">NAV</span>
+              <span class="text-xs text-slate-400 font-mono">#16</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Vertical Tabs (Settings Pattern)</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Control panel side-navigation for settings and configuration screens.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 shadow-sm">
+          <div class="flex flex-col md:flex-row gap-6 min-h-[300px]">
+            <div class="w-full md:w-48 space-y-1 text-xs">
+              <button onclick="vSettingsTabSelect(this)" class="v-settings-tab w-full text-left px-3 py-2 rounded-md bg-slate-100 text-slate-900 font-bold">General Profile</button>
+              <button onclick="vSettingsTabSelect(this)" class="v-settings-tab w-full text-left px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 font-medium">Security & API</button>
+              <button onclick="vSettingsTabSelect(this)" class="v-settings-tab w-full text-left px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 font-medium">Notifications</button>
+              <button onclick="vSettingsTabSelect(this)" class="v-settings-tab w-full text-left px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 font-medium">Billing Details</button>
+            </div>
+            <div id="v-settings-content" class="flex-1 border border-slate-200 border-dashed rounded-lg bg-slate-50 flex items-center justify-center text-xs font-mono text-slate-400 p-8">
+              Tab Content Container Specimen
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 17. Steppers & Progress -->
+      <div id="tab-steppers" class="tab-content hidden w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">NAV</span>
+              <span class="text-xs text-slate-400 font-mono">#17</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Steppers & Progress</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Multi-step linear progress bars and sequential workflow indicators.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 shadow-sm">
+          <div class="space-y-6">
+            <div class="space-y-1.5">
+              <div class="flex justify-between text-[10px] font-mono text-slate-500">
+                <span>Uploading assets</span>
+                <span>65%</span>
+              </div>
+              <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                <div class="bg-slate-900 h-2 rounded-full w-[65%]"></div>
+              </div>
+            </div>
+            <div class="pt-4 border-t border-slate-100">
+              <div class="flex items-center justify-between text-xs">
+                <div onclick="stepperSelect(this, 1)" data-step="1" class="stepper-step flex items-center gap-2 font-bold text-slate-900 cursor-pointer">
+                  <span class="stepper-circle w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-[10px] font-mono">1</span>
+                  <span class="stepper-label text-[11px]">Cart</span>
+                </div>
+                <div class="flex-1 h-px bg-slate-300 mx-3"></div>
+                <div onclick="stepperSelect(this, 2)" data-step="2" class="stepper-step flex items-center gap-2 font-bold text-slate-900 cursor-pointer">
+                  <span class="stepper-circle w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-[10px] font-mono">2</span>
+                  <span class="stepper-label text-[11px]">Shipping</span>
+                </div>
+                <div class="flex-1 h-px bg-slate-300 mx-3"></div>
+                <div onclick="stepperSelect(this, 3)" data-step="3" class="stepper-step flex items-center gap-2 text-slate-400 cursor-pointer">
+                  <span class="stepper-circle w-5 h-5 rounded-full border border-slate-300 flex items-center justify-center text-[10px] font-mono">3</span>
+                  <span class="stepper-label text-[11px]">Pay</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 18. Context Menu Specimen -->
+      <div id="tab-context-menu" class="tab-content hidden w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">MENU</span>
+              <span class="text-xs text-slate-400 font-mono">#18</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Context Menu Specimen</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Right-click action popup menu with icons, dividers, keyboard shortcuts, and destructive states.</p>
+          </div>
+        </div>
+        <div id="context-menu-demo-box" oncontextmenu="contextMenuOpen(event)" class="bg-white border border-slate-300 rounded-xl p-12 flex flex-col items-center justify-center shadow-sm relative min-h-[350px]">
+          <div class="text-xs text-slate-400 mb-6 font-mono">[ Right-click anywhere in this box ]</div>
+          <div id="context-menu-panel" class="hidden fixed w-64 bg-white border border-slate-300 rounded-lg shadow-xl p-1.5 text-xs text-slate-700 space-y-0.5 z-50">
+            <button onclick="contextMenuItemClick(this)" class="w-full text-left px-3 py-2 rounded hover:bg-slate-100 flex items-center justify-between font-medium">
+              <span class="flex items-center gap-2"><i data-lucide="eye" class="w-3.5 h-3.5 text-slate-500"></i> Inspect Entity</span>
+              <span class="font-mono text-[10px] text-slate-400">⌘I</span>
+            </button>
+            <button onclick="contextMenuItemClick(this)" class="w-full text-left px-3 py-2 rounded hover:bg-slate-100 flex items-center justify-between font-medium">
+              <span class="flex items-center gap-2"><i data-lucide="copy" class="w-3.5 h-3.5 text-slate-500"></i> Duplicate Record</span>
+              <span class="font-mono text-[10px] text-slate-400">⌘D</span>
+            </button>
+            <button onclick="contextMenuItemClick(this)" class="w-full text-left px-3 py-2 rounded hover:bg-slate-100 flex items-center justify-between font-medium">
+              <span class="flex items-center gap-2"><i data-lucide="share-2" class="w-3.5 h-3.5 text-slate-500"></i> Copy Share Link</span>
+            </button>
+            <div class="h-px bg-slate-200 my-1"></div>
+            <button onclick="contextMenuItemClick(this)" class="w-full text-left px-3 py-2 rounded hover:bg-slate-100 flex items-center justify-between font-medium">
+              <span class="flex items-center gap-2"><i data-lucide="download" class="w-3.5 h-3.5 text-slate-500"></i> Export JSON</span>
+            </button>
+            <div class="h-px bg-slate-200 my-1"></div>
+            <button onclick="contextMenuDeleteClick(this)" class="w-full text-left px-3 py-2 rounded hover:bg-red-50 text-red-600 flex items-center justify-between font-semibold">
+              <span class="flex items-center gap-2"><i data-lucide="trash-2" class="w-3.5 h-3.5 text-red-500"></i> <span class="context-menu-delete-label">Delete Record</span></span>
+              <span class="font-mono text-[10px] text-red-400">⌫</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================== MOLECULES & CARDS ============================== -->
+
+      <!-- 19. KPI Metric Card -->
+      <div id="tab-kpi" class="tab-content hidden w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">CARD</span>
+              <span class="text-xs text-slate-400 font-mono">#19</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">KPI Metric Card</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Statistical summary card with percentage growth and targets.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 shadow-sm max-w-xl">
+          <div class="bg-slate-50 border border-slate-200 rounded-lg p-5 space-y-2">
+            <div class="flex items-center justify-between text-xs text-slate-500">
+              <span id="kpi-title-label">YTD Dealer Revenue</span>
+              <button id="kpi-period-toggle" onclick="kpiCyclePeriod()" class="p-1 rounded bg-white border border-slate-300 font-mono text-[10px] hover:bg-slate-100 cursor-pointer">YTD</button>
+            </div>
+            <div id="kpi-value-label" class="text-3xl font-extrabold font-mono text-slate-900">$84,320.00</div>
+            <div class="flex items-center justify-between text-[11px] pt-1">
+              <span id="kpi-growth-label" class="text-slate-700 font-semibold font-mono">↑ +18.4% vs last mo</span>
+              <span class="text-slate-400">Target: $100k</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 20. Product/Part Card -->
+      <div id="tab-product" class="tab-content hidden w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">CARD</span>
+              <span class="text-xs text-slate-400 font-mono">#20</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Product/Part Card</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Catalog item specimen for heavy machinery spare parts and equipment.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 shadow-sm max-w-sm">
+          <div class="space-y-3">
+            <div class="h-32 rounded-lg image-placeholder border border-slate-300 flex items-center justify-center text-xs font-mono text-slate-500">
+              <span>Part Image [4:3]</span>
+            </div>
+            <div class="space-y-1">
+              <div class="flex items-center justify-between">
+                <h4 class="font-bold text-xs text-slate-900">Hydraulic Pump Assy</h4>
+                <span class="font-mono font-bold text-xs">$199.00</span>
+              </div>
+              <p class="text-[11px] text-slate-500">SKU: HYD-092-A • Heavy machinery compatible.</p>
+            </div>
+            <button id="product-add-po-btn" onclick="productToggleAddToPO(this)" class="w-full py-2 rounded-lg bg-slate-900 text-white text-xs font-semibold flex items-center justify-center gap-1.5">
+              <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i> <span>Add to PO</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 21. Profile Card -->
+      <div id="tab-profile" class="tab-content hidden w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">CARD</span>
+              <span class="text-xs text-slate-400 font-mono">#21</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Profile Card</h1>
+            <p class="text-xs text-slate-500 mt-0.5">User account summary card with activity counts and performance SLA.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 shadow-sm max-w-sm">
+          <div class="text-center space-y-3">
+            <div class="w-16 h-16 rounded-full bg-slate-800 text-white mx-auto flex items-center justify-center font-bold text-lg font-mono border-2 border-slate-300">
+              AR
+            </div>
+            <div>
+              <h4 class="font-bold text-sm">Alex Rivera</h4>
+              <p class="text-[11px] text-slate-500 font-mono">DMS Administrator</p>
+            </div>
+            <div class="grid grid-cols-3 gap-2 py-3 border-t border-b border-slate-200 text-xs">
+              <div><div class="font-bold font-mono">142</div><div class="text-[10px] text-slate-400">POs</div></div>
+              <div><div class="font-bold font-mono">3.8k</div><div class="text-[10px] text-slate-400">Parts</div></div>
+              <div><div class="font-bold font-mono">98%</div><div class="text-[10px] text-slate-400">SLA</div></div>
+            </div>
+            <div id="profile-details-extra" class="hidden text-left space-y-1 py-2 border-t border-slate-100 text-[11px] text-slate-500">
+              <div>Joined: Jan 2024</div>
+              <div>Region: West</div>
+            </div>
+            <button id="profile-view-details-btn" onclick="profileToggleDetails(this)" class="w-full py-1.5 rounded-md border border-slate-300 text-xs font-medium hover:bg-slate-50">View Details</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 22. Accordions & Panels -->
+      <div id="tab-accordions" class="tab-content hidden w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">CARD</span>
+              <span class="text-xs text-slate-400 font-mono">#22</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Accordions & Panels</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Collapsible sections for space-efficient form layouts.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 shadow-sm">
+          <div class="border border-slate-200 rounded-lg divide-y divide-slate-200 text-xs">
+            <div class="bg-slate-50">
+              <button onclick="accordionToggle(this)" class="accordion-header w-full flex justify-between items-center p-4 font-bold text-slate-900 focus:outline-none">
+                <span>Billing Address</span>
+                <i data-lucide="chevron-up" class="accordion-chevron w-4 h-4 text-slate-500"></i>
+              </button>
+              <div class="accordion-content p-4 pt-0 text-slate-600 space-y-3">
+                <div class="grid grid-cols-2 gap-4">
+                  <input type="text" placeholder="Street Address" class="w-full px-3 py-2 rounded border border-slate-300 bg-white" />
+                  <input type="text" placeholder="City" class="w-full px-3 py-2 rounded border border-slate-300 bg-white" />
+                </div>
+              </div>
+            </div>
+            <div class="bg-white">
+              <button onclick="accordionToggle(this)" class="accordion-header w-full flex justify-between items-center p-4 font-semibold text-slate-700 hover:bg-slate-50 focus:outline-none">
+                <span>Shipping Address (Same as Billing)</span>
+                <i data-lucide="chevron-down" class="accordion-chevron w-4 h-4 text-slate-400"></i>
+              </button>
+              <div class="accordion-content hidden p-4 pt-0 text-slate-600 space-y-3">
+                <div class="grid grid-cols-2 gap-4">
+                  <input type="text" placeholder="Street Address" class="w-full px-3 py-2 rounded border border-slate-300 bg-white" />
+                  <input type="text" placeholder="City" class="w-full px-3 py-2 rounded border border-slate-300 bg-white" />
+                </div>
+              </div>
+            </div>
+            <div class="bg-white">
+              <button onclick="accordionToggle(this)" class="accordion-header w-full flex justify-between items-center p-4 font-semibold text-slate-700 hover:bg-slate-50 focus:outline-none">
+                <span>Tax Certificates</span>
+                <i data-lucide="chevron-down" class="accordion-chevron w-4 h-4 text-slate-400"></i>
+              </button>
+              <div class="accordion-content hidden p-4 pt-0 text-slate-600 space-y-3">
+                <p class="text-[11px] text-slate-500 leading-relaxed">No tax exemption certificates on file for this account. Upload a certificate to apply tax-exempt status to future purchase orders.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 23. Empty States -->
+      <div id="tab-empty-states" class="tab-content hidden w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">CARD</span>
+              <span class="text-xs text-slate-400 font-mono">#23</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Empty States</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Zero-data placeholders with call-to-action buttons.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 shadow-sm">
+          <div class="border-2 border-dashed border-slate-200 rounded-xl p-12 flex flex-col items-center justify-center text-center bg-slate-50/50">
+            <div class="w-16 h-16 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-slate-500 mb-4">
+              <i data-lucide="clipboard-x" class="w-8 h-8"></i>
+            </div>
+            <h3 class="font-bold text-sm text-slate-900 mb-2">No Purchase Orders Found</h3>
+            <p class="text-xs text-slate-500 max-w-sm mb-6 leading-relaxed">It looks like you haven't received any orders yet or your applied filters returned no results.</p>
+            <div class="flex gap-3">
+              <button onclick="emptyStateAction('Filters cleared.')" class="px-4 py-2 border border-slate-300 rounded-md text-xs font-medium bg-white">Clear Filters</button>
+              <button onclick="emptyStateAction('Manual PO draft created.')" class="px-4 py-2 bg-slate-900 text-white rounded-md text-xs font-semibold">+ Create Manual PO</button>
+            </div>
+            <div id="empty-state-toast" class="mt-3 text-[11px] text-slate-500 font-mono h-4"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================== COMPLEX DISPLAYS & SCHEDULING ============================== -->
+
+      <!-- 24. Data Table -->
+      <div id="tab-table" class="tab-content hidden w-full max-w-5xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">DATA</span>
+              <span class="text-xs text-slate-400 font-mono">#24</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Data Table (Full)</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Exhaustive tabular data grid with filtering, pagination, and row checkboxes.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 shadow-sm">
+          <div class="border border-slate-300 rounded-lg overflow-hidden">
+            <div class="p-3 bg-slate-50 flex items-center justify-between text-xs border-b border-slate-200">
+              <div class="flex items-center gap-2">
+                <input type="text" id="table-filter-input" oninput="tableFilterRows(this.value)" placeholder="Filter rows..." class="px-3 py-1.5 text-xs border border-slate-300 rounded bg-white outline-none" />
+                <button class="px-3 py-1.5 border border-slate-300 rounded bg-white text-xs">Status: All</button>
+              </div>
+              <div class="text-[11px] text-slate-500 font-mono">Showing 2 of 84 items</div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs whitespace-nowrap">
+                <thead class="bg-slate-100 text-slate-600 font-mono text-[10px] border-b border-slate-200">
+                  <tr>
+                    <th class="p-3 w-8"><input type="checkbox" id="table-select-all" onchange="tableSelectAll(this.checked)" class="rounded border-slate-300" /></th>
+                    <th class="p-3">PO NUMBER</th>
+                    <th class="p-3">DEALER CLIENT</th>
+                    <th class="p-3">STATUS</th>
+                    <th class="p-3">AMOUNT</th>
+                    <th class="p-3 text-right">ACTION</th>
+                  </tr>
+                </thead>
+                <tbody id="table-body" class="divide-y divide-slate-200 text-[11px]">
+                  <tr class="table-row hover:bg-slate-50">
+                    <td class="p-3"><input type="checkbox" checked class="table-row-checkbox rounded border-slate-300" /></td>
+                    <td class="p-3 font-mono font-medium table-cell-po">#PO-9021</td>
+                    <td class="p-3 font-semibold text-slate-800 table-cell-dealer">Apex Machinery Group</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-200 text-slate-800 font-mono text-[10px]">SETTLED</span></td>
+                    <td class="p-3 font-mono font-bold">$2,400.00</td>
+                    <td class="p-3 text-right"><button onclick="tableViewRowToggle(this)" class="text-slate-500 hover:text-slate-900 font-medium underline">View</button></td>
+                  </tr>
+                  <tr class="table-row hover:bg-slate-50">
+                    <td class="p-3"><input type="checkbox" class="table-row-checkbox rounded border-slate-300" /></td>
+                    <td class="p-3 font-mono font-medium table-cell-po">#PO-9022</td>
+                    <td class="p-3 font-semibold text-slate-800 table-cell-dealer">EuroTractors Ltd</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded border border-dashed border-slate-400 text-slate-600 font-mono text-[10px]">PROCESSING</span></td>
+                    <td class="p-3 font-mono font-bold">$850.00</td>
+                    <td class="p-3 text-right"><button onclick="tableViewRowToggle(this)" class="text-slate-500 hover:text-slate-900 font-medium underline">View</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="p-3 bg-slate-50 flex items-center justify-between text-xs text-slate-500 border-t border-slate-200">
+              <span class="text-[11px]">Page 1 of 12</span>
+              <div class="flex items-center gap-1">
+                <button onclick="tablePaginationClick('prev')" class="px-2 py-1 border border-slate-300 rounded bg-white text-[11px]">Prev</button>
+                <button onclick="tablePaginationClick(1)" id="table-page-1" class="table-page-btn px-2 py-1 bg-slate-900 text-white rounded font-mono text-[11px]">1</button>
+                <button onclick="tablePaginationClick(2)" id="table-page-2" class="table-page-btn px-2 py-1 border border-slate-300 rounded bg-white font-mono text-[11px]">2</button>
+                <button onclick="tablePaginationClick('next')" class="px-2 py-1 border border-slate-300 rounded bg-white text-[11px]">Next</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 25. Kanban Board -->
+      <div id="tab-kanban" class="tab-content hidden w-full max-w-5xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">DATA</span>
+              <span class="text-xs text-slate-400 font-mono">#25</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Kanban Board</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Fulfillment workflow board with drag-and-drop order columns.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 shadow-sm h-[550px] flex flex-col">
+          <div class="flex gap-4 flex-1 overflow-x-auto">
+            <div class="kanban-column flex-shrink-0 w-72 bg-slate-50 rounded-lg flex flex-col border border-slate-200" ondragover="kanbanDragOver(event)" ondrop="kanbanDrop(event, this)">
+              <div class="p-3 border-b border-slate-200 flex justify-between items-center bg-slate-100 rounded-t-lg">
+                <span class="font-bold text-xs">New Orders</span>
+                <span class="kanban-count-badge bg-slate-200 text-slate-600 px-1.5 rounded text-[10px] font-mono">1</span>
+              </div>
+              <div class="kanban-card-list p-2 space-y-2 flex-1 overflow-y-auto">
+                <div draggable="true" ondragstart="kanbanDragStart(event, this)" class="bg-white border border-slate-300 rounded p-3 shadow-sm cursor-move hover:border-slate-400 text-xs">
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-mono font-bold">#PO-9025</span>
+                    <span class="text-[10px] bg-slate-100 px-1 rounded border border-slate-200">Today</span>
+                  </div>
+                  <div class="font-semibold text-slate-800">Southern Agri Supply</div>
+                  <div class="text-slate-500 font-mono mt-2 pt-2 border-t border-slate-100">$12,400.00</div>
+                </div>
+                <div class="kanban-empty-placeholder hidden flex justify-center pt-8 text-xs text-slate-400">Drag orders here</div>
+              </div>
+            </div>
+
+            <div class="kanban-column flex-shrink-0 w-72 bg-slate-50 rounded-lg flex flex-col border border-slate-200" ondragover="kanbanDragOver(event)" ondrop="kanbanDrop(event, this)">
+              <div class="p-3 border-b border-slate-200 flex justify-between items-center bg-slate-100 rounded-t-lg">
+                <span class="font-bold text-xs">Processing / Packing</span>
+                <span class="kanban-count-badge bg-slate-200 text-slate-600 px-1.5 rounded text-[10px] font-mono">1</span>
+              </div>
+              <div class="kanban-card-list p-2 space-y-2 flex-1 overflow-y-auto">
+                <div draggable="true" ondragstart="kanbanDragStart(event, this)" class="bg-white border border-slate-300 rounded p-3 shadow-sm cursor-move hover:border-slate-400 text-xs">
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-mono font-bold">#PO-9022</span>
+                    <span class="text-[10px] bg-slate-100 px-1 rounded border border-slate-200">Yesterday</span>
+                  </div>
+                  <div class="font-semibold text-slate-800">EuroTractors Ltd</div>
+                  <div class="text-slate-500 font-mono mt-2 pt-2 border-t border-slate-100">$850.00</div>
+                </div>
+                <div class="kanban-empty-placeholder hidden flex justify-center pt-8 text-xs text-slate-400">Drag orders here</div>
+              </div>
+            </div>
+
+            <div class="kanban-column flex-shrink-0 w-72 bg-slate-50 rounded-lg flex flex-col border border-slate-200" ondragover="kanbanDragOver(event)" ondrop="kanbanDrop(event, this)">
+              <div class="p-3 border-b border-slate-200 flex justify-between items-center bg-slate-100 rounded-t-lg">
+                <span class="font-bold text-xs">Shipped / Fulfilled</span>
+                <span class="kanban-count-badge bg-slate-200 text-slate-600 px-1.5 rounded text-[10px] font-mono">0</span>
+              </div>
+              <div class="kanban-card-list p-2 space-y-2 flex-1 overflow-y-auto">
+                <div class="kanban-empty-placeholder flex justify-center pt-8 text-xs text-slate-400">Drag orders here</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 26. Appointment Calendar Views (Day, Week, Month) -->
+      <div id="tab-calendar" class="tab-content hidden w-full max-w-5xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">SCHEDULE</span>
+              <span class="text-xs text-slate-400 font-mono">#26</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Appointment Calendar Views</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Dealer service appointment scheduler with Day, Week, and Month toggle views.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="inline-flex rounded-md shadow-sm border border-slate-300 text-xs">
+              <button onclick="switchCalendarView('day')" id="cal-btn-day" class="cal-view-btn px-3 py-1.5 font-medium bg-white text-slate-700 rounded-l-md">Day</button>
+              <button onclick="switchCalendarView('week')" id="cal-btn-week" class="cal-view-btn px-3 py-1.5 font-medium border-l border-r border-slate-300 bg-slate-900 text-white">Week</button>
+              <button onclick="switchCalendarView('month')" id="cal-btn-month" class="cal-view-btn px-3 py-1.5 font-medium bg-white text-slate-700 rounded-r-md">Month</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-300 rounded-xl p-6 shadow-sm">
+          <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 text-xs">
+            <div class="flex items-center gap-3 font-bold text-slate-900">
+              <button onclick="calendarNavClick(-1)" class="p-1.5 border border-slate-300 rounded hover:bg-slate-50"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+              <span id="calendar-title-label">Week of Sep 01 - Sep 07, 2026</span>
+              <button onclick="calendarNavClick(1)" class="p-1.5 border border-slate-300 rounded hover:bg-slate-50"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+            </div>
+            <button onclick="calendarNewAppointmentClick()" class="px-3 py-1.5 rounded bg-slate-900 text-white font-semibold">+ New Appointment</button>
+          </div>
+
+          <div id="calendar-view-day" class="calendar-view-content hidden space-y-2 text-xs">
+            <div class="font-mono text-[11px] text-slate-400 pb-2">Wednesday, September 2, 2026</div>
+            <div class="space-y-2">
+              <div class="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-between">
+                <div>
+                  <div class="font-bold text-slate-900">09:00 AM - Hydraulic Inspection</div>
+                  <div class="text-[11px] text-slate-500">Apex Machinery Group (Bay 3)</div>
+                </div>
+                <span class="px-2 py-0.5 rounded bg-slate-200 font-mono text-[10px]">CONFIRMED</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="calendar-view-week" class="calendar-view-content space-y-3 text-xs">
+            <div class="grid grid-cols-7 gap-2 text-center font-mono text-[10px] text-slate-400 border-b border-slate-200 pb-2">
+              <div>MON 01</div><div>TUE 02</div><div>WED 03</div><div>THU 04</div><div>FRI 05</div><div>SAT 06</div><div>SUN 07</div>
+            </div>
+            <div class="grid grid-cols-7 gap-2 min-h-[220px]">
+              <div class="border border-slate-200 rounded p-1.5 bg-slate-50/50 space-y-1">
+                <div class="text-[10px] font-mono text-slate-400">08:00</div>
+                <div class="p-1 rounded bg-slate-900 text-white text-[10px] leading-tight font-medium">Service #81<br/>Apex Group</div>
+              </div>
+              <div class="border border-slate-200 rounded p-1.5 bg-slate-50/50 space-y-1">
+                <div class="text-[10px] font-mono text-slate-400">10:00</div>
+                <div class="p-1 rounded border border-slate-300 bg-white text-[10px] leading-tight font-medium">Inspection<br/>EuroTractors</div>
+              </div>
+              <div class="border border-slate-200 rounded p-1.5 bg-slate-50/50"></div>
+              <div class="border border-slate-200 rounded p-1.5 bg-slate-50/50 space-y-1">
+                <div class="text-[10px] font-mono text-slate-400">02:00</div>
+                <div class="p-1 rounded bg-slate-200 text-slate-800 text-[10px] leading-tight font-medium">Delivery<br/>Southern Agri</div>
+              </div>
+              <div class="border border-slate-200 rounded p-1.5 bg-slate-50/50"></div>
+              <div class="border border-slate-200 rounded p-1.5 bg-slate-50/50"></div>
+              <div class="border border-slate-200 rounded p-1.5 bg-slate-50/50"></div>
+            </div>
+          </div>
+
+          <div id="calendar-view-month" class="calendar-view-content hidden text-xs">
+            <div class="grid grid-cols-7 gap-1 text-center font-mono text-[10px] text-slate-400 mb-2">
+              <div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div><div>SUN</div>
+            </div>
+            <div class="grid grid-cols-7 gap-1 text-center text-[11px]">
+              <div class="p-2 border border-slate-100 text-slate-300">28</div>
+              <div class="p-2 border border-slate-100 text-slate-300">29</div>
+              <div class="p-2 border border-slate-100 text-slate-300">30</div>
+              <div onclick="calendarDaySelect(this)" class="calendar-month-day p-2 border border-slate-100 bg-slate-50 rounded cursor-pointer">1</div>
+              <div onclick="calendarDaySelect(this)" class="calendar-month-day p-2 border border-slate-100 bg-slate-50 rounded cursor-pointer">2</div>
+              <div onclick="calendarDaySelect(this)" class="calendar-month-day p-2 border border-slate-100 bg-slate-50 rounded cursor-pointer">3</div>
+              <div onclick="calendarDaySelect(this)" class="calendar-month-day p-2 border border-slate-100 bg-slate-50 rounded cursor-pointer">4</div>
+              <div onclick="calendarDaySelect(this)" class="calendar-month-day p-2 border border-slate-100 bg-slate-50 rounded cursor-pointer">5</div>
+              <div onclick="calendarDaySelect(this)" class="calendar-month-day p-2 border border-slate-100 bg-slate-900 text-white rounded font-bold cursor-pointer">6</div>
+              <div onclick="calendarDaySelect(this)" class="calendar-month-day p-2 border border-slate-100 bg-slate-50 rounded cursor-pointer">7</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 27. Activity Timeline -->
+      <div id="tab-timeline" class="tab-content hidden w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">DATA</span>
+              <span class="text-xs text-slate-400 font-mono">#27</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Activity Timeline</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Audit trail and system event logs.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 shadow-sm">
+          <div class="space-y-6 relative ml-2">
+            <div class="relative flex items-center justify-between md:justify-normal gap-4">
+              <div class="flex items-center justify-center w-10 h-10 rounded-full border border-slate-300 bg-white text-slate-700 shadow shrink-0 font-mono text-xs font-bold">01</div>
+              <div class="flex-1 bg-slate-50 p-4 rounded border border-slate-200 shadow-sm text-xs space-y-1">
+                <div class="flex justify-between font-mono text-[10px] text-slate-400">
+                  <span>System Event</span>
+                  <span>10:42 AM</span>
+                </div>
+                <div class="font-bold text-slate-900">PO #9025 Created</div>
+                <p class="text-slate-600 text-[11px]">Dealer Southern Agri Supply submitted purchase order via API gateway.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 28. File Manager & Repository -->
+      <div id="tab-filemanager" class="tab-content hidden w-full max-w-4xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">ENTERPRISE</span>
+              <span class="text-xs text-slate-400 font-mono">#28</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">File Manager & Repository</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Dealer document management repository with folders, tagging, and preview pane.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 shadow-sm flex flex-col md:flex-row gap-6 min-h-[350px]">
+          <div class="w-full md:w-56 space-y-1 text-xs border-r border-slate-200 pr-4">
+            <div class="font-mono text-[10px] text-slate-400 uppercase font-bold mb-2">Directories</div>
+            <button onclick="fileManagerSelectDir(this, 'Invoices & POs')" data-dir="invoices" class="filemanager-dir-btn w-full text-left px-3 py-2 rounded bg-slate-100 font-semibold flex items-center gap-2 text-slate-900">
+              <i data-lucide="folder" class="w-4 h-4 text-slate-600"></i> Invoices & POs
+            </button>
+            <button onclick="fileManagerSelectDir(this, 'Tax Certificates')" data-dir="tax" class="filemanager-dir-btn w-full text-left px-3 py-2 rounded hover:bg-slate-50 font-medium flex items-center gap-2 text-slate-600">
+              <i data-lucide="folder" class="w-4 h-4 text-slate-400"></i> Tax Certificates
+            </button>
+            <button onclick="fileManagerSelectDir(this, 'Service Manuals')" data-dir="manuals" class="filemanager-dir-btn w-full text-left px-3 py-2 rounded hover:bg-slate-50 font-medium flex items-center gap-2 text-slate-600">
+              <i data-lucide="folder" class="w-4 h-4 text-slate-400"></i> Service Manuals
+            </button>
+          </div>
+          <div class="flex-1 space-y-3 text-xs">
+            <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+              <span id="filemanager-files-found-label" class="font-bold text-slate-900">3 Files Found</span>
+              <button onclick="fileManagerUploadClick()" class="px-3 py-1.5 rounded bg-slate-900 text-white font-medium">+ Upload File</button>
+            </div>
+            <input type="file" id="filemanager-file-input" class="hidden" onchange="fileManagerFilesSelected(this.files)" />
+            <div id="filemanager-file-list" class="space-y-2">
+              <div class="filemanager-file-row p-3 rounded border border-slate-200 bg-slate-50 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <i data-lucide="file-text" class="w-5 h-5 text-slate-500"></i>
+                  <div>
+                    <div class="font-bold text-slate-800">Dealer_Agreement_2026.pdf</div>
+                    <div class="text-[10px] text-slate-400 font-mono">2.4 MB • Updated Sep 01</div>
+                  </div>
+                </div>
+                <button class="text-slate-500 hover:text-slate-900 underline font-medium">Download</button>
+              </div>
+              <div class="filemanager-file-row p-3 rounded border border-slate-200 bg-slate-50 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <i data-lucide="file-spreadsheet" class="w-5 h-5 text-emerald-600"></i>
+                  <div>
+                    <div class="font-bold text-slate-800">Q3_Parts_Manifest.xlsx</div>
+                    <div class="text-[10px] text-slate-400 font-mono">840 KB • Updated Aug 28</div>
+                  </div>
+                </div>
+                <button class="text-slate-500 hover:text-slate-900 underline font-medium">Download</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 29. Live Chat & Support Ticket Thread -->
+      <div id="tab-chat" class="tab-content hidden w-full max-w-4xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">ENTERPRISE</span>
+              <span class="text-xs text-slate-400 font-mono">#29</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Live Chat & Support Ticket Thread</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Real-time dealer support thread with message history and priority tagging.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 shadow-sm flex flex-col h-[400px]">
+          <div class="flex justify-between items-center pb-3 border-b border-slate-200 text-xs">
+            <div>
+              <div class="font-bold text-slate-900">Ticket #TK-8492: Hydraulic Valve Part Delay</div>
+              <div class="text-[10px] text-slate-500 font-mono">Status: Escalated • Priority: High</div>
+            </div>
+            <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-mono text-[10px] font-bold">OPEN</span>
+          </div>
+          <div id="chat-message-container" class="flex-1 overflow-y-auto py-4 space-y-4 text-xs">
+            <div class="flex gap-3">
+              <div class="w-8 h-8 rounded-full bg-slate-800 text-white font-bold flex items-center justify-center shrink-0 font-mono text-[10px]">TM</div>
+              <div class="bg-slate-100 p-3 rounded-lg max-w-md space-y-1">
+                <div class="font-bold text-slate-900">Tech Motors Support</div>
+                <p class="text-slate-700">We are experiencing a shipment hold on SKU HYD-092-A. Can you verify estimated delivery?</p>
+                <div class="text-[9px] text-slate-400 font-mono">10:14 AM</div>
+              </div>
+            </div>
+            <div class="flex gap-3 flex-row-reverse">
+              <div class="w-8 h-8 rounded-full bg-slate-900 text-white font-bold flex items-center justify-center shrink-0 font-mono text-[10px]">DS</div>
+              <div class="bg-slate-900 text-white p-3 rounded-lg max-w-md space-y-1">
+                <div class="font-bold">Dispatcher Agent</div>
+                <p>Courier dispatch confirmed for tomorrow morning shift. Tracking ID will update shortly.</p>
+                <div class="text-[9px] text-slate-300 font-mono">10:18 AM</div>
+              </div>
+            </div>
+          </div>
+          <div class="pt-3 border-t border-slate-200 flex gap-2">
+            <input type="text" id="chat-message-input" onkeydown="chatInputKeydown(event)" placeholder="Type message..." class="flex-1 px-3 py-2 border border-slate-300 rounded text-xs outline-none focus:ring-1 focus:ring-slate-900" />
+            <button onclick="chatSendMessage()" class="px-4 py-2 bg-slate-900 text-white rounded text-xs font-semibold">Send</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 30. Analytics Sparkline & Charts -->
+      <div id="tab-sparkline" class="tab-content hidden w-full max-w-4xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">ENTERPRISE</span>
+              <span class="text-xs text-slate-400 font-mono">#30</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Analytics Sparkline & Metric Grid</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Miniature trend charts and performance indicators.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="p-4 rounded-lg border border-slate-200 bg-slate-50 space-y-2">
+            <div class="text-xs text-slate-500 font-medium">Daily RO Throughput</div>
+            <div class="text-2xl font-bold font-mono">142 units</div>
+            <div class="h-10 flex items-end gap-1 pt-2">
+              <div class="w-4 bg-slate-300 rounded-t h-4"></div>
+              <div class="w-4 bg-slate-400 rounded-t h-7"></div>
+              <div class="w-4 bg-slate-600 rounded-t h-5"></div>
+              <div class="w-4 bg-slate-900 rounded-t h-10"></div>
+              <div class="w-4 bg-slate-700 rounded-t h-8"></div>
+            </div>
+          </div>
+          <div class="p-4 rounded-lg border border-slate-200 bg-slate-50 space-y-2">
+            <div class="text-xs text-slate-500 font-medium">Customer Satisfaction</div>
+            <div class="text-2xl font-bold font-mono">98.4%</div>
+            <div class="h-10 flex items-end gap-1 pt-2">
+              <div class="w-4 bg-slate-400 rounded-t h-6"></div>
+              <div class="w-4 bg-slate-500 rounded-t h-8"></div>
+              <div class="w-4 bg-slate-700 rounded-t h-7"></div>
+              <div class="w-4 bg-slate-900 rounded-t h-9"></div>
+              <div class="w-4 bg-emerald-600 rounded-t h-10"></div>
+            </div>
+          </div>
+          <div class="p-4 rounded-lg border border-slate-200 bg-slate-50 space-y-2">
+            <div class="text-xs text-slate-500 font-medium">Average Labor Time</div>
+            <div class="text-2xl font-bold font-mono">42 mins</div>
+            <div class="h-10 flex items-end gap-1 pt-2">
+              <div class="w-4 bg-slate-900 rounded-t h-10"></div>
+              <div class="w-4 bg-slate-700 rounded-t h-8"></div>
+              <div class="w-4 bg-slate-500 rounded-t h-5"></div>
+              <div class="w-4 bg-slate-400 rounded-t h-4"></div>
+              <div class="w-4 bg-slate-300 rounded-t h-3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 31. RBAC Permissions Matrix -->
+      <div id="tab-rbac" class="tab-content hidden w-full max-w-4xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">ENTERPRISE</span>
+              <span class="text-xs text-slate-400 font-mono">#31</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">RBAC Permissions Matrix</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Role-based access control toggle matrix across modules.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 shadow-sm overflow-x-auto">
+          <table class="w-full text-left text-xs whitespace-nowrap">
+            <thead class="bg-slate-100 text-slate-600 font-mono text-[10px] border-b border-slate-200">
+              <tr>
+                <th class="p-3">MODULE / PERMISSION</th>
+                <th onclick="rbacToggleColumn(0)" class="p-3 text-center cursor-pointer hover:text-slate-900">DEALER ADMIN</th>
+                <th onclick="rbacToggleColumn(1)" class="p-3 text-center cursor-pointer hover:text-slate-900">SERVICE ADVISOR</th>
+                <th onclick="rbacToggleColumn(2)" class="p-3 text-center cursor-pointer hover:text-slate-900">PARTS TECHNICIAN</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 text-[11px]">
+              <tr>
+                <td class="p-3 font-semibold text-slate-800">Purchase Orders (Create & Approve)</td>
+                <td class="p-3 text-center"><input type="checkbox" checked data-rbac-col="0" class="rbac-checkbox rounded border-slate-300" /></td>
+                <td class="p-3 text-center"><input type="checkbox" checked data-rbac-col="1" class="rbac-checkbox rounded border-slate-300" /></td>
+                <td class="p-3 text-center"><input type="checkbox" data-rbac-col="2" class="rbac-checkbox rounded border-slate-300" /></td>
+              </tr>
+              <tr>
+                <td class="p-3 font-semibold text-slate-800">Financial Ledger & Billing</td>
+                <td class="p-3 text-center"><input type="checkbox" checked data-rbac-col="0" class="rbac-checkbox rounded border-slate-300" /></td>
+                <td class="p-3 text-center"><input type="checkbox" data-rbac-col="1" class="rbac-checkbox rounded border-slate-300" /></td>
+                <td class="p-3 text-center"><input type="checkbox" data-rbac-col="2" class="rbac-checkbox rounded border-slate-300" /></td>
+              </tr>
+              <tr>
+                <td class="p-3 font-semibold text-slate-800">Parts Inventory Requisition</td>
+                <td class="p-3 text-center"><input type="checkbox" checked data-rbac-col="0" class="rbac-checkbox rounded border-slate-300" /></td>
+                <td class="p-3 text-center"><input type="checkbox" checked data-rbac-col="1" class="rbac-checkbox rounded border-slate-300" /></td>
+                <td class="p-3 text-center"><input type="checkbox" checked data-rbac-col="2" class="rbac-checkbox rounded border-slate-300" /></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 32. Global Notification Inbox -->
+      <div id="tab-inbox" class="tab-content hidden w-full max-w-4xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">ENTERPRISE</span>
+              <span class="text-xs text-slate-400 font-mono">#32</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Global Notification Inbox</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Centralized inbox for unread system alerts, order updates, and dispatches.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 shadow-sm space-y-2 text-xs">
+          <div onclick="inboxMarkRead(this)" class="inbox-row cursor-pointer p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="inbox-dot w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+              <div>
+                <div class="inbox-title font-bold text-slate-900">PO #9025 Dispatched</div>
+                <div class="text-[11px] text-slate-500">Southern Agri Supply shipment is out for delivery.</div>
+              </div>
+            </div>
+            <span class="text-[10px] font-mono text-slate-400">10m ago</span>
+          </div>
+          <div onclick="inboxMarkRead(this)" class="inbox-row cursor-pointer p-3 rounded-lg border border-slate-200 bg-white flex items-center justify-between opacity-75">
+            <div class="flex items-center gap-3">
+              <span class="inbox-dot w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              <div>
+                <div class="inbox-title font-semibold text-slate-800">Low Stock Alert: Hydraulic Pump</div>
+                <div class="text-[11px] text-slate-500">Inventory fell below threshold of 5 units.</div>
+              </div>
+            </div>
+            <span class="text-[10px] font-mono text-slate-400">2h ago</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================== OVERLAYS & SHELLS ============================== -->
+
+      <!-- 33. Notification Banners -->
+      <div id="tab-banners" class="tab-content hidden w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">BANNER</span>
+              <span class="text-xs text-slate-400 font-mono">#33</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Notification Banners</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Different types of system banners across Success, Warning, Error, and Info intents.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 shadow-sm space-y-4">
+          <div class="banner-row p-3.5 rounded-lg border border-emerald-300 bg-emerald-50/70 flex items-start gap-3 text-xs relative">
+            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5"></i>
+            <div class="flex-1">
+              <div class="font-bold text-emerald-900">Purchase Order Successfully Synced</div>
+              <p class="text-emerald-700 text-[11px] mt-0.5">All 14 line items have been processed and dispatched to the fulfillment queue.</p>
+            </div>
+            <button onclick="this.closest('.banner-row').remove()" class="text-emerald-500 hover:text-emerald-800 shrink-0"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+          </div>
+          <div class="banner-row p-3.5 rounded-lg border border-amber-300 bg-amber-50/70 flex items-start gap-3 text-xs relative">
+            <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>
+            <div class="flex-1">
+              <div class="font-bold text-amber-900">Low Stock Threshold Warning</div>
+              <p class="text-amber-700 text-[11px] mt-0.5">Hydraulic Pump Assy (SKU: HYD-092-A) is down to 3 units in warehouse storage.</p>
+            </div>
+            <button onclick="this.closest('.banner-row').remove()" class="text-amber-500 hover:text-amber-800 shrink-0"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+          </div>
+          <div class="banner-row p-3.5 rounded-lg border border-red-300 bg-red-50/70 flex items-start gap-3 text-xs relative">
+            <i data-lucide="x-circle" class="w-4 h-4 text-red-600 shrink-0 mt-0.5"></i>
+            <div class="flex-1">
+              <div class="font-bold text-red-900">API Gateway Authentication Failed</div>
+              <p class="text-red-700 text-[11px] mt-0.5">Unable to connect to EuroTractors dealer endpoint. Please verify API keys in settings.</p>
+            </div>
+            <button onclick="this.closest('.banner-row').remove()" class="text-red-500 hover:text-red-800 shrink-0"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+          </div>
+          <div class="banner-row p-3.5 rounded-lg border border-slate-300 bg-slate-50 flex items-start gap-3 text-xs relative">
+            <i data-lucide="info" class="w-4 h-4 text-slate-700 shrink-0 mt-0.5"></i>
+            <div class="flex-1">
+              <div class="font-bold text-slate-900">Scheduled System Maintenance Notice</div>
+              <p class="text-slate-600 text-[11px] mt-0.5">Database sync will occur tonight at 02:00 UTC. API write actions will be temporarily paused.</p>
+            </div>
+            <button onclick="this.closest('.banner-row').remove()" class="text-slate-400 hover:text-slate-800 shrink-0"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 34. Confirmation Modal -->
+      <div id="tab-modal" class="tab-content hidden w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">OVERLAY</span>
+              <span class="text-xs text-slate-400 font-mono">#34</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Confirmation Modal</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Destructive action confirmation dialog.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 shadow-sm max-w-md space-y-4">
+          <button onclick="modalOpen()" class="px-4 py-2 bg-slate-900 text-white rounded-md text-xs font-semibold">Preview Modal</button>
+          <div class="border border-slate-300 rounded-lg p-6 bg-white shadow-md space-y-4 text-xs">
+            <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-900 flex items-center justify-center font-bold">!</div>
+            <div>
+              <h4 class="font-bold text-sm text-slate-900 mb-1">Archive Selected Order?</h4>
+              <p class="text-slate-500 leading-relaxed text-xs">This action will move #PO-9022 to the archive storage. You can restore it later from historical records.</p>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+              <button class="px-3 py-1.5 border border-slate-300 rounded font-medium bg-white">Cancel</button>
+              <button class="px-3 py-1.5 bg-slate-900 text-white rounded font-semibold">Confirm Archive</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Confirmation Modal overlay (rendered outside .tab-content flow but only meaningful while tab-modal is active) -->
+      <div id="modal-overlay" class="hidden fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center" onclick="modalBackdropClick(event)">
+        <div class="border border-slate-300 rounded-lg p-6 bg-white shadow-md space-y-4 text-xs w-full max-w-md m-4">
+          <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-900 flex items-center justify-center font-bold">!</div>
+          <div>
+            <h4 class="font-bold text-sm text-slate-900 mb-1">Archive Selected Order?</h4>
+            <p class="text-slate-500 leading-relaxed text-xs">This action will move #PO-9022 to the archive storage. You can restore it later from historical records.</p>
+          </div>
+          <div class="flex justify-end gap-2 pt-2">
+            <button onclick="modalClose()" class="px-3 py-1.5 border border-slate-300 rounded font-medium bg-white">Cancel</button>
+            <button onclick="modalClose()" class="px-3 py-1.5 bg-slate-900 text-white rounded font-semibold">Confirm Archive</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 35. Slide-out Drawer -->
+      <div id="tab-drawer" class="tab-content hidden w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">OVERLAY</span>
+              <span class="text-xs text-slate-400 font-mono">#35</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Slide-out Drawer</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Side panel overlay for rapid editing and detail inspection.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 shadow-sm space-y-4">
+          <button onclick="drawerOpen()" class="px-4 py-2 bg-slate-900 text-white rounded-md text-xs font-semibold">Open Drawer</button>
+          <div class="border border-slate-300 rounded-lg p-6 bg-slate-50 text-xs flex justify-end min-h-[300px]">
+            <div class="w-80 bg-white border border-slate-300 rounded-lg shadow-lg p-5 flex flex-col justify-between opacity-60">
+              <div class="space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+                  <h4 class="font-bold text-sm">Drawer Header</h4>
+                  <button class="text-slate-400 hover:text-slate-900"><i data-lucide="x" class="w-4 h-4"></i></button>
+                </div>
+                <p class="text-slate-500 text-[11px] leading-relaxed">Slide-out drawers are used for quick editing workflows, viewing item details, or managing form sequences without navigating away. (Static reference specimen &mdash; use the button above to see it slide in live.)</p>
+              </div>
+              <div class="flex gap-2 pt-4 border-t border-slate-200">
+                <button class="flex-1 py-2 border border-slate-300 rounded font-medium">Cancel</button>
+                <button class="flex-1 py-2 bg-slate-900 text-white rounded font-semibold">Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide-out Drawer overlay -->
+      <div id="drawer-overlay" class="hidden fixed inset-0 bg-slate-900/50 z-50" onclick="drawerBackdropClick(event)">
+        <div id="drawer-panel" class="absolute top-0 right-0 h-full w-80 bg-white border-l border-slate-300 shadow-lg p-5 flex flex-col justify-between text-xs transform translate-x-full transition-transform duration-300">
+          <div class="space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+              <h4 class="font-bold text-sm">Drawer Header</h4>
+              <button onclick="drawerClose()" class="text-slate-400 hover:text-slate-900"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <p class="text-slate-500 text-[11px] leading-relaxed">Slide-out drawers are used for quick editing workflows, viewing item details, or managing form sequences without navigating away.</p>
+          </div>
+          <div class="flex gap-2 pt-4 border-t border-slate-200">
+            <button onclick="drawerClose()" class="flex-1 py-2 border border-slate-300 rounded font-medium">Cancel</button>
+            <button onclick="drawerClose()" class="flex-1 py-2 bg-slate-900 text-white rounded font-semibold">Save</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 36. Command Palette -->
+      <div id="tab-command" class="tab-content hidden w-full max-w-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">OVERLAY</span>
+              <span class="text-xs text-slate-400 font-mono">#36</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Command Palette (⌘K)</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Quick search and action launcher overlay.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl p-6 shadow-sm max-w-xl space-y-4">
+          <button onclick="commandPaletteOpen()" class="px-4 py-2 bg-slate-900 text-white rounded-md text-xs font-semibold">Open Command Palette (&#8984;K)</button>
+          <div class="border border-slate-300 rounded-xl bg-white shadow-md overflow-hidden text-xs opacity-60">
+            <div class="p-3 border-b border-slate-200 flex items-center gap-2">
+              <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+              <input type="text" placeholder="Type a command or search..." value="Export" disabled class="w-full bg-transparent outline-none font-medium" />
+            </div>
+            <div class="p-2 space-y-1 text-slate-600 font-medium">
+              <div class="p-2 rounded bg-slate-100 text-slate-900 flex justify-between items-center">
+                <span>Export POs to CSV</span>
+                <span class="font-mono text-[10px] text-slate-400">↵ Return</span>
+              </div>
+              <div class="p-2 rounded hover:bg-slate-50 flex justify-between items-center">
+                <span>Export Ledger to PDF</span>
+                <span class="font-mono text-[10px] text-slate-400">⌘E</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Command Palette overlay -->
+      <div id="command-palette-overlay" class="hidden fixed inset-0 bg-slate-900/50 z-50 flex items-start justify-center pt-32" onclick="commandPaletteBackdropClick(event)">
+        <div class="border border-slate-300 rounded-xl bg-white shadow-md overflow-hidden text-xs w-full max-w-xl mx-4" onclick="event.stopPropagation()">
+          <div class="p-3 border-b border-slate-200 flex items-center gap-2">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+            <input type="text" id="command-palette-input" oninput="commandPaletteFilter(this.value)" placeholder="Type a command or search..." class="w-full bg-transparent outline-none font-medium" />
+          </div>
+          <div class="p-2 space-y-1 text-slate-600 font-medium">
+            <div class="command-palette-item p-2 rounded bg-slate-100 text-slate-900 flex justify-between items-center" data-cmd-label="Export POs to CSV">
+              <span>Export POs to CSV</span>
+              <span class="font-mono text-[10px] text-slate-400">↵ Return</span>
+            </div>
+            <div class="command-palette-item p-2 rounded hover:bg-slate-50 flex justify-between items-center" data-cmd-label="Export Ledger to PDF">
+              <span>Export Ledger to PDF</span>
+              <span class="font-mono text-[10px] text-slate-400">⌘E</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 37. Tekion DMS Shell Wireframe (Clean White & Grey Theme) -->
+      <div id="tab-shell" class="tab-content hidden w-full max-w-6xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">SHELL</span>
+              <span class="text-xs text-slate-400 font-mono">#37</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Tekion DMS Enterprise Shell Wireframe</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Clean white and grey theme wireframe layout featuring top application header and vertical icon workstation sidebar.</p>
+          </div>
+        </div>
+        
+        <!-- Tekion DMS Shell Clean White & Grey Wireframe Mockup -->
+        <div class="border border-slate-300 rounded-xl overflow-hidden bg-white text-slate-900 shadow-sm flex flex-col h-[450px] text-xs font-sans">
+          
+          <!-- Top Clean Header (White & Grey) -->
+          <div class="h-12 bg-white px-4 flex items-center justify-between border-b border-slate-200 shrink-0">
+            <div class="flex items-center gap-4">
+              <div class="flex items-center gap-1.5 cursor-pointer text-slate-600 hover:text-slate-900">
+                <i data-lucide="grip" class="w-4 h-4"></i>
+              </div>
+              <div class="font-extrabold tracking-wider text-slate-900 text-sm">TEKION</div>
+              <div class="relative w-64">
+                <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-2 text-slate-400"></i>
+                <input type="text" placeholder="Search here..." class="w-full pl-8 pr-3 py-1 bg-slate-50 border border-slate-300 rounded text-xs text-slate-800 outline-none" />
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="px-2.5 py-1 bg-slate-100 rounded border border-slate-200 flex items-center gap-1.5 text-[11px] cursor-pointer text-slate-700">
+                <i data-lucide="help-circle" class="w-3.5 h-3.5 text-slate-900"></i> Get Help <i data-lucide="chevron-down" class="w-3 h-3"></i>
+              </div>
+              <i data-lucide="bell" class="w-4 h-4 text-slate-500 cursor-pointer"></i>
+              <i data-lucide="message-square" class="w-4 h-4 text-slate-500 cursor-pointer"></i>
+              <i data-lucide="mail" class="w-4 h-4 text-slate-500 cursor-pointer"></i>
+              <div class="flex items-center gap-2 pl-2 border-l border-slate-200">
+                <div class="w-7 h-7 rounded bg-slate-900 font-bold text-[10px] flex items-center justify-center text-white">TM</div>
+                <span class="font-semibold text-xs text-slate-800">Tech Motors</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex-1 flex overflow-hidden">
+            <!-- Left Reduced Rail Navigation (White & Grey) -->
+            <aside class="w-12 bg-slate-100 border-r border-slate-200 flex flex-col items-center py-3 justify-between shrink-0">
+              <div class="space-y-2">
+                <div onclick="shellRailSelect(this)" class="shell-rail-tile w-8 h-8 rounded bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-[10px] cursor-pointer">TF</div>
+                <div onclick="shellRailSelect(this)" class="shell-rail-tile w-8 h-8 rounded bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-[10px] cursor-pointer">CM</div>
+                <div onclick="shellRailSelect(this)" class="shell-rail-tile w-8 h-8 rounded bg-slate-900 text-white flex items-center justify-center font-bold text-[10px] cursor-pointer shadow-sm">RO</div>
+                <div onclick="shellRailSelect(this)" class="shell-rail-tile w-8 h-8 rounded bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-[10px] cursor-pointer">SS</div>
+                <div onclick="shellRailSelect(this)" class="shell-rail-tile w-8 h-8 rounded bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-[10px] cursor-pointer">R</div>
+                <div onclick="shellRailSelect(this)" class="shell-rail-tile w-8 h-8 rounded bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-[10px] cursor-pointer">D</div>
+              </div>
+              <div class="space-y-1.5 text-center text-[10px] text-slate-500">
+                <div class="w-8 h-8 rounded bg-slate-200 text-slate-700 flex items-center justify-center mx-auto"><i data-lucide="clock" class="w-3.5 h-3.5"></i></div>
+                <div class="font-mono text-[9px]">8:24 PM</div>
+                <div class="w-6 h-6 rounded-full bg-slate-300 text-slate-800 flex items-center justify-center font-bold mx-auto text-[9px]">J</div>
+              </div>
+            </aside>
+
+            <!-- Main Workspace Placeholder Area (Clean White & Grey) -->
+            <div class="flex-1 flex flex-col bg-slate-50 overflow-hidden items-center justify-center p-8 text-center space-y-3">
+              <div class="w-12 h-12 rounded-full bg-white border border-slate-300 flex items-center justify-center text-slate-500 shadow-sm">
+                <i data-lucide="layout-template" class="w-6 h-6"></i>
+              </div>
+              <div class="font-bold text-slate-800 text-sm">Tekion DMS Shell Frame (Header & Left Navigation)</div>
+              <p class="text-slate-500 text-xs max-w-sm">This clean white and grey wireframe shell demonstrates the top enterprise application header and reduced vertical icon workstation sidebar without inner table headers or dark mode styling.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 38. AI Chat Assistant -->
+      <div id="tab-ai-chat" class="tab-content hidden w-full max-w-4xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">ENTERPRISE</span>
+              <span class="text-xs text-slate-400 font-mono">#38</span>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">AI Chat Assistant</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Conversational assistant panel — user prompt, streaming/typing state, a formatted AI answer, follow-up suggestion chips, and a model-disclaimer footer. Distinct from #29's human support ticket thread.</p>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-xl shadow-sm flex flex-col h-[460px] text-xs font-sans">
+
+          <!-- Assistant header -->
+          <div class="flex justify-between items-center px-4 py-3 border-b border-slate-200 shrink-0">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center shrink-0">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <div class="font-bold text-slate-900">DMS Assistant</div>
+                <div class="text-[10px] text-slate-500 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Online</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 text-slate-400">
+              <i data-lucide="rotate-ccw" onclick="aiChatNewConversation()" class="w-4 h-4 cursor-pointer" title="Start new conversation"></i>
+              <i data-lucide="x" class="w-4 h-4 cursor-pointer" title="Close"></i>
+            </div>
+          </div>
+
+          <!-- Message thread -->
+          <div id="ai-chat-thread" class="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+
+            <!-- User prompt -->
+            <div class="flex gap-3 flex-row-reverse">
+              <div class="w-7 h-7 rounded-full bg-slate-200 text-slate-700 font-bold flex items-center justify-center shrink-0 font-mono text-[10px]">JR</div>
+              <div class="bg-slate-900 text-white p-3 rounded-lg max-w-md">
+                <p>Why are 3 repair orders from yesterday still showing "Pending Parts"?</p>
+              </div>
+            </div>
+
+            <!-- AI answer: formatted response with a short structured list, not a plain paragraph -->
+            <div class="flex gap-3">
+              <div class="w-7 h-7 rounded-full bg-slate-900 text-white flex items-center justify-center shrink-0">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+              </div>
+              <div class="bg-slate-100 p-3 rounded-lg max-w-md space-y-2">
+                <p class="text-slate-700">3 ROs are held on backordered parts. Here's the breakdown:</p>
+                <ul class="space-y-1.5">
+                  <li class="flex items-center justify-between gap-3 bg-white rounded-md border border-slate-200 px-2.5 py-1.5">
+                    <span class="font-mono text-[10px] text-slate-600">RO-4471</span>
+                    <span class="text-slate-700">HYD-092-A &middot; ETA Sep 4</span>
+                  </li>
+                  <li class="flex items-center justify-between gap-3 bg-white rounded-md border border-slate-200 px-2.5 py-1.5">
+                    <span class="font-mono text-[10px] text-slate-600">RO-4483</span>
+                    <span class="text-slate-700">BRK-114-C &middot; ETA Sep 5</span>
+                  </li>
+                  <li class="flex items-center justify-between gap-3 bg-white rounded-md border border-slate-200 px-2.5 py-1.5">
+                    <span class="font-mono text-[10px] text-slate-600">RO-4490</span>
+                    <span class="text-slate-700">FLT-021-B &middot; ETA Sep 4</span>
+                  </li>
+                </ul>
+                <div class="flex items-center gap-3 pt-1 text-slate-400">
+                  <i data-lucide="thumbs-up" onclick="aiChatFeedbackToggle(this, 'up')" class="ai-feedback-icon w-3.5 h-3.5 cursor-pointer hover:text-slate-600"></i>
+                  <i data-lucide="thumbs-down" onclick="aiChatFeedbackToggle(this, 'down')" class="ai-feedback-icon w-3.5 h-3.5 cursor-pointer hover:text-slate-600"></i>
+                  <i data-lucide="copy" onclick="aiChatCopyAnswer(this)" class="ai-feedback-icon w-3.5 h-3.5 cursor-pointer hover:text-slate-600"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Typing / generating indicator -->
+            <div class="flex gap-3">
+              <div class="w-7 h-7 rounded-full bg-slate-900 text-white flex items-center justify-center shrink-0">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+              </div>
+              <div class="bg-slate-100 p-3 rounded-lg flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style="animation-delay:0ms"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style="animation-delay:150ms"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style="animation-delay:300ms"></span>
+              </div>
+            </div>
+
+            <!-- Follow-up suggestion chips -->
+            <div class="flex flex-wrap gap-2 pl-10">
+              <button onclick="aiChatSuggestionClick(this)" class="px-3 py-1.5 rounded-full border border-slate-300 text-slate-700 text-[11px] hover:bg-slate-50">Notify the 3 customers</button>
+              <button onclick="aiChatSuggestionClick(this)" class="px-3 py-1.5 rounded-full border border-slate-300 text-slate-700 text-[11px] hover:bg-slate-50">Reorder the parts now</button>
+              <button onclick="aiChatSuggestionClick(this)" class="px-3 py-1.5 rounded-full border border-slate-300 text-slate-700 text-[11px] hover:bg-slate-50">Show all held ROs</button>
+            </div>
+          </div>
+
+          <!-- Composer + model disclaimer -->
+          <div class="px-4 py-3 border-t border-slate-200 shrink-0 space-y-2">
+            <div class="flex gap-2">
+              <input type="text" id="ai-chat-input" onkeydown="aiChatInputKeydown(event)" placeholder="Ask the assistant..." class="flex-1 px-3 py-2 border border-slate-300 rounded-md text-xs outline-none focus:ring-1 focus:ring-slate-900" />
+              <button onclick="aiChatSendMessage()" class="w-9 h-9 rounded-md bg-slate-900 text-white flex items-center justify-center shrink-0">
+                <i data-lucide="arrow-up" class="w-4 h-4"></i>
+              </button>
+            </div>
+            <p class="text-[10px] text-slate-400 text-center">AI responses may be inaccurate — verify anything critical before acting on it.</p>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    function switchTab(tabId) {
+      const contents = document.querySelectorAll('.tab-content');
+      contents.forEach(el => el.classList.add('hidden'));
+
+      const target = document.getElementById(tabId);
+      if (target) {
+        target.classList.remove('hidden');
+      }
+
+      const navButtons = document.querySelectorAll('.nav-btn');
+      navButtons.forEach(btn => {
+        btn.classList.remove('bg-slate-100', 'text-slate-900', 'font-semibold');
+        btn.classList.add('text-slate-600', 'hover:bg-slate-50');
+      });
+
+      const activeBtn = document.getElementById('nav-' + tabId);
+      if (activeBtn) {
+        activeBtn.classList.remove('text-slate-600', 'hover:bg-slate-50');
+        activeBtn.classList.add('bg-slate-100', 'text-slate-900', 'font-semibold');
+      }
+
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+
+      if (tabId === 'tab-vertical-anchor-tabs' && typeof vaInitIndicator === 'function') {
+        vaInitIndicator();
+      }
+    }
+
+    function switchCalendarView(viewMode) {
+      const views = document.querySelectorAll('.calendar-view-content');
+      views.forEach(el => el.classList.add('hidden'));
+
+      const targetView = document.getElementById('calendar-view-' + viewMode);
+      if (targetView) {
+        targetView.classList.remove('hidden');
+      }
+
+      const viewButtons = document.querySelectorAll('.cal-view-btn');
+      viewButtons.forEach(btn => {
+        btn.classList.remove('bg-slate-900', 'text-white');
+        btn.classList.add('bg-white', 'text-slate-700');
+      });
+
+      const activeCalBtn = document.getElementById('cal-btn-' + viewMode);
+      if (activeCalBtn) {
+        activeCalBtn.classList.remove('bg-white', 'text-slate-700');
+        activeCalBtn.classList.add('bg-slate-900', 'text-white');
+      }
+
+      const titleLabel = document.getElementById('calendar-title-label');
+      if (titleLabel) {
+        if (viewMode === 'day') {
+          titleLabel.textContent = 'Wednesday, Sep 02, 2026';
+        } else if (viewMode === 'week') {
+          titleLabel.textContent = 'Week of Sep 01 - Sep 07, 2026';
+        } else if (viewMode === 'month') {
+          titleLabel.textContent = 'September 2026';
+        }
+      }
+    }
+
+    // ===================================================================
+    // 2. Button Groups & Icons
+    // ===================================================================
+    function btnGroupSelectSegment(el) {
+      const segs = el.parentElement.querySelectorAll('.btngroup-segment');
+      segs.forEach(s => { s.classList.remove('bg-slate-900', 'text-white'); s.classList.add('bg-white', 'text-slate-700'); });
+      el.classList.remove('bg-white', 'text-slate-700');
+      el.classList.add('bg-slate-900', 'text-white');
+    }
+    function btnGroupToggleFilterPanel() {
+      const panel = document.getElementById('btngroup-filter-panel');
+      if (panel) panel.classList.toggle('hidden');
+    }
+
+    // ===================================================================
+    // 6. Tooltips & Popovers
+    // ===================================================================
+    function togglePopover(evt) {
+      evt.stopPropagation();
+      const panel = document.getElementById('popover-panel');
+      if (panel) panel.classList.toggle('hidden');
+    }
+    document.addEventListener('click', (evt) => {
+      const panel = document.getElementById('popover-panel');
+      const trigger = document.getElementById('popover-trigger-btn');
+      if (!panel || panel.classList.contains('hidden')) return;
+      if (panel.contains(evt.target) || (trigger && trigger.contains(evt.target))) return;
+      panel.classList.add('hidden');
+    });
+
+    // ===================================================================
+    // 8. Selects & Textareas — password eye toggle
+    // ===================================================================
+    function togglePasswordVisibility() {
+      const input = document.getElementById('selects-password-input');
+      const icon = document.getElementById('selects-password-eye-icon');
+      if (!input || !icon) return;
+      const showing = input.type === 'text';
+      input.type = showing ? 'password' : 'text';
+      icon.setAttribute('data-lucide', showing ? 'eye' : 'eye-off');
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    // ===================================================================
+    // 9. Toggles, Checkboxes & Radios
+    // ===================================================================
+    function toggleConfigSwitch() {
+      const sw = document.getElementById('toggle-config-switch');
+      if (!sw) return;
+      const isOn = sw.classList.contains('bg-slate-900');
+      const knob = sw.querySelector('div');
+      if (isOn) {
+        sw.classList.remove('bg-slate-900', 'justify-end');
+        sw.classList.add('bg-slate-200', 'justify-start');
+      } else {
+        sw.classList.remove('bg-slate-200', 'justify-start');
+        sw.classList.add('bg-slate-900', 'justify-end');
+      }
+    }
+
+    // ===================================================================
+    // 10. Date Pickers
+    // ===================================================================
+    function datepickerSelectDay(el, day) {
+      document.querySelectorAll('.datepicker-day').forEach(d => {
+        d.classList.remove('bg-slate-900', 'text-white');
+        d.classList.add('bg-slate-100');
+      });
+      el.classList.remove('bg-slate-100');
+      el.classList.add('bg-slate-900', 'text-white');
+      const input = document.getElementById('datepicker-range-input');
+      if (input) input.value = 'Sep ' + String(day).padStart(2, '0') + ', 2026';
+    }
+    function datepickerNavClick(direction) {
+      console.log('Datepicker nav clicked:', direction > 0 ? 'next' : 'prev');
+    }
+
+    // ===================================================================
+    // 11. Range Sliders
+    // ===================================================================
+    let sliderDragState = null;
+
+    function sliderClampPercent(track, clientX) {
+      const rect = track.getBoundingClientRect();
+      let pct = ((clientX - rect.left) / rect.width) * 100;
+      return Math.max(0, Math.min(100, pct));
+    }
+
+    function sliderFormatPrice(pct) {
+      return Math.round((pct / 100) * 10000);
+    }
+
+    function sliderUpdateSingle(pct) {
+      const fill = document.getElementById('slider-single-fill');
+      const handle = document.getElementById('slider-single-handle');
+      const label = document.getElementById('slider-single-label');
+      if (fill) fill.style.width = pct + '%';
+      if (handle) handle.style.left = pct + '%';
+      if (label) label.textContent = Math.round(pct) + ' Units';
+    }
+
+    function sliderUpdateRange(leftPct, rightPct) {
+      const fill = document.getElementById('slider-range-fill');
+      const handleLeft = document.getElementById('slider-range-handle-left');
+      const handleRight = document.getElementById('slider-range-handle-right');
+      const label = document.getElementById('slider-range-label');
+      if (fill) { fill.style.left = leftPct + '%'; fill.style.width = (rightPct - leftPct) + '%'; }
+      if (handleLeft) handleLeft.style.left = leftPct + '%';
+      if (handleRight) handleRight.style.left = rightPct + '%';
+      if (label) {
+        const lo = sliderFormatPrice(leftPct);
+        const hi = sliderFormatPrice(rightPct);
+        label.textContent = '$' + lo.toLocaleString() + ' - $' + hi.toLocaleString();
+      }
+    }
+
+    function sliderPointerX(evt) {
+      if (evt.touches && evt.touches.length) return evt.touches[0].clientX;
+      return evt.clientX;
+    }
+
+    function sliderStartDrag(type, evt) {
+      evt.preventDefault();
+      sliderDragState = { type };
+      document.body.style.userSelect = 'none';
+    }
+
+    function sliderOnMove(evt) {
+      if (!sliderDragState) return;
+      const clientX = sliderPointerX(evt);
+      if (sliderDragState.type === 'single') {
+        const track = document.getElementById('slider-single-track');
+        const pct = sliderClampPercent(track, clientX);
+        sliderUpdateSingle(pct);
+      } else if (sliderDragState.type === 'range-left' || sliderDragState.type === 'range-right') {
+        const track = document.getElementById('slider-range-track');
+        const pct = sliderClampPercent(track, clientX);
+        const handleLeft = document.getElementById('slider-range-handle-left');
+        const handleRight = document.getElementById('slider-range-handle-right');
+        let leftPct = parseFloat(handleLeft.style.left) || 0;
+        let rightPct = parseFloat(handleRight.style.left) || 100;
+        if (sliderDragState.type === 'range-left') {
+          leftPct = Math.min(pct, rightPct);
+        } else {
+          rightPct = Math.max(pct, leftPct);
+        }
+        sliderUpdateRange(leftPct, rightPct);
+      }
+    }
+
+    function sliderOnEnd() {
+      sliderDragState = null;
+      document.body.style.userSelect = '';
+    }
+
+    function initSliders() {
+      const singleHandle = document.getElementById('slider-single-handle');
+      const rangeLeftHandle = document.getElementById('slider-range-handle-left');
+      const rangeRightHandle = document.getElementById('slider-range-handle-right');
+      if (singleHandle) {
+        singleHandle.addEventListener('mousedown', (e) => sliderStartDrag('single', e));
+        singleHandle.addEventListener('touchstart', (e) => sliderStartDrag('single', e), { passive: false });
+      }
+      if (rangeLeftHandle) {
+        rangeLeftHandle.addEventListener('mousedown', (e) => sliderStartDrag('range-left', e));
+        rangeLeftHandle.addEventListener('touchstart', (e) => sliderStartDrag('range-left', e), { passive: false });
+      }
+      if (rangeRightHandle) {
+        rangeRightHandle.addEventListener('mousedown', (e) => sliderStartDrag('range-right', e));
+        rangeRightHandle.addEventListener('touchstart', (e) => sliderStartDrag('range-right', e), { passive: false });
+      }
+      document.addEventListener('mousemove', sliderOnMove);
+      document.addEventListener('touchmove', sliderOnMove, { passive: false });
+      document.addEventListener('mouseup', sliderOnEnd);
+      document.addEventListener('touchend', sliderOnEnd);
+    }
+
+    // ===================================================================
+    // 12. Drag & Drop Upload
+    // ===================================================================
+    function uploadDropzoneClick() {
+      const input = document.getElementById('upload-file-input');
+      if (input) input.click();
+    }
+    function uploadDragOver(evt) {
+      evt.preventDefault();
+      const zone = document.getElementById('upload-dropzone');
+      if (zone) { zone.classList.add('border-slate-500', 'bg-slate-100'); zone.classList.remove('bg-slate-50'); }
+    }
+    function uploadDragLeave(evt) {
+      const zone = document.getElementById('upload-dropzone');
+      if (zone) { zone.classList.remove('border-slate-500', 'bg-slate-100'); zone.classList.add('bg-slate-50'); }
+    }
+    function uploadFormatSize(bytes) {
+      return (bytes / 1024).toFixed(1) + ' KB';
+    }
+    function uploadAddFileRow(file) {
+      const list = document.getElementById('upload-file-list');
+      if (!list) return;
+      const row = document.createElement('div');
+      row.className = 'upload-file-row flex items-center justify-between p-3 rounded-lg border border-slate-200 bg-slate-50 text-xs';
+      row.innerHTML = '<div class="flex items-center gap-3">' +
+        '<i data-lucide="file-text" class="w-5 h-5 text-slate-400"></i>' +
+        '<div><div class="font-semibold text-slate-800">' + file.name + '</div>' +
+        '<div class="text-[10px] text-slate-500 font-mono">' + uploadFormatSize(file.size) + '</div></div></div>' +
+        '<button onclick="this.closest(\'.upload-file-row\').remove()" class="text-slate-400 hover:text-slate-900"><i data-lucide="x" class="w-4 h-4"></i></button>';
+      list.appendChild(row);
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+    function uploadDrop(evt) {
+      evt.preventDefault();
+      const zone = document.getElementById('upload-dropzone');
+      if (zone) { zone.classList.remove('border-slate-500', 'bg-slate-100'); zone.classList.add('bg-slate-50'); }
+      const files = evt.dataTransfer ? evt.dataTransfer.files : [];
+      Array.from(files).forEach(uploadAddFileRow);
+    }
+    function uploadFilesSelected(files) {
+      Array.from(files).forEach(uploadAddFileRow);
+    }
+
+    // ===================================================================
+    // 13. App Header
+    // ===================================================================
+    function headerNavClick(evt, el) {
+      evt.preventDefault();
+      const links = document.querySelectorAll('.header-nav-link');
+      links.forEach(l => { l.classList.remove('font-bold', 'text-slate-900'); l.classList.add('hover:text-slate-900'); });
+      el.classList.add('font-bold', 'text-slate-900');
+      el.classList.remove('hover:text-slate-900');
+    }
+
+    // ===================================================================
+    // 14. Horizontal & Anchor Tabs
+    // ===================================================================
+    function localTabGroupSelect(el) {
+      const group = el.closest('[data-tabgroup]');
+      if (!group) return;
+      group.querySelectorAll('.local-tab-item').forEach(t => {
+        t.classList.remove('border-slate-900', 'font-bold', 'text-slate-900');
+        t.classList.add('text-slate-500', 'font-medium');
+      });
+      el.classList.add('border-slate-900', 'font-bold', 'text-slate-900');
+      el.classList.remove('text-slate-500', 'font-medium');
+    }
+    function localPillGroupSelect(el) {
+      const group = el.closest('[data-tabgroup]');
+      if (!group) return;
+      group.querySelectorAll('.local-pill-item').forEach(t => {
+        t.classList.remove('bg-white', 'text-slate-900', 'shadow-sm', 'border', 'border-slate-200');
+        t.classList.add('text-slate-600');
+      });
+      el.classList.add('bg-white', 'text-slate-900', 'shadow-sm', 'border', 'border-slate-200');
+      el.classList.remove('text-slate-600');
+    }
+
+    // ===================================================================
+    // 15. Vertical Anchor / Scroll Tabs
+    // ===================================================================
+    function vaSelectSection(el) {
+      document.querySelectorAll('.va-toc-link').forEach(l => {
+        const isSub = l.classList.contains('va-toc-sub');
+        l.classList.remove('font-bold', 'text-slate-900', 'text-slate-700', 'text-slate-500', 'text-slate-400');
+        if (l === el) {
+          l.classList.add('font-bold', 'text-slate-900');
+        } else {
+          l.classList.add(isSub ? 'text-slate-400' : 'text-slate-500');
+        }
+      });
+
+      const indicator = document.getElementById('va-toc-indicator');
+      if (indicator) {
+        indicator.style.top = el.offsetTop + 'px';
+        indicator.style.height = el.offsetHeight + 'px';
+      }
+
+      document.querySelectorAll('.va-content-section').forEach(s => s.classList.add('hidden'));
+      const target = document.getElementById(el.getAttribute('data-target'));
+      if (target) target.classList.remove('hidden');
+    }
+
+    function vaInitIndicator() {
+      const active = document.querySelector('.va-toc-link.font-bold') || document.querySelector('.va-toc-link');
+      if (active) vaSelectSection(active);
+    }
+
+    // ===================================================================
+    // 16. Vertical Tabs (Settings Pattern)
+    // ===================================================================
+    function vSettingsTabSelect(el) {
+      document.querySelectorAll('.v-settings-tab').forEach(t => {
+        t.classList.remove('bg-slate-100', 'text-slate-900', 'font-bold');
+        t.classList.add('text-slate-600', 'font-medium');
+      });
+      el.classList.add('bg-slate-100', 'text-slate-900', 'font-bold');
+      el.classList.remove('text-slate-600', 'font-medium');
+      const content = document.getElementById('v-settings-content');
+      if (content) content.textContent = 'Tab Content Container Specimen — ' + el.textContent.trim();
+    }
+
+    // ===================================================================
+    // 17. Steppers & Progress
+    // ===================================================================
+    function stepperSelect(el, stepIdx) {
+      document.querySelectorAll('.stepper-step').forEach(s => {
+        const idx = parseInt(s.getAttribute('data-step'), 10);
+        const circle = s.querySelector('.stepper-circle');
+        const label = s.querySelector('.stepper-label');
+        if (idx <= stepIdx) {
+          s.classList.remove('text-slate-400');
+          s.classList.add('font-bold', 'text-slate-900');
+          if (circle) { circle.classList.remove('border', 'border-slate-300'); circle.classList.add('bg-slate-900', 'text-white'); }
+        } else {
+          s.classList.remove('font-bold', 'text-slate-900');
+          s.classList.add('text-slate-400');
+          if (circle) { circle.classList.remove('bg-slate-900', 'text-white'); circle.classList.add('border', 'border-slate-300'); }
+        }
+      });
+    }
+
+    // ===================================================================
+    // 18. Context Menu Specimen
+    // ===================================================================
+    function contextMenuOpen(evt) {
+      evt.preventDefault();
+      const panel = document.getElementById('context-menu-panel');
+      const box = document.getElementById('context-menu-demo-box');
+      if (!panel || !box) return;
+      panel.classList.remove('hidden');
+      const boxRect = box.getBoundingClientRect();
+      const menuWidth = panel.offsetWidth || 256;
+      const menuHeight = panel.offsetHeight || 260;
+      let x = evt.clientX;
+      let y = evt.clientY;
+      x = Math.min(x, boxRect.right - menuWidth - 8);
+      y = Math.min(y, boxRect.bottom - menuHeight - 8);
+      x = Math.max(x, boxRect.left + 8);
+      y = Math.max(y, boxRect.top + 8);
+      panel.style.left = x + 'px';
+      panel.style.top = y + 'px';
+    }
+    function contextMenuClose() {
+      const panel = document.getElementById('context-menu-panel');
+      if (panel) panel.classList.add('hidden');
+    }
+    function contextMenuItemClick(el) {
+      contextMenuClose();
+    }
+    function contextMenuDeleteClick(el) {
+      const label = el.querySelector('.context-menu-delete-label');
+      if (label) {
+        const original = label.textContent;
+        label.textContent = 'Deleted.';
+        setTimeout(() => {
+          label.textContent = original;
+          contextMenuClose();
+        }, 800);
+      } else {
+        contextMenuClose();
+      }
+    }
+    document.addEventListener('click', (evt) => {
+      const panel = document.getElementById('context-menu-panel');
+      if (!panel || panel.classList.contains('hidden')) return;
+      if (!panel.contains(evt.target)) contextMenuClose();
+    });
+    document.addEventListener('keydown', (evt) => {
+      if (evt.key === 'Escape') contextMenuClose();
+    });
+
+    // ===================================================================
+    // 19. KPI Metric Card
+    // ===================================================================
+    const kpiPeriods = [
+      { label: 'YTD', title: 'YTD Dealer Revenue', value: '$84,320.00', growth: '↑ +18.4% vs last mo' },
+      { label: 'MTD', title: 'MTD Dealer Revenue', value: '$12,940.00', growth: '↑ +6.1% vs last mo' },
+      { label: 'QTD', title: 'QTD Dealer Revenue', value: '$41,205.00', growth: '↑ +11.2% vs last mo' }
+    ];
+    let kpiPeriodIdx = 0;
+    function kpiCyclePeriod() {
+      kpiPeriodIdx = (kpiPeriodIdx + 1) % kpiPeriods.length;
+      const p = kpiPeriods[kpiPeriodIdx];
+      const btn = document.getElementById('kpi-period-toggle');
+      const title = document.getElementById('kpi-title-label');
+      const value = document.getElementById('kpi-value-label');
+      const growth = document.getElementById('kpi-growth-label');
+      if (btn) btn.textContent = p.label;
+      if (title) title.textContent = p.title;
+      if (value) value.textContent = p.value;
+      if (growth) growth.textContent = p.growth;
+    }
+
+    // ===================================================================
+    // 20. Product/Part Card
+    // ===================================================================
+    function productToggleAddToPO(btn) {
+      const span = btn.querySelector('span');
+      const added = btn.classList.contains('bg-slate-700');
+      if (added) {
+        btn.classList.remove('bg-slate-700');
+        btn.classList.add('bg-slate-900');
+        if (span) span.textContent = 'Add to PO';
+      } else {
+        btn.classList.remove('bg-slate-900');
+        btn.classList.add('bg-slate-700');
+        if (span) span.textContent = '✓ Added to PO';
+      }
+    }
+
+    // ===================================================================
+    // 21. Profile Card
+    // ===================================================================
+    function profileToggleDetails(btn) {
+      const extra = document.getElementById('profile-details-extra');
+      if (!extra) return;
+      const hidden = extra.classList.contains('hidden');
+      extra.classList.toggle('hidden');
+      btn.textContent = hidden ? 'Hide Details' : 'View Details';
+    }
+
+    // ===================================================================
+    // 22. Accordions & Panels
+    // ===================================================================
+    function accordionToggle(header) {
+      const content = header.nextElementSibling;
+      const chevron = header.querySelector('.accordion-chevron');
+      if (!content) return;
+      const isHidden = content.classList.contains('hidden');
+      content.classList.toggle('hidden');
+      if (chevron) {
+        chevron.setAttribute('data-lucide', isHidden ? 'chevron-up' : 'chevron-down');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+      }
+    }
+
+    // ===================================================================
+    // 23. Empty States
+    // ===================================================================
+    function emptyStateAction(message) {
+      console.log(message);
+      const toast = document.getElementById('empty-state-toast');
+      if (!toast) return;
+      toast.textContent = message;
+      setTimeout(() => { toast.textContent = ''; }, 1500);
+    }
+
+    // ===================================================================
+    // 24. Data Table
+    // ===================================================================
+    function tableSelectAll(checked) {
+      document.querySelectorAll('.table-row-checkbox').forEach(cb => { cb.checked = checked; });
+    }
+    function tableFilterRows(query) {
+      const q = query.toLowerCase();
+      document.querySelectorAll('#table-body .table-row').forEach(row => {
+        const dealer = (row.querySelector('.table-cell-dealer') || {}).textContent || '';
+        const po = (row.querySelector('.table-cell-po') || {}).textContent || '';
+        const match = dealer.toLowerCase().includes(q) || po.toLowerCase().includes(q);
+        row.classList.toggle('hidden', !match);
+      });
+    }
+    function tablePaginationClick(page) {
+      const buttons = document.querySelectorAll('.table-page-btn');
+      if (page === 'prev' || page === 'next') {
+        let current = 1;
+        buttons.forEach(b => { if (b.classList.contains('bg-slate-900')) current = parseInt(b.textContent, 10); });
+        page = page === 'prev' ? Math.max(1, current - 1) : Math.min(2, current + 1);
+      }
+      buttons.forEach(b => {
+        const isTarget = parseInt(b.textContent, 10) === page;
+        b.classList.toggle('bg-slate-900', isTarget);
+        b.classList.toggle('text-white', isTarget);
+        b.classList.toggle('bg-white', !isTarget);
+        b.classList.toggle('border', !isTarget);
+        b.classList.toggle('border-slate-300', !isTarget);
+      });
+    }
+    function tableViewRowToggle(btn) {
+      const row = btn.closest('.table-row');
+      if (row) row.classList.toggle('bg-slate-100');
+    }
+
+    // ===================================================================
+    // 25. Kanban Board
+    // ===================================================================
+    let kanbanDraggedCard = null;
+    function kanbanDragStart(evt, card) {
+      kanbanDraggedCard = card;
+      evt.dataTransfer.effectAllowed = 'move';
+      try { evt.dataTransfer.setData('text/plain', 'card'); } catch (e) {}
+    }
+    function kanbanDragOver(evt) {
+      evt.preventDefault();
+    }
+    function kanbanUpdateCount(column) {
+      const badge = column.querySelector('.kanban-count-badge');
+      const list = column.querySelector('.kanban-card-list');
+      if (!badge || !list) return;
+      const count = list.querySelectorAll(':scope > [draggable="true"]').length;
+      badge.textContent = String(count);
+      const placeholder = list.querySelector('.kanban-empty-placeholder');
+      if (placeholder) placeholder.classList.toggle('hidden', count > 0);
+    }
+    function kanbanDrop(evt, column) {
+      evt.preventDefault();
+      if (!kanbanDraggedCard) return;
+      const list = column.querySelector('.kanban-card-list');
+      if (!list) return;
+      const sourceColumn = kanbanDraggedCard.closest('.kanban-column');
+      // insert before the empty-state placeholder (if any) so the placeholder always stays last
+      const placeholder = list.querySelector('.kanban-empty-placeholder');
+      if (placeholder) {
+        list.insertBefore(kanbanDraggedCard, placeholder);
+      } else {
+        list.appendChild(kanbanDraggedCard);
+      }
+      if (sourceColumn) kanbanUpdateCount(sourceColumn);
+      kanbanUpdateCount(column);
+      kanbanDraggedCard = null;
+    }
+
+    // ===================================================================
+    // 26. Appointment Calendar
+    // ===================================================================
+    function calendarNewAppointmentClick() {
+      console.log('New Appointment clicked');
+    }
+    function calendarNavClick(direction) {
+      console.log('Calendar nav clicked:', direction > 0 ? 'next' : 'prev');
+    }
+    function calendarDaySelect(el) {
+      document.querySelectorAll('.calendar-month-day').forEach(d => {
+        d.classList.remove('bg-slate-900', 'text-white', 'font-bold');
+      });
+      el.classList.add('bg-slate-900', 'text-white', 'font-bold');
+    }
+
+    // ===================================================================
+    // 28. File Manager & Repository
+    // ===================================================================
+    const fileManagerDirFiles = {
+      invoices: [
+        { icon: 'file-text', color: 'text-slate-500', name: 'Dealer_Agreement_2026.pdf', meta: '2.4 MB • Updated Sep 01' },
+        { icon: 'file-spreadsheet', color: 'text-emerald-600', name: 'Q3_Parts_Manifest.xlsx', meta: '840 KB • Updated Aug 28' }
+      ],
+      tax: [
+        { icon: 'file-text', color: 'text-slate-500', name: 'Tax_Exempt_Certificate_CA.pdf', meta: '512 KB • Updated Jul 14' }
+      ],
+      manuals: [
+        { icon: 'file-text', color: 'text-slate-500', name: 'Hydraulic_Assembly_Manual.pdf', meta: '4.1 MB • Updated Jun 02' },
+        { icon: 'file-text', color: 'text-slate-500', name: 'Diagnostic_Procedures_v3.pdf', meta: '1.8 MB • Updated May 20' }
+      ]
+    };
+    let fileManagerActiveDir = 'invoices';
+    function fileManagerRenderList() {
+      const list = document.getElementById('filemanager-file-list');
+      const label = document.getElementById('filemanager-files-found-label');
+      if (!list) return;
+      const files = fileManagerDirFiles[fileManagerActiveDir] || [];
+      list.innerHTML = files.map(f =>
+        '<div class="filemanager-file-row p-3 rounded border border-slate-200 bg-slate-50 flex items-center justify-between">' +
+          '<div class="flex items-center gap-3">' +
+            '<i data-lucide="' + f.icon + '" class="w-5 h-5 ' + f.color + '"></i>' +
+            '<div><div class="font-bold text-slate-800">' + f.name + '</div>' +
+            '<div class="text-[10px] text-slate-400 font-mono">' + f.meta + '</div></div>' +
+          '</div>' +
+          '<button class="text-slate-500 hover:text-slate-900 underline font-medium">Download</button>' +
+        '</div>'
+      ).join('');
+      if (label) label.textContent = files.length + ' Files Found';
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+    function fileManagerSelectDir(el, label) {
+      document.querySelectorAll('.filemanager-dir-btn').forEach(b => {
+        b.classList.remove('bg-slate-100', 'font-semibold', 'text-slate-900');
+        b.classList.add('text-slate-600', 'font-medium');
+      });
+      el.classList.add('bg-slate-100', 'font-semibold', 'text-slate-900');
+      el.classList.remove('text-slate-600', 'font-medium');
+      fileManagerActiveDir = el.getAttribute('data-dir');
+      fileManagerRenderList();
+    }
+    function fileManagerUploadClick() {
+      const input = document.getElementById('filemanager-file-input');
+      if (input) input.click();
+    }
+    function fileManagerFilesSelected(files) {
+      const dirFiles = fileManagerDirFiles[fileManagerActiveDir] || (fileManagerDirFiles[fileManagerActiveDir] = []);
+      Array.from(files).forEach(file => {
+        dirFiles.push({
+          icon: 'file-text',
+          color: 'text-slate-500',
+          name: file.name,
+          meta: (file.size / 1024).toFixed(1) + ' KB • Updated just now'
+        });
+      });
+      fileManagerRenderList();
+    }
+
+    // ===================================================================
+    // 29. Live Chat & Support Ticket
+    // ===================================================================
+    function chatInputKeydown(evt) {
+      if (evt.key === 'Enter') {
+        evt.preventDefault();
+        chatSendMessage();
+      }
+    }
+    function chatSendMessage() {
+      const input = document.getElementById('chat-message-input');
+      const container = document.getElementById('chat-message-container');
+      if (!input || !container || !input.value.trim()) return;
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const row = document.createElement('div');
+      row.className = 'flex gap-3 flex-row-reverse';
+      row.innerHTML = '<div class="w-8 h-8 rounded-full bg-slate-900 text-white font-bold flex items-center justify-center shrink-0 font-mono text-[10px]">DS</div>' +
+        '<div class="bg-slate-900 text-white p-3 rounded-lg max-w-md space-y-1">' +
+        '<div class="font-bold">Dispatcher Agent</div>' +
+        '<p>' + input.value.replace(/</g, '&lt;') + '</p>' +
+        '<div class="text-[9px] text-slate-300 font-mono">' + time + '</div></div>';
+      container.appendChild(row);
+      input.value = '';
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // ===================================================================
+    // 31. RBAC Permissions Matrix
+    // ===================================================================
+    function rbacToggleColumn(colIdx) {
+      const checkboxes = document.querySelectorAll('.rbac-checkbox[data-rbac-col="' + colIdx + '"]');
+      if (!checkboxes.length) return;
+      const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+      const shouldCheck = checkedCount < checkboxes.length / 2 || checkedCount === 0;
+      checkboxes.forEach(cb => { cb.checked = shouldCheck; });
+    }
+
+    // ===================================================================
+    // 32. Global Notification Inbox
+    // ===================================================================
+    function inboxMarkRead(row) {
+      const dot = row.querySelector('.inbox-dot');
+      if (dot) { dot.classList.remove('bg-blue-600'); dot.classList.add('bg-transparent'); }
+      row.classList.add('opacity-75');
+      const title = row.querySelector('.inbox-title');
+      if (title) { title.classList.remove('font-bold', 'text-slate-900'); title.classList.add('font-semibold', 'text-slate-800'); }
+    }
+
+    // ===================================================================
+    // 34. Confirmation Modal
+    // ===================================================================
+    function modalOpen() {
+      const overlay = document.getElementById('modal-overlay');
+      if (overlay) overlay.classList.remove('hidden');
+    }
+    function modalClose() {
+      const overlay = document.getElementById('modal-overlay');
+      if (overlay) overlay.classList.add('hidden');
+    }
+    function modalBackdropClick(evt) {
+      if (evt.target.id === 'modal-overlay') modalClose();
+    }
+
+    // ===================================================================
+    // 35. Slide-out Drawer
+    // ===================================================================
+    function drawerOpen() {
+      const overlay = document.getElementById('drawer-overlay');
+      const panel = document.getElementById('drawer-panel');
+      if (overlay) overlay.classList.remove('hidden');
+      requestAnimationFrame(() => {
+        if (panel) { panel.classList.remove('translate-x-full'); panel.classList.add('translate-x-0'); }
+      });
+    }
+    function drawerClose() {
+      const overlay = document.getElementById('drawer-overlay');
+      const panel = document.getElementById('drawer-panel');
+      if (panel) { panel.classList.add('translate-x-full'); panel.classList.remove('translate-x-0'); }
+      setTimeout(() => { if (overlay) overlay.classList.add('hidden'); }, 300);
+    }
+    function drawerBackdropClick(evt) {
+      if (evt.target.id === 'drawer-overlay') drawerClose();
+    }
+
+    // ===================================================================
+    // 36. Command Palette
+    // ===================================================================
+    function commandPaletteOpen() {
+      const overlay = document.getElementById('command-palette-overlay');
+      const input = document.getElementById('command-palette-input');
+      if (overlay) overlay.classList.remove('hidden');
+      if (input) { input.value = ''; commandPaletteFilter(''); setTimeout(() => input.focus(), 0); }
+    }
+    function commandPaletteClose() {
+      const overlay = document.getElementById('command-palette-overlay');
+      if (overlay) overlay.classList.add('hidden');
+    }
+    function commandPaletteBackdropClick(evt) {
+      if (evt.target.id === 'command-palette-overlay') commandPaletteClose();
+    }
+    function commandPaletteFilter(query) {
+      const q = query.toLowerCase();
+      document.querySelectorAll('.command-palette-item').forEach(item => {
+        const label = (item.getAttribute('data-cmd-label') || '').toLowerCase();
+        item.classList.toggle('hidden', !label.includes(q));
+      });
+    }
+    document.addEventListener('keydown', (evt) => {
+      if ((evt.metaKey || evt.ctrlKey) && evt.key.toLowerCase() === 'k') {
+        evt.preventDefault();
+        commandPaletteOpen();
+      } else if (evt.key === 'Escape') {
+        commandPaletteClose();
+      }
+    });
+
+    // ===================================================================
+    // 37. Tekion DMS Shell Wireframe
+    // ===================================================================
+    function shellRailSelect(el) {
+      document.querySelectorAll('.shell-rail-tile').forEach(t => {
+        t.classList.remove('bg-slate-900', 'text-white', 'shadow-sm');
+        t.classList.add('bg-slate-200', 'text-slate-700');
+      });
+      el.classList.remove('bg-slate-200', 'text-slate-700');
+      el.classList.add('bg-slate-900', 'text-white', 'shadow-sm');
+    }
+
+    // ===================================================================
+    // 38. AI Chat Assistant
+    // ===================================================================
+    let aiChatInitialThreadHTML = '';
+    function aiChatInputKeydown(evt) {
+      if (evt.key === 'Enter') {
+        evt.preventDefault();
+        aiChatSendMessage();
+      }
+    }
+    function aiChatSuggestionClick(chip) {
+      const input = document.getElementById('ai-chat-input');
+      if (input) input.value = chip.textContent.trim();
+      aiChatSendMessage();
+    }
+    function aiChatSendMessage() {
+      const input = document.getElementById('ai-chat-input');
+      const thread = document.getElementById('ai-chat-thread');
+      if (!input || !thread || !input.value.trim()) return;
+      const text = input.value.replace(/</g, '&lt;');
+      const userRow = document.createElement('div');
+      userRow.className = 'flex gap-3 flex-row-reverse';
+      userRow.innerHTML = '<div class="w-7 h-7 rounded-full bg-slate-200 text-slate-700 font-bold flex items-center justify-center shrink-0 font-mono text-[10px]">JR</div>' +
+        '<div class="bg-slate-900 text-white p-3 rounded-lg max-w-md"><p>' + text + '</p></div>';
+      thread.appendChild(userRow);
+      input.value = '';
+      thread.scrollTop = thread.scrollHeight;
+      setTimeout(() => {
+        const aiRow = document.createElement('div');
+        aiRow.className = 'flex gap-3';
+        aiRow.innerHTML = '<div class="w-7 h-7 rounded-full bg-slate-900 text-white flex items-center justify-center shrink-0"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i></div>' +
+          '<div class="bg-slate-100 p-3 rounded-lg max-w-md"><p class="text-slate-700">Got it — let me check that for you.</p></div>';
+        thread.appendChild(aiRow);
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        thread.scrollTop = thread.scrollHeight;
+      }, 700);
+    }
+    function aiChatNewConversation() {
+      const thread = document.getElementById('ai-chat-thread');
+      if (thread && aiChatInitialThreadHTML) {
+        thread.innerHTML = aiChatInitialThreadHTML;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+      }
+    }
+    function aiChatFeedbackToggle(icon, kind) {
+      icon.classList.toggle('text-slate-900');
+      icon.classList.toggle('text-slate-400');
+    }
+    function aiChatCopyAnswer(icon) {
+      const text = "3 ROs are held on backordered parts: RO-4471 (HYD-092-A, ETA Sep 4), RO-4483 (BRK-114-C, ETA Sep 5), RO-4490 (FLT-021-B, ETA Sep 4).";
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text);
+        }
+      } catch (e) {}
+      icon.classList.add('text-slate-900');
+      setTimeout(() => icon.classList.remove('text-slate-900'), 600);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+      switchTab('tab-btn-variants');
+      initSliders();
+      const aiThread = document.getElementById('ai-chat-thread');
+      if (aiThread) aiChatInitialThreadHTML = aiThread.innerHTML;
+    });
+  </script>
+</body>
+</html>
