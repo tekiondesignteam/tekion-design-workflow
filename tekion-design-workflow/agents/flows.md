@@ -41,6 +41,8 @@ Do not blindly trust the brief's "Identified Flows" section on its own — cross
 2. Re-read every Surface's "How it works," the "Clarifications" section, and named edge cases for any user flow implied there that isn't already on the list. A flow is anything a user does end-to-end to accomplish one goal — some only surface as a side-effect of an edge case note (e.g. an account-recovery path implied by a mention of expired sessions), never listed explicitly.
 3. Append any missing flows in the same format: `[Flow name]: [one sentence — what the user is trying to accomplish]`.
 
+4. **Comment / feedback flows**: if the feature includes any surface where a user can comment on, annotate, or give feedback on a record or item, explicitly check whether a "Add comment on [surface]" flow is present. If not, add it — this is frequently omitted from ISDs but is always needed when the surface supports it.
+
 Do not generate any diagrams yet.
 
 ---
@@ -66,6 +68,8 @@ If the designer describes changes: apply them to the list and repeat this step w
 ## Step 4: Generate the Mermaid flow for each confirmed flow
 
 For every confirmed flow, write one complete `flowchart TD` diagram. Always generate full depth — happy path plus all meaningful branches (error states, retries, fallbacks, empty states, permission gates). There is no "happy path only" mode.
+
+**User journey only — no backend nodes**: Every node must describe something the user sees, does, or decides. Never include backend operations, API calls, data writes, service processing steps, database events, or system-internal logic as flow nodes. If a system response is needed for context (e.g. a confirmation message), represent it as a single `[System shows confirmation]` node — never expand system internals into sub-steps. If you find yourself writing a node like `[System updates record in DB]`, `[API validates token]`, or `[Event published to queue]`, that node does not belong here.
 
 **Node conventions** (see `${CLAUDE_PLUGIN_ROOT}/references/flows/template.html` for worked examples):
 - **Start node** — stadium shape: `([User lands on X])`

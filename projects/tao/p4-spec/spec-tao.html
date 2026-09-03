@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spec — TAO Dealer Website Scraping</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--s2:#F8F9FA;--bd:#EDEEF0;--bds:#D4D5D6;
+  --t:#161616;--ts:#444F5C;--tm:#6B7280;--td:#9BA5B4;
+  --ok:#16A34A;--okbg:#DCFCE7;--warn:#D97706;--warnbg:#FEF3C7;--err:#DC2626;--errbg:#FEF2F2;--errbd:#FECACA;
+  --font-body:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);color:var(--t);line-height:1.65;font-size:14px;background:#fff;font-weight:500}
+
+.sec-head{display:flex;align-items:center;gap:10px;margin:44px 0 14px;padding-bottom:10px;border-bottom:2px solid var(--t)}
+.sec-head:first-of-type{margin-top:0}
+.sec-head svg{flex-shrink:0;color:var(--t)}
+.sec-title{font-size:17px;font-weight:700;letter-spacing:-.1px;color:var(--t)}
+.sec-count{font-size:10px;font-weight:500;color:var(--td);background:var(--s2);padding:2px 8px;border-radius:20px;font-family:var(--font-mono);margin-left:auto}
+
+.doc-section{margin-bottom:8px;font-size:13.5px;color:var(--ts);line-height:1.7}
+.doc-section p{margin-bottom:10px}
+.doc-section ul{padding-left:20px;margin-bottom:10px}
+.doc-section li{margin-bottom:4px}
+.doc-section b{color:var(--t)}
+
+.persona-card{border:1px solid var(--bd);border-radius:8px;padding:16px;margin-bottom:12px}
+.persona-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.persona-avatar{width:34px;height:34px;border-radius:50%;flex-shrink:0;image-rendering:pixelated;overflow:hidden}
+.persona-avatar svg{display:block;width:100%;height:100%}
+.persona-name{font-weight:700;font-size:15px}
+.persona-role{font-size:12.5px;color:var(--tm)}
+.tension-row{display:flex;gap:8px;font-size:13.5px;line-height:1.6;margin-top:9px}
+.tension-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--td);flex-shrink:0;width:100px;padding-top:2px}
+.tension-row span:last-child{color:var(--ts)}
+
+.ref-item{font-size:13.5px;line-height:1.7;color:var(--ts);margin-bottom:8px;padding-left:14px;position:relative}
+.ref-item::before{content:'\2014';color:var(--td);position:absolute;left:0;top:0}
+
+.scope-nongoal{background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;padding:14px 16px}
+.scope-nongoal-body{font-size:13.5px;line-height:1.65;color:#78350F}
+
+.metric-item{display:flex;gap:8px;margin-bottom:9px;line-height:1.6;font-size:13.5px;color:var(--ts)}
+
+.tvd-wrap{display:flex;flex-direction:column;border:1px solid var(--bd);border-radius:10px;overflow:hidden}
+.tvd-row{display:flex;gap:14px;padding:16px 18px;background:#fff}
+.tvd-row.today{background:var(--s2);border-bottom:1px solid var(--bd)}
+.tvd-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tvd-icon.today{background:#EDEEF0;color:var(--tm)}
+.tvd-icon.desired{background:var(--t);color:#fff}
+.tvd-body{flex:1}
+.tvd-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.tvd-label.today{color:var(--tm)}
+.tvd-label.desired{color:var(--t)}
+.tvd-list{list-style:none}
+.tvd-list li{font-size:12.5px;line-height:1.6;color:var(--ts);margin-bottom:8px;padding-left:14px;position:relative}
+.tvd-list li::before{content:'';position:absolute;left:0;top:7px;width:4px;height:4px;border-radius:50%;background:var(--td)}
+.tvd-list li:last-child{margin-bottom:0}
+.tvd-row.today .tvd-list li{color:var(--tm)}
+
+.surface-block{border:1.5px solid var(--bd);border-radius:12px;margin-bottom:28px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.surface-block-head{background:var(--s2);padding:16px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px}
+.surface-block-num{font-size:11px;font-weight:700;font-family:var(--font-mono);color:#fff;background:var(--t);border-radius:5px;padding:2px 8px;flex-shrink:0}
+.surface-block-name{font-size:17px;font-weight:700;color:var(--t)}
+.surface-block-body{padding:20px}
+.surface-sub-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t);margin:26px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
+.surface-sub-title:first-child{margin-top:0}
+
+.step-list{display:flex;flex-direction:column}
+.step-row{display:flex;gap:10px;align-items:stretch}
+.step-col{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.step-circle{width:22px;height:22px;border-radius:50%;background:var(--t);color:#fff;font-size:10px;font-weight:700;font-family:var(--font-mono);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-line{width:1.5px;flex:1;min-height:20px;background:var(--bd);margin:4px 0}
+.step-body{flex:1;font-size:13.5px;line-height:1.6;color:var(--ts);padding-bottom:16px}
+.step-row:last-child .step-body{padding-bottom:0}
+.step-body b{color:var(--t);font-weight:700;font-size:13.5px;display:block;margin-bottom:3px}
+
+.scope-tier-list{display:flex;flex-direction:column}
+.scope-tier-row{display:flex;gap:14px;padding:9px 0;border-bottom:1px solid var(--bd);align-items:flex-start}
+.scope-tier-row:last-child{border-bottom:none}
+.scope-tier-badge{flex-shrink:0;width:96px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;border-radius:4px;padding:3px 8px;height:18px;display:flex;align-items:center;justify-content:center;white-space:nowrap;margin-top:1px}
+.scope-tier-badge.must{background:#F0FDF4;color:#166534;border:1px solid #BBF7D0}
+.scope-tier-badge.good{background:#EEF6FF;color:#1D4ED8;border:1px solid #BFDBFE}
+.scope-tier-badge.later{background:var(--s2);color:var(--tm);border:1px solid var(--bd)}
+.scope-tier-body{flex:1;font-size:13.5px;line-height:1.6;color:var(--ts)}
+
+.surface-row-tag{flex-shrink:0;font-size:9px;font-weight:700;font-family:var(--font-mono);color:#fff;background:var(--t);border-radius:4px;padding:2px 6px;height:18px;min-width:18px;display:flex;align-items:center;justify-content:center;white-space:nowrap;margin-top:1px}
+.surface-row-list{display:flex;flex-direction:column;gap:10px}
+.surface-row{display:flex;gap:10px}
+.surface-row-body{flex:1;font-size:13.5px;line-height:1.6;color:var(--ts)}
+.surface-row-body b{color:var(--t);font-weight:600}
+
+.success-group{margin-bottom:22px}
+.success-group:last-child{margin-bottom:0}
+.success-group-head{font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.success-row{display:flex;align-items:baseline;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd)}
+.success-row:last-child{border-bottom:none}
+.success-num{font-weight:700;color:var(--t);font-family:var(--font-mono);font-size:14px;flex-shrink:0;min-width:70px}
+.success-desc{font-size:13.5px;line-height:1.6;color:var(--ts)}
+
+.flow-block,.task-block{border:1.5px solid var(--bd);border-radius:12px;margin-bottom:32px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.flow-block-head,.task-block-head{background:var(--s2);padding:16px 20px;border-bottom:1px solid var(--bd)}
+.flow-block-name,.task-block-name{font-size:17px;font-weight:700;color:var(--t);display:flex;align-items:center;gap:10px}
+.flow-block-num,.task-block-num{font-size:11px;font-weight:700;font-family:var(--font-mono);color:#fff;background:var(--t);border-radius:5px;padding:2px 8px;flex-shrink:0}
+.flow-block-desc{font-size:13.5px;color:var(--ts);margin-top:8px;line-height:1.55}
+.flow-block-body,.task-block-body{padding:24px 20px}
+.flow-block-body .mermaid{display:flex;justify-content:center}
+
+.ac-list{list-style:none}
+.ac-list li{position:relative;padding-left:18px;margin-bottom:10px;font-size:13.5px;color:var(--ts);line-height:1.6}
+.ac-list li::before{content:'';position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%;background:var(--bds)}
+.ac-assumed{display:inline-block;font-size:10px;font-weight:700;font-family:var(--font-mono);color:var(--warn);background:var(--warnbg);border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:2px}
+
+.assumptions-list{list-style:none;counter-reset:assump}
+.assumptions-list li{counter-increment:assump;position:relative;padding-left:28px;margin-bottom:12px;font-size:13.5px;color:var(--ts);line-height:1.6}
+.assumptions-list li::before{content:counter(assump);position:absolute;left:0;top:0;width:18px;height:18px;border-radius:5px;background:var(--warnbg);color:var(--warn);font-family:var(--font-mono);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.assumptions-list b{color:var(--t)}
+
+.not-specified{font-size:12.5px;color:var(--td);font-style:italic}
+
+.page-wrap{display:flex;gap:56px;align-items:flex-start;width:100%;padding:0 32px 160px}
+.page-main{flex:1;min-width:0;padding-top:28px}
+
+#sticky-header{position:fixed;top:0;left:0;right:0;background:rgba(255,255,255,.97);backdrop-filter:blur(6px);border-bottom:1px solid var(--bd);padding:14px 32px;font-size:14px;font-weight:700;color:var(--t);z-index:50;transform:translateY(-100%);transition:transform .18s ease;display:flex;align-items:center;gap:10px;height:53px}
+#sticky-header.vis{transform:translateY(0)}
+#sticky-header-sub{font-size:10px;font-weight:500;color:var(--td);font-family:var(--font-mono);margin-left:auto;text-align:right}
+
+.score-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;font-weight:700;border-radius:20px;padding:4px 10px}
+.score-high{background:var(--okbg);color:var(--ok)}
+.score-medium{background:var(--warnbg);color:var(--warn)}
+.score-low{background:var(--errbg);color:var(--err)}
+
+.side-toc{width:230px;flex-shrink:0;position:sticky;top:65px;display:none;margin-top:98px}
+.side-toc-title{font-size:13px;font-weight:700;color:var(--t);margin-bottom:16px}
+.side-toc-list{position:relative;padding-left:16px;border-left:1px solid var(--bd);max-height:80vh;overflow-y:auto}
+.side-toc-list a{display:block;font-size:13px;color:var(--tm);text-decoration:none;padding:9px 0;line-height:1.3}
+.side-toc-list a.active{color:var(--t);font-weight:700}
+.side-toc-list a.side-toc-sub{padding-left:16px;font-size:12px;color:var(--td)}
+.side-toc-list a.side-toc-sub.active{color:var(--t);font-weight:600}
+.side-toc-indicator{position:absolute;left:-1px;width:2px;background:var(--t);border-radius:1px;transition:top .2s ease,height .2s ease;top:0;height:0}
+
+@media (min-width: 900px){
+  .side-toc{display:block}
+  #toc-fab{display:none}
+}
+
+#toc-fab{position:fixed;right:24px;bottom:32px;z-index:40}
+#toc-menu{display:none;position:absolute;bottom:52px;right:0;min-width:230px;max-height:60vh;overflow-y:auto;background:#fff;border:1px solid var(--bd);border-radius:10px;box-shadow:0 10px 28px rgba(17,20,23,.14);padding:6px}
+#toc-menu.open{display:block}
+#toc-menu a{display:block;padding:8px 12px;font-size:12px;color:var(--t);text-decoration:none;border-radius:6px;white-space:nowrap}
+#toc-menu a:hover{background:var(--s2)}
+#toc-menu a.toc-sub{padding-left:26px;font-size:11.5px;color:var(--tm)}
+#toc-btn{width:44px;height:44px;border-radius:50%;background:var(--t);color:#fff;border:none;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center}
+[id^="sec-"]{scroll-margin-top:96px}
+
+.approval-banner{background:#EEF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:14px 16px;margin-bottom:8px;font-size:13px;color:#1D4ED8;line-height:1.6}
+.doc-footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--bd);text-align:center;font-size:12px;color:var(--td);font-style:italic}
+
+.annot-mark{background:#FEF3C7;border-bottom:2px solid var(--warn);border-radius:2px;cursor:default;position:relative}
+.annot-mark sup{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--warn);margin-left:1px}
+
+#annot-btn{position:absolute;display:none;z-index:60;background:var(--t);color:#fff;border:none;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:700;font-family:var(--font-body);cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.22);align-items:center;gap:6px}
+#annot-btn.show{display:flex}
+#annot-btn svg{flex-shrink:0}
+
+#annot-popover{position:absolute;display:none;z-index:61;background:#fff;border:1px solid var(--bd);border-radius:10px;box-shadow:0 10px 28px rgba(17,20,23,.16);padding:12px;width:280px}
+#annot-popover.show{display:block}
+#annot-popover .annot-quote{font-size:11.5px;color:var(--tm);font-style:italic;margin-bottom:8px;max-height:60px;overflow-y:auto;border-left:2px solid var(--bd);padding-left:8px}
+#annot-popover textarea{width:100%;min-height:64px;border:1px solid var(--bd);border-radius:6px;padding:8px;font-family:var(--font-body);font-size:12.5px;resize:vertical}
+#annot-popover .annot-popover-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
+.annot-btn-sm{border:none;border-radius:6px;padding:6px 12px;font-size:11.5px;font-weight:700;font-family:var(--font-body);cursor:pointer}
+.annot-btn-save{background:var(--t);color:#fff}
+.annot-btn-cancel{background:var(--s2);color:var(--ts)}
+
+#feedback-fab{position:fixed;left:24px;bottom:32px;z-index:40;background:#fff;border:1.5px solid var(--t);border-radius:26px;padding:10px 16px;font-size:12.5px;font-weight:700;color:var(--t);cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.14);display:flex;align-items:center;gap:8px}
+#feedback-fab svg{flex-shrink:0}
+#feedback-fab .fb-count{background:var(--t);color:#fff;border-radius:12px;padding:1px 8px;font-family:var(--font-mono);font-size:11px}
+
+#feedback-panel{position:fixed;left:24px;bottom:82px;z-index:41;background:#fff;border:1px solid var(--bd);border-radius:12px;box-shadow:0 12px 32px rgba(17,20,23,.18);width:320px;max-height:50vh;display:none;flex-direction:column;overflow:hidden}
+#feedback-panel.open{display:flex}
+#feedback-panel-head{padding:12px 14px;border-bottom:1px solid var(--bd);font-size:12.5px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+#feedback-list{overflow-y:auto;padding:8px 14px;flex:1}
+.fb-item{border-bottom:1px dashed var(--bd);padding:10px 0;font-size:12px}
+.fb-item-loc{font-family:var(--font-mono);font-size:10px;color:var(--td);text-transform:uppercase;letter-spacing:.02em}
+.fb-item-quote{font-style:italic;color:var(--tm);margin:4px 0;font-size:11.5px}
+.fb-item-comment{color:var(--t)}
+.fb-item-del{float:right;color:var(--err);background:none;border:none;cursor:pointer;font-size:11px;font-weight:700}
+#feedback-panel-foot{padding:12px 14px;border-top:1px solid var(--bd)}
+#copy-feedback-btn{width:100%;background:var(--t);color:#fff;border:none;border-radius:8px;padding:10px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:var(--font-body)}
+.fb-empty{color:var(--td);font-size:12px;font-style:italic;padding:16px 0;text-align:center}
+
+</style>
+</head>
+<body>
+
+<div id="sticky-header">
+  <span>TAO Dealer Website Scraping — Spec</span>
+  <span id="sticky-header-sub">PRD Score: 78% · Medium</span>
+</div>
+
+<div class="page-wrap">
+<div class="page-main">
+
+<div id="page-title" style="font-size:24px;font-weight:700;letter-spacing:-.3px;margin-bottom:6px">TAO — Dealer Website Scraping: Pre-fill Dealer Details Review</div>
+<div style="font-size:13.5px;color:var(--ts);margin-bottom:10px;max-width:680px">TAO-DWS-001 eliminates the blank-form experience on the TAO Dealer Details Review screen for every dealer, regardless of whether they have a public website, by always prefilling from the TOC/Salesforce baseline and additively scraping the dealer's own website for a field-by-field before/after comparison the Dealer Admin confirms.</div>
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+  <span class="score-badge score-medium">PRD Score: 78% — Medium</span>
+  <span style="font-size:11px;color:var(--td);font-family:var(--font-mono)">generated 2026-09-03</span>
+</div>
+
+<div class="approval-banner">
+  This is the blueprint for your feature — every screen, task, and rule in one place. Review and flag anything that's off.
+</div>
+
+<!-- ============ OVERVIEW ============ -->
+<div class="sec-head" id="sec-overview" data-loc="Overview">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+  <span class="sec-title">Overview</span>
+</div>
+<div class="doc-section">
+  <p>TAO-DWS-001 eliminates the blank-form experience on the TAO Dealer Details Review screen for every dealer, regardless of whether they have a public website. At provisioning, TAO reads dealer details already captured in Salesforce and synced into TOC (Tekion Operating Cloud) — this always-present baseline (Layer 1) guarantees the screen is never blank. For dealers with a public website, TAO additionally scrapes it (Layer 2) and shows the Dealer Admin a field-by-field before/after comparison against the on-file record, so the Dealer Admin only reviews and confirms differences rather than retyping information Tekion already has. This ships as part of TAO V1 (MVP, no phased rollout), with a secondary read-only preview surface for the Implementation Manager (IM) during provisioning.</p>
+</div>
+
+<!-- ============ CONTEXT & ENVIRONMENT ============ -->
+<div class="sec-head" id="sec-context" data-loc="Context & environment">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+  <span class="sec-title">Context &amp; environment</span>
+</div>
+<div class="metric-item"><span>&bull;</span><span>Expected volume: 1 TOC-sync invocation per dealer provisioning + 1 scrape per Dealer Admin session.</span></div>
+<div class="metric-item"><span>&bull;</span><span>Scrape timeout: hard 5000ms (5s), enforced async so it never blocks screen load.</span></div>
+<div class="metric-item"><span>&bull;</span><span>Screen load latency requirement: the Dealer Admin screen must render from Layer 1 (TOC) data in &lt; 500ms; Layer 2 (scraping) runs asynchronously and never blocks.</span></div>
+<div class="metric-item"><span>&bull;</span><span>Rate limiting: max 1 auto-scrape per (dealership_id, session); max 1 user-triggered re-scrape per 5 minutes per dealership.</span></div>
+<div class="metric-item"><span>&bull;</span><span>Confidence threshold: scraped fields below 0.80 confidence are suppressed from the comparison entirely (no warning shown — they simply don't appear).</span></div>
+<div class="metric-item"><span>&bull;</span><span>URL fuzzy-match thresholds (for Dealer Admin-provided alternate URLs): &lt; 0.70 → reject; 0.70–0.85 → confirmation prompt; &ge; 0.85 → accept silently.</span></div>
+<div class="metric-item"><span>&bull;</span><span>Data residency: scraped data cached/stored in US region only for MVP.</span></div>
+<div class="metric-item"><span>&bull;</span><span>Post-launch monitoring targets: scrape success rate &ge; 50%; timeout rate &le; 10%; Dealer Admin edit rate on prefilled fields &lt; 25%.</span></div>
+
+<!-- ============ PERSONAS ============ -->
+<div class="sec-head" id="sec-personas" data-loc="Personas">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  <span class="sec-title">Personas</span>
+</div>
+
+<div class="persona-card" data-loc="Persona: Dealer Admin">
+  <div class="persona-top">
+    <div class="persona-avatar">
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges">
+        <rect width="8" height="8" fill="#DBEAFE"/>
+        <rect x="2" y="1" width="4" height="1" fill="#1E3A8A"/>
+        <rect x="1" y="2" width="6" height="1" fill="#1E3A8A"/>
+        <rect x="1" y="3" width="1" height="2" fill="#1E3A8A"/>
+        <rect x="6" y="3" width="1" height="2" fill="#1E3A8A"/>
+        <rect x="2" y="3" width="4" height="3" fill="#FBCFA0"/>
+        <rect x="2" y="4" width="1" height="1" fill="#1E3A8A"/>
+        <rect x="5" y="4" width="1" height="1" fill="#1E3A8A"/>
+        <rect x="3" y="6" width="2" height="1" fill="#92400E"/>
+        <rect x="1" y="7" width="6" height="1" fill="#2563EB"/>
+      </svg>
+    </div>
+    <div>
+      <div class="persona-name">Dealer Admin</div>
+      <div class="persona-role">Primary dealership-side owner; completes the TAO journey end-to-end.</div>
+    </div>
+  </div>
+  <div class="tension-row"><span class="tension-label">Tasks</span><span>Opens the Dealer Details Review screen; reviews the prefilled baseline; accepts or rejects website comparison rows field-by-field; can provide a corrected/alternate website URL via "Try a different website"; confirms final values once to proceed.</span></div>
+  <div class="tension-row"><span class="tension-label">Priorities</span><span>Not re-typing data Tekion already has; trusting that prefilled/suggested values are accurate; moving through onboarding quickly.</span></div>
+  <div class="tension-row"><span class="tension-label">Pain points</span><span>Historically opens a review screen that is ~100% blank (baseline blank-field rate stated in the source) and must manually type everything.</span></div>
+  <div class="tension-row"><span class="tension-label">Needs to see</span><span>Which values came from Tekion's records vs. the website; a clear on-file/found-on-website comparison per field; a quiet indicator when nothing changed; a clear rejection message when a provided URL doesn't match their dealership.</span></div>
+  <div class="tension-row"><span class="tension-label">Authority</span><span>Only the Dealer Admin can confirm/save final dealer details (explicit RBAC rule). Any manual edit silently overrides a prefilled or scraped value — the Dealer Admin is always the source of truth.</span></div>
+</div>
+
+<div class="persona-card" data-loc="Persona: Implementation Manager (IM)">
+  <div class="persona-top">
+    <div class="persona-avatar">
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges">
+        <rect width="8" height="8" fill="#DCFCE7"/>
+        <rect x="2" y="1" width="4" height="2" fill="#14532D"/>
+        <rect x="1" y="2" width="1" height="3" fill="#14532D"/>
+        <rect x="6" y="2" width="1" height="3" fill="#14532D"/>
+        <rect x="2" y="3" width="4" height="3" fill="#D9A066"/>
+        <rect x="2" y="4" width="1" height="1" fill="#14532D"/>
+        <rect x="5" y="4" width="1" height="1" fill="#14532D"/>
+        <rect x="3" y="6" width="2" height="1" fill="#7C2D12"/>
+        <rect x="1" y="7" width="6" height="1" fill="#16A34A"/>
+      </svg>
+    </div>
+    <div>
+      <div class="persona-name">Implementation Manager (IM)</div>
+      <div class="persona-role">Tekion-side operator who sees the dealer pipeline and provisions dealers.</div>
+    </div>
+  </div>
+  <div class="tension-row"><span class="tension-label">Tasks</span><span>Opens the provisioning queue / dealer list view; views a read-only inline comparison preview (contract value vs. website-found value, per field) for each dealer before the Dealer Admin journey begins.</span></div>
+  <div class="tension-row"><span class="tension-label">Priorities</span><span>Verifying dealer info readiness ahead of handoff to the Dealer Admin.</span></div>
+  <div class="tension-row"><span class="tension-label">Needs to see</span><span>Contract/TOC values side-by-side with website-scraped values, inline in the dealer list row, with differences highlighted.</span></div>
+  <div class="tension-row"><span class="tension-label">Authority</span><span>None — this surface is read-only and informational only. IM cannot confirm, edit, or save dealer details; the write endpoint hard-rejects any save call flagged as IM-provisioning-sourced.</span></div>
+</div>
+
+<!-- ============ HOW IT WORKS TODAY, VS. WITH THIS ============ -->
+<div class="sec-head" id="sec-tvd" data-loc="How it works today, vs. with this">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+  <span class="sec-title">How it works today, vs. with this</span>
+</div>
+<div class="tvd-wrap">
+  <div class="tvd-row today">
+    <div class="tvd-icon today"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+    <div class="tvd-body">
+      <div class="tvd-label today">Today</div>
+      <ul class="tvd-list">
+        <li>The Dealer Details Review screen is blank at open — baseline blank-field rate at screen open is stated as ~100% ("all fields blank today").</li>
+        <li>Dealer Admin manually types in every field, including data Tekion already has on file from the signed contract.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="tvd-row desired">
+    <div class="tvd-icon desired"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/></svg></div>
+    <div class="tvd-body">
+      <div class="tvd-label desired">With this</div>
+      <ul class="tvd-list">
+        <li>Layer 1 (TOC/contract sync) guarantees the screen is never blank for any dealer, with or without a website — all fields prefill from the merged internal record labelled "From your records on file."</li>
+        <li>Layer 2 (website scraping) additively surfaces a field-by-field before/after comparison for dealers with a public website, so the Dealer Admin confirms/accepts differences instead of retyping.</li>
+        <li>No dealer is left with a blank form; small dealers with no website get a fully prefilled contract-only view with no degraded messaging.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PRODUCT SURFACES ============ -->
+<div class="sec-head" id="sec-surfaces" data-loc="Product surfaces">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
+  <span class="sec-title">Product surfaces</span>
+  <span class="sec-count">2</span>
+</div>
+
+<div class="surface-block" id="sec-surface-1" data-loc="Surface: Dealer Details Review Screen (Dealer Admin)">
+  <div class="surface-block-head"><span class="surface-block-num">1</span><span class="surface-block-name">Dealer Details Review Screen (Dealer Admin)</span></div>
+  <div class="surface-block-body">
+
+    <div class="surface-sub-title">How it works</div>
+    <div class="step-list">
+      <div class="step-row"><div class="step-col"><div class="step-circle">1</div><div class="step-line"></div></div><div class="step-body"><b>TOC sync gates screen load.</b>Screen load is blocked until TOC sync (DWS-SI-00 / DWS-SI-01a) completes for the dealer; if not complete, the Dealer Admin sees a loading state and cannot proceed.</div></div>
+      <div class="step-row"><div class="step-col"><div class="step-circle">2</div><div class="step-line"></div></div><div class="step-body"><b>Baseline prefill guarantees a non-blank screen.</b>All fields render pre-populated from the merged TOC/contract record, labelled "From your records on file" — the screen is never blank regardless of website presence.</div></div>
+      <div class="step-row"><div class="step-col"><div class="step-circle">3</div><div class="step-line"></div></div><div class="step-body"><b>Website scrape runs async, non-blocking.</b>If a dealer website URL exists on file (or was resolved from the IM's pre-scrape cache), TAO scrapes it in the background (5s timeout) without blocking the screen.</div></div>
+      <div class="step-row"><div class="step-col"><div class="step-circle">4</div><div class="step-line"></div></div><div class="step-body"><b>Fields classified and confidence-filtered.</b>Scraped fields are classified as Match, Different, New, or Missing against the on-file record; only fields &ge;0.80 confidence are surfaced.</div></div>
+      <div class="step-row"><div class="step-col"><div class="step-circle">5</div><div class="step-line"></div></div><div class="step-body"><b>Diff renders as a comparison row.</b>Where the website found a different or new value: a side-by-side comparison row renders — "On file: [value] / Found on your website: [value] / Use website version? [Yes] [Keep on file]."</div></div>
+      <div class="step-row"><div class="step-col"><div class="step-circle">6</div><div class="step-line"></div></div><div class="step-body"><b>Match renders as a quiet checkmark.</b>Where the website found the same value: a quiet "✓ Matches your website" checkmark shows — no action needed.</div></div>
+      <div class="step-row"><div class="step-col"><div class="step-circle">7</div><div class="step-line"></div></div><div class="step-body"><b>Missing website value shows on-file alone.</b>Where the website found nothing for a field: the on-file value shows alone, with no comparison row.</div></div>
+      <div class="step-row"><div class="step-col"><div class="step-circle">8</div><div class="step-line"></div></div><div class="step-body"><b>Scrape absence/failure is a first-class fallback.</b>If no website URL exists, the scrape fails, or it times out: the screen shows the contract-prefilled form with no comparison rows and no error message — this is a first-class fallback, not a degraded state.</div></div>
+      <div class="step-row"><div class="step-col"><div class="step-circle">9</div><div class="step-line"></div></div><div class="step-body"><b>Alternate URL must pass validation.</b>Dealer Admin can select "Try a different website" to submit an alternate/corrected URL; the URL must pass domain block-list and business-name fuzzy-match validation before a fresh scrape/comparison runs.</div></div>
+      <div class="step-row"><div class="step-col"><div class="step-circle">10</div><div class="step-line"></div></div><div class="step-body"><b>Manual re-scrape is rate-limited.</b>Dealer Admin can manually trigger a re-scrape (/prefill-dealer-details), rate-limited to 1 per 5 minutes per dealership.</div></div>
+      <div class="step-row"><div class="step-col"><div class="step-circle">11</div><div class="step-line"></div></div><div class="step-body"><b>Manual edits silently override.</b>Dealer Admin can edit any field directly; edited values silently replace prefilled ones — the Dealer Admin is always the source of truth.</div></div>
+      <div class="step-row"><div class="step-col"><div class="step-circle">12</div></div><div class="step-body"><b>Confirm persists and unblocks the next step.</b>Dealer Admin clicks Confirm/Submit; required fields are validated, and only then are final values persisted to the TAO dealer record, unblocking the next Configure Phase step.</div></div>
+    </div>
+
+    <div class="surface-sub-title">Scope</div>
+    <div class="scope-tier-list">
+      <div class="scope-tier-row">
+        <div class="scope-tier-badge must">Must-have</div>
+        <div class="scope-tier-body">All flows on this screen (DWS-SI-00 through DWS-SI-08) ship in TAO V1 as MVP; the source states there is no separate phased rollout.</div>
+      </div>
+    </div>
+
+    <div class="surface-sub-title">Edge cases &amp; states</div>
+    <div class="surface-row-list">
+      <div class="surface-row"><div class="surface-row-tag">1</div><div class="surface-row-body">No website URL on file → contract-only view; no comparison rows; explicitly not a degraded state.</div></div>
+      <div class="surface-row"><div class="surface-row-tag">2</div><div class="surface-row-body">Website behind auth / returns 403 or is otherwise unreachable → same as no-website case; silent fallback; no error shown.</div></div>
+      <div class="surface-row"><div class="surface-row-tag">3</div><div class="surface-row-body">Scrape exceeds the 5s timeout → screen already loaded from contract data; scrape simply times out silently, no blocking spinner.</div></div>
+      <div class="surface-row"><div class="surface-row-tag">4</div><div class="surface-row-body">Scraped field confidence below 0.80 (e.g., phone at 0.62 in the source's example) → field suppressed from comparison entirely.</div></div>
+      <div class="surface-row"><div class="surface-row-tag">5</div><div class="surface-row-body">All scraped fields match on-file data → all comparison rows suppressed; only quiet checkmarks shown.</div></div>
+      <div class="surface-row"><div class="surface-row-tag">6</div><div class="surface-row-body">Dealer-provided URL on domain block-list (e.g., google.com) → rejected immediately: "This doesn't look like a dealership website."</div></div>
+      <div class="surface-row"><div class="surface-row-tag">7</div><div class="surface-row-body">Dealer-provided URL's scraped business name similarity &lt; 0.70 vs. contract dealership name → rejected post-scrape: "The website you provided doesn't appear to be for [Dealership Name]."</div></div>
+      <div class="surface-row"><div class="surface-row-tag">8</div><div class="surface-row-body">Dealer-provided URL fuzzy match 0.70–0.85 (borderline) → confirmation prompt: "We found [scraped name] on this website — is this your dealership?"</div></div>
+      <div class="surface-row"><div class="surface-row-tag">9</div><div class="surface-row-body">Dealer Admin submits with required fields empty → submit blocked, validation error shown.</div></div>
+      <div class="surface-row"><div class="surface-row-tag">10</div><div class="surface-row-body">Dealer Admin re-triggers scrape within the 5-minute debounce window → rejected: "Please wait before retrying."</div></div>
+      <div class="surface-row"><div class="surface-row-tag">11</div><div class="surface-row-body">TOC sync not yet complete when Dealer Admin opens the screen → loading state; Dealer Admin blocked from proceeding.</div></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="surface-block" id="sec-surface-2" data-loc="Surface: IM Provisioning / Dealer List View (Implementation Manager)">
+  <div class="surface-block-head"><span class="surface-block-num">2</span><span class="surface-block-name">IM Provisioning / Dealer List View (Implementation Manager)</span></div>
+  <div class="surface-block-body">
+
+    <div class="surface-sub-title">How it works</div>
+    <div class="step-list">
+      <div class="step-row"><div class="step-col"><div class="step-circle">1</div><div class="step-line"></div></div><div class="step-body"><b>IM opens the provisioning queue.</b>IM opens the provisioning queue / dealer list view in the TAO IM portal.</div></div>
+      <div class="step-row"><div class="step-col"><div class="step-circle">2</div><div class="step-line"></div></div><div class="step-body"><b>Proactive scrape builds the comparison map.</b>Once TOC sync (DWS-SI-00) completes for a dealer record with a website URL present, TAO proactively scrapes the dealer's website and builds a comparison map (DWS-SI-00b) — max 1 scrape per dealer record (re-scraped only if the Dealer Admin later provides a new URL).</div></div>
+      <div class="step-row"><div class="step-col"><div class="step-circle">3</div><div class="step-line"></div></div><div class="step-body"><b>Read-only preview shows in the row.</b>IM sees a read-only inline comparison preview in the dealer list row: contract/TOC value vs. website-found value, per field, with differences highlighted.</div></div>
+      <div class="step-row"><div class="step-col"><div class="step-circle">4</div></div><div class="step-body"><b>IM cannot write.</b>IM cannot confirm, edit, or save any previewed values — purely informational, to help IM verify dealer readiness before the Dealer Admin journey begins.</div></div>
+    </div>
+
+    <div class="surface-sub-title">Scope</div>
+    <div class="scope-tier-list">
+      <div class="scope-tier-row">
+        <div class="scope-tier-badge must">Must-have</div>
+        <div class="scope-tier-body">The source's rollout pre-launch gate explicitly requires "IM provisioning view updated to show scraped preview column."</div>
+      </div>
+    </div>
+
+    <div class="surface-sub-title">Edge cases &amp; states</div>
+    <div class="surface-row-list">
+      <div class="surface-row"><div class="surface-row-tag">1</div><div class="surface-row-body">Dealer record has no website URL in contract data → the proactive scrape (DWS-SI-00b) does not run; IM sees TOC/contract values only, no comparison preview.</div></div>
+      <div class="surface-row"><div class="surface-row-tag">2</div><div class="surface-row-body">IM-triggered write/save attempts are hard-blocked at the write endpoint — any save call flagged as IM-provisioning-sourced is rejected (invariant).</div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ CONTENT & DATA ============ -->
+<div class="sec-head" id="sec-data" data-loc="Content & Data">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>
+  <span class="sec-title">Content &amp; Data</span>
+</div>
+<div class="doc-section"><p><b>Comparable field set (16 fields, mapped across TOC baseline + scrape target):</b></p></div>
+<div class="ref-item">Dealer Business Name (Public) — TOC + scrape</div>
+<div class="ref-item">DBA (Doing Business As) — scrape only</div>
+<div class="ref-item">Street Address 1 — TOC + scrape</div>
+<div class="ref-item">Street Address 2 — scrape only</div>
+<div class="ref-item">City — TOC + scrape</div>
+<div class="ref-item">State — TOC + scrape</div>
+<div class="ref-item">ZIP Code — TOC + scrape</div>
+<div class="ref-item">Phone — Main — TOC + scrape</div>
+<div class="ref-item">Phone — Sales Department — scrape only</div>
+<div class="ref-item">Phone — Service Department — scrape only</div>
+<div class="ref-item">Phone — Parts Department — scrape only</div>
+<div class="ref-item">Email — scrape only</div>
+<div class="ref-item">Operating Hours — Sales (Mon–Sun) — scrape only</div>
+<div class="ref-item">Operating Hours — Service (Mon–Sun) — scrape only</div>
+<div class="ref-item">Operating Hours — Parts (Mon–Sun) — scrape only</div>
+<div class="ref-item">Dealership Banner Logo — scrape only (compared as URL presence only, not visually)</div>
+
+<div class="doc-section" style="margin-top:16px"><p><b>Fields explicitly not scrapeable</b> — collected from dealer/OEM directly, never shown in the website comparison:</p></div>
+<div class="ref-item">OEM Dealer ID</div>
+<div class="ref-item">Federal EIN / Tax ID</div>
+<div class="ref-item">Bank Details</div>
+<div class="ref-item">OEM + Makes identity (website can confirm but is not the source)</div>
+
+<div class="doc-section" style="margin-top:16px"><p><b>Microcopy specified in the source:</b></p></div>
+<div class="ref-item">Baseline label: "From your records on file"</div>
+<div class="ref-item">Comparison diff row: "On file: [value] / Found on your website: [value] / Use website version? [Yes] [Keep on file]"</div>
+<div class="ref-item">Match indicator: "✓ Matches your website"</div>
+<div class="ref-item">Domain block-list rejection: "This doesn't look like a dealership website."</div>
+<div class="ref-item">Post-scrape name-mismatch rejection: "The website you provided doesn't appear to be for [Dealership Name]. Please check the URL and try again."</div>
+<div class="ref-item">Borderline match confirmation: "We found [scraped name] on this website — is this your dealership? [Yes, use this website] [No, try a different URL]"</div>
+<div class="ref-item">Rate-limit message: "Please wait before retrying"</div>
+<div class="ref-item">Generic scrape-fallback label declared in the rendering spec ("We couldn't find your details automatically — please fill in below") is superseded — see the resolved decisions in Global Notes below; scrape failure shows no message at all.</div>
+
+<!-- ============ USER FLOWS ============ -->
+<div class="sec-head" id="sec-flows">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+  <span class="sec-title">User Flows</span>
+  <span class="sec-count">9</span>
+</div>
+
+<div class="flow-block" id="sec-flow-1" data-loc="Flow 1: IM Provisioning Preview">
+  <div class="flow-block-head">
+    <div class="flow-block-name"><span class="flow-block-num">1</span>IM Provisioning Preview</div>
+    <div class="flow-block-desc">Implementation Manager views a read-only contract-vs-website comparison in the dealer list before the Dealer Admin journey begins.</div>
+  </div>
+  <div class="flow-block-body">
+    <pre class="mermaid">
+flowchart TD
+    subgraph IM["Implementation Manager"]
+      A1(["IM opens provisioning queue"])
+      A2["IM views dealer list"]
+      G1["IM sees read-only inline comparison: contract vs website value per field, diffs highlighted"]
+      H1{"IM attempts to edit or save a value?"}
+      I1(["IM confirms dealer readiness, handoff to Dealer Admin"])
+      E1["IM sees contract and TOC values only, no comparison preview"]
+      ENDCONTRACT(["IM reviews contract-only row"])
+      ENDPENDING(["IM revisits row later"])
+    end
+    subgraph System["TAO System"]
+      B1{"TOC sync complete for dealer?"}
+      B2["Dealer row shows Syncing state"]
+      C1{"Website URL present in contract data?"}
+      C2["No proactive scrape runs"]
+      D1["System scrapes website async, 5s timeout, max 1 scrape per dealer record"]
+      F1["System builds comparison map, classifies fields, suppresses low-confidence fields"]
+      ERR1["Write endpoint hard-rejects IM-provisioning-sourced save"]
+      ENDBLOCKED(["Save blocked, IM remains read-only"])
+    end
+    subgraph Website["Dealer Website"]
+      D2{"Scrape succeeds within timeout?"}
+    end
+
+    A1 --> A2
+    A2 --> B1
+    B1 -->|No| B2
+    B2 --> ENDPENDING
+    B1 -->|Yes| C1
+    C1 -->|No| C2
+    C1 -->|Yes| D1
+    D1 --> D2
+    D2 -->|No, timeout or blocked| C2
+    C2 --> E1
+    E1 --> ENDCONTRACT
+    D2 -->|Yes| F1
+    F1 --> G1
+    G1 --> H1
+    H1 -->|Yes| ERR1
+    ERR1 --> ENDBLOCKED
+    H1 -->|No, view only| I1
+
+    classDef errorNode fill:#FEF2F2,stroke:#DC2626,color:#7F1D1D;
+    class ERR1 errorNode;
+    </pre>
+  </div>
+</div>
+
+<div class="flow-block" id="sec-flow-2" data-loc="Flow 2: Dealer Admin Reviews Prefill With Website Diffs">
+  <div class="flow-block-head">
+    <div class="flow-block-name"><span class="flow-block-num">2</span>Dealer Admin Reviews Prefill With Website Diffs</div>
+    <div class="flow-block-desc">Dealer Admin opens the review screen, sees the TOC baseline plus per-field website comparison rows, accepts or rejects each diff, and confirms final values.</div>
+  </div>
+  <div class="flow-block-body">
+    <pre class="mermaid">
+flowchart TD
+    subgraph DealerAdmin["Dealer Admin"]
+      A1(["Dealer Admin opens Dealer Details Review screen"])
+      REVIEW1["Dealer Admin reviews checkmarks on matching fields, no action needed"]
+      REVIEW2{"More comparison rows to decide?"}
+      DECIDE1["Dealer Admin selects Use website version for this field"]
+      DECIDE2["Dealer Admin selects Keep on file for this field"]
+      EXPANDHRS["Dealer Admin expands Operating Hours row to view day-by-day diff, then decides per department"]
+      EDIT1["Dealer Admin optionally edits any field directly, overriding prefilled or scraped value"]
+      SUBMIT1["Dealer Admin clicks Confirm/Submit"]
+      VALID1{"All required fields valid?"}
+      ERR1["Validation error shown, submit blocked"]
+      ENDSUCCESS(["Final values persisted, Dealer Admin proceeds to next Configure Phase step"])
+      ENDNODIFF(["Continues in Flow 3, no diffs found"])
+      ENDFAIL(["Continues in Flow 5, silent fallback"])
+    end
+    subgraph System["TAO System"]
+      LOAD1["Screen renders TOC/contract baseline in under 500ms, labeled From your records on file"]
+      SCRAPE1["System triggers async scrape of on-file website URL, 5s timeout"]
+      CLASSIFY1["System classifies fields as Match, Different, New, or Missing, suppresses fields below 0.80 confidence"]
+      OUTCOME1{"Scrape outcome"}
+      DIFFROWS1["System renders comparison rows: On file value / Found on website value / Use website version Yes or Keep on file"]
+      SAVE1["System persists final values to TAO dealer record"]
+    end
+    subgraph Website["Dealer Website"]
+      SITE1["Website returns field data with confidence scores"]
+    end
+
+    A1 --> LOAD1
+    LOAD1 --> SCRAPE1
+    SCRAPE1 --> SITE1
+    SITE1 --> CLASSIFY1
+    CLASSIFY1 --> OUTCOME1
+    OUTCOME1 -->|Diffs found| DIFFROWS1
+    OUTCOME1 -->|All fields match| ENDNODIFF
+    OUTCOME1 -->|Scrape fails or times out| ENDFAIL
+    DIFFROWS1 --> REVIEW1
+    REVIEW1 --> REVIEW2
+    REVIEW2 -->|Yes| DECIDE1
+    REVIEW2 -->|Yes, alternate choice| DECIDE2
+    REVIEW2 -->|Yes, Operating Hours row| EXPANDHRS
+    DECIDE1 --> REVIEW2
+    DECIDE2 --> REVIEW2
+    EXPANDHRS --> REVIEW2
+    REVIEW2 -->|No, all rows decided| EDIT1
+    EDIT1 --> SUBMIT1
+    SUBMIT1 --> VALID1
+    VALID1 -->|No| ERR1
+    ERR1 --> SUBMIT1
+    VALID1 -->|Yes| SAVE1
+    SAVE1 --> ENDSUCCESS
+
+    classDef errorNode fill:#FEF2F2,stroke:#DC2626,color:#7F1D1D;
+    class ERR1 errorNode;
+    </pre>
+  </div>
+</div>
+
+<div class="flow-block" id="sec-flow-3" data-loc="Flow 3: Dealer Admin Reviews Prefill, All Fields Match">
+  <div class="flow-block-head">
+    <div class="flow-block-name"><span class="flow-block-num">3</span>Dealer Admin Reviews Prefill, All Fields Match</div>
+    <div class="flow-block-desc">Dealer Admin opens the review screen and finds every scraped field matches the on-file record, confirming with only quiet checkmarks shown.</div>
+  </div>
+  <div class="flow-block-body">
+    <pre class="mermaid">
+flowchart TD
+    subgraph DealerAdmin["Dealer Admin"]
+      A1(["Dealer Admin opens Dealer Details Review screen"])
+      REVIEW1["Dealer Admin sees quiet checkmark Matches your website on every scraped field, no action needed"]
+      EDIT1["Dealer Admin optionally edits any field directly"]
+      SUBMIT1["Dealer Admin clicks Confirm/Submit"]
+      VALID1{"All required fields valid?"}
+      ERR1["Validation error shown, submit blocked"]
+      ENDSUCCESS(["Final values persisted, Dealer Admin proceeds to next Configure Phase step"])
+      ENDDIVERT(["Continues in Flow 2, diffs found"])
+    end
+    subgraph System["TAO System"]
+      LOAD1["Screen renders TOC/contract baseline in under 500ms"]
+      SCRAPE1["System triggers async scrape of on-file website URL, 5s timeout"]
+      CLASSIFY1["System classifies fields, suppresses fields below 0.80 confidence"]
+      ALLMATCH1{"Any Different or New fields found?"}
+      SUPPRESS1["All comparison rows suppressed, only checkmarks shown"]
+      SAVE1["System persists final values to TAO dealer record"]
+    end
+    subgraph Website["Dealer Website"]
+      SITE1["Website returns field data, all values match on-file record"]
+    end
+
+    A1 --> LOAD1
+    LOAD1 --> SCRAPE1
+    SCRAPE1 --> SITE1
+    SITE1 --> CLASSIFY1
+    CLASSIFY1 --> ALLMATCH1
+    ALLMATCH1 -->|No, all match| SUPPRESS1
+    ALLMATCH1 -->|Yes| ENDDIVERT
+    SUPPRESS1 --> REVIEW1
+    REVIEW1 --> EDIT1
+    EDIT1 --> SUBMIT1
+    SUBMIT1 --> VALID1
+    VALID1 -->|No| ERR1
+    ERR1 --> SUBMIT1
+    VALID1 -->|Yes| SAVE1
+    SAVE1 --> ENDSUCCESS
+
+    classDef errorNode fill:#FEF2F2,stroke:#DC2626,color:#7F1D1D;
+    class ERR1 errorNode;
+    </pre>
+  </div>
+</div>
+
+<div class="flow-block" id="sec-flow-4" data-loc="Flow 4: Dealer Admin Reviews Contract-Only Prefill (No Website)">
+  <div class="flow-block-head">
+    <div class="flow-block-name"><span class="flow-block-num">4</span>Dealer Admin Reviews Contract-Only Prefill (No Website)</div>
+    <div class="flow-block-desc">Dealer Admin opens the review screen for a dealer with no website on file and confirms the fully prefilled contract data, with no degraded messaging.</div>
+  </div>
+  <div class="flow-block-body">
+    <pre class="mermaid">
+flowchart TD
+    subgraph DealerAdmin["Dealer Admin"]
+      A1(["Dealer Admin opens Dealer Details Review screen"])
+      REVIEW1["Dealer Admin sees fully prefilled contract-only form, no comparison rows, no degraded messaging"]
+      TRYURL1{"Dealer Admin wants to add a website?"}
+      TRYURLNODE["Dealer Admin selects Try a different website"]
+      EDIT1["Dealer Admin optionally edits any field directly"]
+      SUBMIT1["Dealer Admin clicks Confirm/Submit"]
+      VALID1{"All required fields valid?"}
+      ERR1["Validation error shown, submit blocked"]
+      ENDSUCCESS(["Final values persisted, Dealer Admin proceeds to next Configure Phase step"])
+      ENDDIVERT(["Continues in Flow 6 or Flow 7"])
+      ENDURLPRESENT(["Continues in Flow 2, 3, or 5"])
+    end
+    subgraph System["TAO System"]
+      LOAD1["Screen renders TOC/contract baseline in under 500ms"]
+      NOURL1{"Website URL present on file?"}
+      SKIP1["No scrape is triggered"]
+      SAVE1["System persists final values to TAO dealer record"]
+    end
+
+    A1 --> LOAD1
+    LOAD1 --> NOURL1
+    NOURL1 -->|No| SKIP1
+    NOURL1 -->|Yes| ENDURLPRESENT
+    SKIP1 --> REVIEW1
+    REVIEW1 --> TRYURL1
+    TRYURL1 -->|Yes| TRYURLNODE
+    TRYURLNODE --> ENDDIVERT
+    TRYURL1 -->|No| EDIT1
+    EDIT1 --> SUBMIT1
+    SUBMIT1 --> VALID1
+    VALID1 -->|No| ERR1
+    ERR1 --> SUBMIT1
+    VALID1 -->|Yes| SAVE1
+    SAVE1 --> ENDSUCCESS
+
+    classDef errorNode fill:#FEF2F2,stroke:#DC2626,color:#7F1D1D;
+    class ERR1 errorNode;
+    </pre>
+  </div>
+</div>
+
+<div class="flow-block" id="sec-flow-5" data-loc="Flow 5: Dealer Admin Reviews Prefill After Silent Scrape Failure">
+  <div class="flow-block-head">
+    <div class="flow-block-name"><span class="flow-block-num">5</span>Dealer Admin Reviews Prefill After Silent Scrape Failure</div>
+    <div class="flow-block-desc">Dealer Admin opens the review screen where a website exists but the scrape fails, times out, or is blocked, and confirms the contract-prefilled data with no error shown.</div>
+  </div>
+  <div class="flow-block-body">
+    <pre class="mermaid">
+flowchart TD
+    subgraph DealerAdmin["Dealer Admin"]
+      A1(["Dealer Admin opens Dealer Details Review screen"])
+      REVIEW1["Dealer Admin sees fully prefilled contract-only form, no comparison rows, no error message"]
+      TRYURL1["Dealer Admin optionally selects Try a different website"]
+      EDIT1["Dealer Admin optionally edits any field directly"]
+      SUBMIT1["Dealer Admin clicks Confirm/Submit"]
+      VALID1{"All required fields valid?"}
+      ERR1["Validation error shown, submit blocked"]
+      ENDSUCCESS(["Final values persisted, Dealer Admin proceeds to next Configure Phase step"])
+      ENDDIVERT(["Continues in Flow 6 or Flow 7"])
+    end
+    subgraph System["TAO System"]
+      LOAD1["Screen renders TOC/contract baseline in under 500ms, unblocked by scrape"]
+      ROBOTS1{"robots.txt allows scraping?"}
+      SKIPROBOTS1["Scrape skipped silently"]
+      SCRAPE1["System attempts scrape with 5s timeout"]
+      OUTCOME1{"Scrape outcome"}
+      TIMEOUT1["Scrape exceeds 5s timeout, aborted silently"]
+      UNREACHABLE1["Website unreachable, behind auth, or returns 403, fails silently"]
+      FALLBACK1["No comparison data generated, no error shown to Dealer Admin"]
+      SAVE1["System persists final values to TAO dealer record"]
+    end
+    subgraph Website["Dealer Website"]
+      SITE1["Website does not respond successfully"]
+    end
+
+    A1 --> LOAD1
+    LOAD1 --> ROBOTS1
+    ROBOTS1 -->|No| SKIPROBOTS1
+    SKIPROBOTS1 --> FALLBACK1
+    ROBOTS1 -->|Yes| SCRAPE1
+    SCRAPE1 --> SITE1
+    SITE1 --> OUTCOME1
+    OUTCOME1 -->|Exceeds 5s| TIMEOUT1
+    OUTCOME1 -->|Unreachable or 403| UNREACHABLE1
+    TIMEOUT1 --> FALLBACK1
+    UNREACHABLE1 --> FALLBACK1
+    FALLBACK1 --> REVIEW1
+    REVIEW1 --> TRYURL1
+    TRYURL1 --> ENDDIVERT
+    REVIEW1 --> EDIT1
+    EDIT1 --> SUBMIT1
+    SUBMIT1 --> VALID1
+    VALID1 -->|No| ERR1
+    ERR1 --> SUBMIT1
+    VALID1 -->|Yes| SAVE1
+    SAVE1 --> ENDSUCCESS
+
+    classDef errorNode fill:#FEF2F2,stroke:#DC2626,color:#7F1D1D;
+    class ERR1 errorNode;
+    </pre>
+  </div>
+</div>
+
+<div class="flow-block" id="sec-flow-6" data-loc="Flow 6: Dealer Admin Submits Alternate URL, Passes Validation">
+  <div class="flow-block-head">
+    <div class="flow-block-name"><span class="flow-block-num">6</span>Dealer Admin Submits Alternate URL, Passes Validation</div>
+    <div class="flow-block-desc">Dealer Admin provides a corrected/alternate website URL that passes domain and business-name validation, triggering a fresh comparison (including resolving a borderline fuzzy-match confirmation).</div>
+  </div>
+  <div class="flow-block-body">
+    <pre class="mermaid">
+flowchart TD
+    subgraph DealerAdmin["Dealer Admin"]
+      A1(["Dealer Admin clicks Try a different website"])
+      ENTER1["Dealer Admin enters alternate URL and submits"]
+      BORDERLINE_PROMPT["System shows confirmation: We found scraped name on this website, is this your dealership?"]
+      CONFIRM_YES["Dealer Admin selects Yes, use this website"]
+      CONFIRM_NO["Dealer Admin selects No, try a different URL"]
+      REVIEWNEW["Dealer Admin reviews fresh comparison rows against new scrape"]
+      SUBMIT1["Dealer Admin clicks Confirm/Submit"]
+      VALID1{"All required fields valid?"}
+      ERR1["Validation error shown, submit blocked"]
+      ENDSUCCESS(["Final values persisted, Dealer Admin proceeds to next Configure Phase step"])
+      ENDRATE(["Dealer Admin must wait before retrying"])
+      ENDDOMAIN(["Dealer Admin retries with a different URL, see Flow 7"])
+      ENDMISMATCH(["Dealer Admin retries with a different URL, see Flow 7"])
+      ENDBORDERLINENO(["Dealer Admin retries with a different URL, see Flow 7"])
+    end
+    subgraph System["TAO System"]
+      RATE1{"Alternate URL scrape within shared 5-minute rate limit window?"}
+      RATEBLOCK1["Rejected: Please wait before retrying"]
+      DOMAIN1{"URL on domain block-list?"}
+      DOMAINBLOCK1["Rejected: This does not look like a dealership website"]
+      SCRAPE1["System scrapes new URL, respects robots.txt, 5s timeout"]
+      MATCH1{"Business-name fuzzy match score vs contract dealership name"}
+      REJECT1["Rejected: The website you provided does not appear to be for Dealership Name"]
+      ACCEPTSILENT1["Score 0.85 or above, accepted silently"]
+      BUILDCOMPARE1["Old scrape data discarded, fresh comparison map built"]
+      SAVE1["System persists final values to TAO dealer record"]
+    end
+    subgraph Website["Dealer Website"]
+      SITE1["New website returns field data and business name"]
+    end
+
+    A1 --> RATE1
+    RATE1 -->|Limited| RATEBLOCK1
+    RATEBLOCK1 --> ENDRATE
+    RATE1 -->|Not limited| ENTER1
+    ENTER1 --> DOMAIN1
+    DOMAIN1 -->|Yes| DOMAINBLOCK1
+    DOMAINBLOCK1 --> ENDDOMAIN
+    DOMAIN1 -->|No| SCRAPE1
+    SCRAPE1 --> SITE1
+    SITE1 --> MATCH1
+    MATCH1 -->|Below 0.70| REJECT1
+    REJECT1 --> ENDMISMATCH
+    MATCH1 -->|0.70 to 0.85| BORDERLINE_PROMPT
+    BORDERLINE_PROMPT --> CONFIRM_YES
+    BORDERLINE_PROMPT --> CONFIRM_NO
+    CONFIRM_NO --> ENDBORDERLINENO
+    CONFIRM_YES --> BUILDCOMPARE1
+    MATCH1 -->|0.85 or above| ACCEPTSILENT1
+    ACCEPTSILENT1 --> BUILDCOMPARE1
+    BUILDCOMPARE1 --> REVIEWNEW
+    REVIEWNEW --> SUBMIT1
+    SUBMIT1 --> VALID1
+    VALID1 -->|No| ERR1
+    ERR1 --> SUBMIT1
+    VALID1 -->|Yes| SAVE1
+    SAVE1 --> ENDSUCCESS
+
+    classDef errorNode fill:#FEF2F2,stroke:#DC2626,color:#7F1D1D;
+    class ERR1,RATEBLOCK1,DOMAINBLOCK1,REJECT1 errorNode;
+    </pre>
+  </div>
+</div>
+
+<div class="flow-block" id="sec-flow-7" data-loc="Flow 7: Dealer Admin Submits Alternate URL, Fails Validation">
+  <div class="flow-block-head">
+    <div class="flow-block-name"><span class="flow-block-num">7</span>Dealer Admin Submits Alternate URL, Fails Validation</div>
+    <div class="flow-block-desc">Dealer Admin provides an alternate website URL that is blocked by the domain list or fails business-name matching (including a borderline match the Dealer Admin rejects), and must retry.</div>
+  </div>
+  <div class="flow-block-body">
+    <pre class="mermaid">
+flowchart TD
+    subgraph DealerAdmin["Dealer Admin"]
+      A1(["Dealer Admin clicks Try a different website"])
+      ENTER1["Dealer Admin enters alternate URL and submits"]
+      RETRYENTER["Dealer Admin enters another alternate URL"]
+      BORDERLINE_PROMPT["System shows confirmation: We found scraped name on this website, is this your dealership?"]
+      CONFIRM_NO["Dealer Admin selects No, try a different URL"]
+      CONFIRM_YES["Dealer Admin selects Yes, use this website"]
+      GIVEUP1{"Dealer Admin retries or abandons alternate URL?"}
+      ENDABANDON(["Dealer Admin abandons alternate URL, continues with existing contract or prior comparison"])
+      ENDRATELIMIT(["Dealer Admin must wait before retrying"])
+      PASS1(["Score 0.85 or above, continues in Flow 6"])
+    end
+    subgraph System["TAO System"]
+      RATE1{"Alternate URL attempt within shared 5-minute rate limit window?"}
+      DOMAIN1{"URL on domain block-list, e.g. google.com?"}
+      DOMAINBLOCK1["Rejected immediately: This does not look like a dealership website"]
+      SCRAPE1["System scrapes candidate URL, respects robots.txt, 5s timeout"]
+      MATCH1{"Business-name fuzzy match score vs contract dealership name"}
+      REJECT1["Rejected post-scrape: The website you provided does not appear to be for Dealership Name, please check the URL and try again"]
+    end
+    subgraph Website["Dealer Website"]
+      SITE1["Candidate website returns business name, if reachable"]
+    end
+
+    A1 --> RATE1
+    RATE1 -->|Limited| ENDRATELIMIT
+    RATE1 -->|Not limited| ENTER1
+    ENTER1 --> DOMAIN1
+    DOMAIN1 -->|Yes| DOMAINBLOCK1
+    DOMAINBLOCK1 --> GIVEUP1
+    DOMAIN1 -->|No| SCRAPE1
+    SCRAPE1 --> SITE1
+    SITE1 --> MATCH1
+    MATCH1 -->|Below 0.70| REJECT1
+    REJECT1 --> GIVEUP1
+    MATCH1 -->|0.70 to 0.85| BORDERLINE_PROMPT
+    BORDERLINE_PROMPT --> CONFIRM_NO
+    BORDERLINE_PROMPT --> CONFIRM_YES
+    CONFIRM_NO --> GIVEUP1
+    CONFIRM_YES --> PASS1
+    MATCH1 -->|0.85 or above| PASS1
+    GIVEUP1 -->|Retry immediately, validation failure does not consume the scrape rate limit| RETRYENTER
+    RETRYENTER --> DOMAIN1
+    GIVEUP1 -->|Abandon| ENDABANDON
+
+    classDef errorNode fill:#FEF2F2,stroke:#DC2626,color:#7F1D1D;
+    class DOMAINBLOCK1,REJECT1,ENDRATELIMIT errorNode;
+    </pre>
+  </div>
+</div>
+
+<div class="flow-block" id="sec-flow-8" data-loc="Flow 8: Dealer Admin Manually Re-Triggers Scrape">
+  <div class="flow-block-head">
+    <div class="flow-block-name"><span class="flow-block-num">8</span>Dealer Admin Manually Re-Triggers Scrape</div>
+    <div class="flow-block-desc">Dealer Admin invokes a manual re-scrape (/prefill-dealer-details) of the on-file website to refresh the comparison, subject to a 5-minute rate limit.</div>
+  </div>
+  <div class="flow-block-body">
+    <pre class="mermaid">
+flowchart TD
+    subgraph DealerAdmin["Dealer Admin"]
+      A1(["Dealer Admin clicks manual re-scrape (prefill-dealer-details) on loaded screen"])
+      REVIEWUPDATED1["Dealer Admin reviews refreshed comparison rows"]
+      REVIEWSAME1["Dealer Admin continues reviewing existing contract-only view, no change"]
+      SUBMIT1["Dealer Admin clicks Confirm/Submit"]
+      VALID1{"All required fields valid?"}
+      ERR1["Validation error shown, submit blocked"]
+      ENDSUCCESS(["Final values persisted, Dealer Admin proceeds to next Configure Phase step"])
+      ENDRATELIMIT(["Dealer Admin must wait before retrying"])
+    end
+    subgraph System["TAO System"]
+      RATE1{"Within 5-minute rate limit since last scrape or re-scrape for this dealership?"}
+      RATEBLOCK1["Rejected: Please wait before retrying"]
+      SCRAPE1["System re-scrapes on-file or current URL, respects robots.txt, 5s timeout"]
+      OUTCOME1{"Scrape outcome"}
+      REBUILD1["Refreshed comparison map built, classifies fields, suppresses below 0.80 confidence, replaces prior comparison state"]
+      FALLBACK1["Silent fallback, no error shown, screen remains contract-only"]
+      SAVE1["System persists final values to TAO dealer record"]
+    end
+    subgraph Website["Dealer Website"]
+      SITE1["Website responds to re-scrape request"]
+    end
+
+    A1 --> RATE1
+    RATE1 -->|Limited| RATEBLOCK1
+    RATEBLOCK1 --> ENDRATELIMIT
+    RATE1 -->|Not limited| SCRAPE1
+    SCRAPE1 --> SITE1
+    SITE1 --> OUTCOME1
+    OUTCOME1 -->|Success, confidence 0.80 or above on at least one field| REBUILD1
+    OUTCOME1 -->|Fails or times out| FALLBACK1
+    REBUILD1 --> REVIEWUPDATED1
+    FALLBACK1 --> REVIEWSAME1
+    REVIEWUPDATED1 --> SUBMIT1
+    REVIEWSAME1 --> SUBMIT1
+    SUBMIT1 --> VALID1
+    VALID1 -->|No| ERR1
+    ERR1 --> SUBMIT1
+    VALID1 -->|Yes| SAVE1
+    SAVE1 --> ENDSUCCESS
+
+    classDef errorNode fill:#FEF2F2,stroke:#DC2626,color:#7F1D1D;
+    class RATEBLOCK1,ERR1 errorNode;
+    </pre>
+  </div>
+</div>
+
+<div class="flow-block" id="sec-flow-9" data-loc="Flow 9: Dealer Admin Blocked by Incomplete or Failed TOC Sync">
+  <div class="flow-block-head">
+    <div class="flow-block-name"><span class="flow-block-num">9</span>Dealer Admin Blocked by Incomplete or Failed TOC Sync</div>
+    <div class="flow-block-desc">Dealer Admin opens the review screen before TOC sync has completed (or after it fails) and sees a blocked loading state until the always-present baseline is ready.</div>
+  </div>
+  <div class="flow-block-body">
+    <pre class="mermaid">
+flowchart TD
+    subgraph DealerAdmin["Dealer Admin"]
+      A1(["Dealer Admin opens Dealer Details Review screen"])
+      LOADING1["Dealer Admin sees loading state, blocked from proceeding"]
+      STUCK1["Dealer Admin sees still preparing your details state, remains blocked"]
+      ESCALATE1["Dealer Admin contacts support, or IM escalates on Dealer Admin behalf"]
+      ENDPROCEED(["Screen renders normally, Dealer Admin proceeds, see Flow 2, 3, 4, or 5"])
+      ENDBLOCKED(["Dealer Admin remains blocked pending manual intervention"])
+    end
+    subgraph TOC["TOC / Salesforce Sync"]
+      B1{"TOC sync status"}
+      POLL1["System polls sync status automatically"]
+      RETRY1["System automatically retries the sync"]
+      RETRYCHECK1{"Retry succeeds within retry budget?"}
+    end
+
+    A1 --> B1
+    B1 -->|Complete| ENDPROCEED
+    B1 -->|Pending, in progress| LOADING1
+    LOADING1 --> POLL1
+    POLL1 --> B1
+    B1 -->|Failed| RETRY1
+    RETRY1 --> RETRYCHECK1
+    RETRYCHECK1 -->|Yes| ENDPROCEED
+    RETRYCHECK1 -->|No, persistent failure| STUCK1
+    STUCK1 --> ESCALATE1
+    ESCALATE1 --> ENDBLOCKED
+
+    classDef errorNode fill:#FEF2F2,stroke:#DC2626,color:#7F1D1D;
+    class STUCK1,ENDBLOCKED errorNode;
+    </pre>
+  </div>
+</div>
+
+<!-- ============ TASKS & ACCEPTANCE CRITERIA ============ -->
+<div class="sec-head" id="sec-tasks">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+  <span class="sec-title">Tasks &amp; Acceptance Criteria</span>
+  <span class="sec-count">9</span>
+</div>
+
+<div class="task-block" id="sec-task-1" data-loc="Task 1: IM Provisioning Dealer List — Scrape Preview Column">
+  <div class="task-block-head"><div class="task-block-name"><span class="task-block-num">1</span>IM Provisioning Dealer List — Scrape Preview Column (read-only, Flow 1)</div></div>
+  <div class="task-block-body">
+    <ul class="ac-list">
+      <li>Each dealer row shows TOC sync status (Complete / Syncing) before any comparison preview can appear; rows still syncing show no comparison data.</li>
+      <li>For dealer records where TOC sync is complete and a website URL is present in contract data, the system proactively scrapes the website once (5s timeout) and builds a field-level comparison map before the IM views the row.</li>
+      <li>If no website URL is present in contract data, no proactive scrape runs — the IM sees TOC/contract values only, with no comparison preview for that row.</li>
+      <li>The comparison renders inline in the dealer list row: contract/TOC value vs. website-found value per field, with differences visually highlighted.</li>
+      <li>Fields below the 0.80 confidence threshold are suppressed from the IM's preview, same as the Dealer Admin screen's threshold.</li>
+      <li>The IM cannot edit, confirm, or save any previewed value from this surface — it is strictly read-only and informational.</li>
+      <li>Any save call flagged as IM-provisioning-sourced is hard-rejected at the write endpoint regardless of client-side controls.</li>
+      <li>A given dealer record is re-scraped only if the Dealer Admin later provides a new URL — the IM view itself never triggers additional scrapes.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="task-block" id="sec-task-2" data-loc="Task 2: Dealer Details Review Screen — Baseline Load + Contract Prefill">
+  <div class="task-block-head"><div class="task-block-name"><span class="task-block-num">2</span>Dealer Details Review Screen — Baseline Load + Contract Prefill (Flows 2–5, 9)</div></div>
+  <div class="task-block-body">
+    <ul class="ac-list">
+      <li>Screen load is blocked until TOC sync completes for the dealer; while incomplete, the Dealer Admin sees a loading state and cannot proceed.</li>
+      <li>Once TOC sync is complete, all fields render pre-populated from the merged TOC/contract record within 500ms, labelled "From your records on file."</li>
+      <li>The screen is never blank for any dealer, regardless of whether a website exists — contract prefill is the guaranteed baseline layer.</li>
+      <li>The Dealer Admin can edit any field directly at any time; an edit silently replaces the prefilled or scraped value with no separate override confirmation.</li>
+      <li>On Confirm/Submit, required fields are validated; if any required field is empty or invalid, submission is blocked and an inline validation error is shown.</li>
+      <li>On successful validation, final values persist to the TAO dealer record and the Dealer Admin moves forward to the next Configure Phase step — this is one-way forward navigation, not a return to an editable state.</li>
+      <li>If TOC sync fails outright rather than merely being pending, the system automatically retries within a retry budget before surfacing anything further to the Dealer Admin.</li>
+      <li>While sync is pending, the system polls sync status automatically in the background — no manual refresh is required.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="task-block" id="sec-task-3" data-loc="Task 3: Dealer Details Review Screen — Website Comparison View With Diffs">
+  <div class="task-block-head"><div class="task-block-name"><span class="task-block-num">3</span>Dealer Details Review Screen — Website Comparison View With Diffs (Flow 2)</div></div>
+  <div class="task-block-body">
+    <ul class="ac-list">
+      <li>If a website URL exists on file, TAO scrapes it in the background (5s timeout) without blocking the already-rendered baseline screen.</li>
+      <li>Scraped fields are classified as Match, Different, New, or Missing against the on-file record; only fields at &ge;0.80 confidence are surfaced in the comparison.</li>
+      <li>Where the website found a different or new value, a comparison row renders: "On file: [value] / Found on your website: [value] / Use website version? [Yes] [Keep on file]."</li>
+      <li>Where the website found the same value as on file, a quiet "✓ Matches your website" checkmark shows in place of a comparison row.</li>
+      <li>Where the website found nothing for a field, the on-file value shows alone with no comparison row at all.</li>
+      <li>Accept/reject decisions are strictly per-field — there is no bulk "use all website values" or "keep all on file" control.</li>
+      <li>Operating Hours (Sales, Service, Parts) each render as a single collapsible row; expanding a department reveals its day-by-day (Mon–Sun) diff for accept/reject decisions within that department.</li>
+      <li>Dealership Banner Logo compares as presence-only — a simple "✓ Logo found on website" indicator, with no visual thumbnail in MVP. <span class="ac-assumed">Assumed</span></li>
+      <li>The Dealer Admin must resolve every rendered comparison row (accept or reject) before moving on to final edits and Confirm/Submit.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="task-block" id="sec-task-4" data-loc="Task 4: Dealer Details Review Screen — All-Match / No-Diff State">
+  <div class="task-block-head"><div class="task-block-name"><span class="task-block-num">4</span>Dealer Details Review Screen — All-Match / No-Diff State (Flow 3)</div></div>
+  <div class="task-block-body">
+    <ul class="ac-list">
+      <li>If the scrape returns no Different or New fields against the on-file record, every potential comparison row is suppressed — only quiet "✓ Matches your website" checkmarks show, one per scraped field.</li>
+      <li>This state is visually indistinguishable from the contract-only baseline aside from the checkmarks — no extra "everything matched" messaging is shown.</li>
+      <li>The Dealer Admin can still edit any field directly even when every scraped field already matches.</li>
+      <li>Submit, validation, and persistence behavior is identical to the diff-found path (Task 2).</li>
+    </ul>
+  </div>
+</div>
+
+<div class="task-block" id="sec-task-5" data-loc="Task 5: Dealer Details Review Screen — No-Website Contract-Only State">
+  <div class="task-block-head"><div class="task-block-name"><span class="task-block-num">5</span>Dealer Details Review Screen — No-Website Contract-Only State (Flow 4)</div></div>
+  <div class="task-block-body">
+    <ul class="ac-list">
+      <li>If no website URL is present on file, no scrape is attempted at all — this is determined up front, before any scrape/timeout logic runs.</li>
+      <li>The Dealer Admin sees the fully prefilled contract-only form, with no comparison rows and no "couldn't find" or degraded-state messaging — absence of a website is a first-class state.</li>
+      <li>From this state, the Dealer Admin can select "Try a different website" to supply a URL and enter the alternate-URL validation flow (Task 7).</li>
+      <li>If no URL is provided, the Dealer Admin proceeds directly to editing and submitting the contract-only data.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="task-block" id="sec-task-6" data-loc="Task 6: Dealer Details Review Screen — Silent Scrape Failure State">
+  <div class="task-block-head"><div class="task-block-name"><span class="task-block-num">6</span>Dealer Details Review Screen — Silent Scrape Failure State (Flow 5)</div></div>
+  <div class="task-block-body">
+    <ul class="ac-list">
+      <li>If the on-file website's robots.txt disallows scraping, the scrape is skipped silently before any request is made.</li>
+      <li>If a scrape attempt exceeds the 5-second timeout, it is aborted silently with no blocking spinner or partial-load indicator.</li>
+      <li>If the website is unreachable, behind auth, or returns a 403, the scrape fails silently.</li>
+      <li>In every failure mode above, no comparison data is generated and no error or fallback message is ever shown to the Dealer Admin — the contract-prefilled data alone fills the screen. This governs over the conflicting "We couldn't find your details automatically…" copy referenced elsewhere in the source; that message does not apply.</li>
+      <li>The resulting screen is functionally identical to the no-website state (Task 5): fully prefilled contract-only form, no comparison rows.</li>
+      <li>The Dealer Admin can still select "Try a different website" or manually re-trigger a scrape from this state.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="task-block" id="sec-task-7" data-loc="Task 7: Alternate URL Input + Validation Flow">
+  <div class="task-block-head"><div class="task-block-name"><span class="task-block-num">7</span>Alternate URL Input + Validation Flow (Flows 6 &amp; 7, borderline branch)</div></div>
+  <div class="task-block-body">
+    <ul class="ac-list">
+      <li>The Dealer Admin selects "Try a different website" and enters a candidate URL.</li>
+      <li>The system first checks the shared 5-minute rate-limit window (shared with manual re-scrape); if limited, the attempt is rejected with "Please wait before retrying" and no scrape is attempted.</li>
+      <li>If not rate-limited, the URL is checked against the domain block-list; a match is rejected immediately, before any scrape, with "This doesn't look like a dealership website."</li>
+      <li>A domain block-list rejection is a validation failure, not a scrape attempt, and does not consume the shared rate limit — the Dealer Admin can retry immediately with a different URL. <span class="ac-assumed">Assumed</span></li>
+      <li>If the URL clears the domain check, the system scrapes it (respecting robots.txt, 5s timeout) and computes a business-name fuzzy-match score against the contract dealership name.</li>
+      <li>A score below 0.70 is rejected post-scrape: "The website you provided doesn't appear to be for [Dealership Name]. Please check the URL and try again."</li>
+      <li>A score of 0.70–0.85 (borderline) triggers a confirmation prompt: "We found [scraped name] on this website — is this your dealership? [Yes, use this website] [No, try a different URL]."</li>
+      <li>Selecting "Yes" on the borderline prompt proceeds to build a fresh comparison map; selecting "No" returns the Dealer Admin to enter another URL.</li>
+      <li>A score of 0.85 or above is accepted silently with no confirmation prompt.</li>
+      <li>On any acceptance (silent or confirmed), prior scrape/comparison data for this dealer is discarded and a fresh comparison map is built, reviewed with the same per-field and Operating-Hours mechanics as Task 3.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="task-block" id="sec-task-8" data-loc="Task 8: Manual Re-Scrape Trigger (/prefill-dealer-details) + Rate Limit">
+  <div class="task-block-head"><div class="task-block-name"><span class="task-block-num">8</span>Manual Re-Scrape Trigger (/prefill-dealer-details) + Rate Limit (Flow 8)</div></div>
+  <div class="task-block-body">
+    <ul class="ac-list">
+      <li>The Dealer Admin can manually trigger a re-scrape of the on-file (or currently active) URL via /prefill-dealer-details from an already-loaded screen.</li>
+      <li>The manual re-scrape shares the same 5-minute rate limit as alternate-URL scrape attempts, measured since the last scrape or re-scrape for that dealership.</li>
+      <li>If within the rate-limit window, the request is rejected with "Please wait before retrying" and no new scrape attempt is made.</li>
+      <li>No live countdown/timer accompanies the rate-limit message — a static message is sufficient for MVP. <span class="ac-assumed">Assumed</span></li>
+      <li>If not rate-limited, the system re-scrapes; on success with at least one field at &ge;0.80 confidence, a refreshed comparison map is built, fully replacing the prior comparison state.</li>
+      <li>If the re-scrape fails or times out, the screen silently falls back to the current contract-only or existing-comparison view with no error shown.</li>
+      <li>Submit, validation, and persistence behavior after a manual re-scrape is identical to the standard flow (Task 2).</li>
+    </ul>
+  </div>
+</div>
+
+<div class="task-block" id="sec-task-9" data-loc="Task 9: TOC Sync Loading / Blocked State">
+  <div class="task-block-head"><div class="task-block-name"><span class="task-block-num">9</span>TOC Sync Loading / Blocked State (Flow 9)</div></div>
+  <div class="task-block-body">
+    <ul class="ac-list">
+      <li>If TOC sync status is "Complete" when the Dealer Admin opens the screen, the screen renders normally with no loading interstitial.</li>
+      <li>If TOC sync is "Pending, in progress," the Dealer Admin sees a loading state and is blocked from proceeding while the system polls sync status automatically.</li>
+      <li>If TOC sync status comes back "Failed," the system automatically retries the sync within a retry budget before surfacing anything further to the Dealer Admin.</li>
+      <li>If an automatic retry succeeds within the retry budget, the screen proceeds to render normally, as if sync had completed on the first attempt.</li>
+      <li>If retries are exhausted (persistent failure), the Dealer Admin sees a "still preparing your details" state and remains blocked, with an escalation path — contact support, or the IM escalates on the Dealer Admin's behalf.</li>
+      <li>The persistent-failure state shows no raw error code or technical failure detail — only the "still preparing" framing plus the escalation path. <span class="ac-assumed">Assumed</span></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============ GLOBAL NOTES ============ -->
+<div class="sec-head" id="sec-global" data-loc="Global Notes — Shared Components, Microcopy & Resolved Decisions">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  <span class="sec-title">Global Notes — Shared Components, Microcopy &amp; Resolved Decisions</span>
+</div>
+<div class="doc-section">
+  <p><b>Shared UI components (used across multiple tasks):</b></p>
+  <ul>
+    <li><b>Baseline label</b> — "From your records on file," applied to every prefilled field regardless of website presence (Task 2).</li>
+    <li><b>Comparison row</b> — "On file: [value] / Found on your website: [value] / Use website version? [Yes] [Keep on file]," used for every Different/New field (Tasks 3, 4, 7, 8).</li>
+    <li><b>Match indicator</b> — quiet "✓ Matches your website" checkmark, used wherever a scraped field equals the on-file value (Tasks 3, 4).</li>
+    <li><b>Collapsible department row</b> — one row per department (Sales/Service/Parts) for Operating Hours, expandable to a 7-day (Mon–Sun) diff (Task 3).</li>
+    <li><b>Rate-limit message</b> — "Please wait before retrying," shared identically by the alternate-URL flow (Task 7) and manual re-scrape (Task 8).</li>
+    <li><b>Domain block-list rejection</b> — "This doesn't look like a dealership website." (Task 7).</li>
+    <li><b>Post-scrape name-mismatch rejection</b> — "The website you provided doesn't appear to be for [Dealership Name]. Please check the URL and try again." (Task 7).</li>
+    <li><b>Borderline match confirmation</b> — "We found [scraped name] on this website — is this your dealership? [Yes, use this website] [No, try a different URL]" (Task 7).</li>
+  </ul>
+  <p><b>Interaction patterns:</b></p>
+  <ul>
+    <li>Per-field accept/reject only — no bulk "use all website values" / "keep all on file" control appears anywhere on the screen (Task 3).</li>
+    <li>Manual edit always wins — the Dealer Admin's own typed value silently overrides any prefilled or scraped value, with no separate override-confirmation step (Task 2).</li>
+    <li>Confirm/Submit is a one-way forward action — once persisted, the Dealer Admin proceeds to the next Configure Phase step rather than remaining on an editable review screen (Task 2).</li>
+  </ul>
+  <p><b>Resolved clarification decisions baked into this spec (from `clarifications-tao.md`, resolved during this phase):</b></p>
+  <ul>
+    <li><b>Scrape-failure messaging conflict (Clarify Q1)</b> — Resolved silent: DWS-SI-05 / POL-TAO-DWS-001-004 govern. No message is ever shown on scrape failure; the rendering declaration's fallback copy ("We couldn't find your details automatically…") does not apply (Task 6).</li>
+    <li><b>Post-submission editability (Clarify Q2)</b> — Resolved: Confirm/Submit is forward navigation to the next Configure Phase step, not a return to an editable review state (Task 2).</li>
+    <li><b>TOC sync failure (Clarify Q3)</b> — Resolved: blocked loading state with automatic retry; if retries are exhausted, an escalation path (contact support / IM escalates on the Dealer Admin's behalf) is shown (Task 9).</li>
+    <li><b>Bulk accept/reject (Clarify Q4)</b> — Resolved: no bulk control; per-field accept/reject decisions only (Task 3).</li>
+    <li><b>Rate-limit scope (Clarify Q5)</b> — Resolved: "Try a different website" shares the same 5-minute rate limit as the manual re-scrape trigger, measured per dealership (Tasks 7, 8).</li>
+    <li><b>Operating Hours comparison rendering (Clarify Q6)</b> — Resolved: one collapsible row per department (Sales/Service/Parts), expanding to a day-by-day (Mon–Sun) diff (Task 3).</li>
+  </ul>
+</div>
+
+<!-- ============ CONSTRAINTS ============ -->
+<div class="sec-head" id="sec-constraints" data-loc="Constraints">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+  <span class="sec-title">Constraints</span>
+</div>
+<div class="ref-item">Screen must never be blank: TOC/contract data must sync into the TAO dealer record before the Dealer Admin can open the screen (hard invariant).</div>
+<div class="ref-item">Scraping is strictly read-only: HTTP GET only — never POST, form submission, authentication, or cookie storage (hard invariant).</div>
+<div class="ref-item">Scraping must respect robots.txt; if disallowed, skip the scrape silently.</div>
+<div class="ref-item">Only the dealer's own website URL (from contract, or a Dealer Admin-corrected alternate) may be scraped — no third-party lookups for MVP.</div>
+<div class="ref-item">No personal data is scraped — all fields are business-level public details.</div>
+<div class="ref-item">Dealer Admin confirmation is always required before save — no value is ever persisted without an explicit Dealer Admin submit action (A1 autonomy tier: suggest-only).</div>
+<div class="ref-item">RBAC: Dealer Admin can view, confirm, and provide an alternate URL. IM can only view a read-only scraped preview and cannot confirm or save.</div>
+<div class="ref-item">Cross-dealer isolation: scrape/comparison cache is keyed by (dealership_id, session_id) — no cross-dealer data leakage.</div>
+<div class="ref-item">"No website" is explicitly not a degraded state — no website-related messaging appears when there's no URL to scrape.</div>
+<div class="ref-item">"Scrape failure" is explicitly not a degraded state — fallback to the contract-prefilled form is silent, with no error shown to the Dealer Admin.</div>
+
+<!-- ============ OUT OF SCOPE ============ -->
+<div class="sec-head" id="sec-outofscope" data-loc="Out of Scope">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+  <span class="sec-title">Out of Scope</span>
+</div>
+<div class="scope-nongoal">
+  <div class="scope-nongoal-body">Web scraping is limited to the dealer's own contract-listed (or Dealer Admin-corrected) website only — no third-party lookups or directory scraping for MVP. Fields not publicly scrapeable — OEM Dealer ID, Federal EIN/Tax ID, Bank Details, and OEM+Makes identity confirmation — must be collected directly from the dealer or OEM and are out of scope for this screen's scraping layer. The Implementation Manager surface is view-only for this release: IM cannot confirm or save dealer details in any version of this feature. No auto-save of scraped or prefilled data is in scope — Dealer Admin confirmation is always required. This feature does not handle financial transactions, monetary values, GL coding, or reconciliation. Legal review of scraping scope is explicitly deferred until GA if the field set expands beyond the MVP list.</div>
+</div>
+
+<!-- ============ RISKS & TRADE-OFFS ============ -->
+<div class="sec-head" id="sec-risks" data-loc="Risks & Trade-offs">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+  <span class="sec-title">Risks &amp; Trade-offs</span>
+</div>
+<div class="ref-item">Website not publicly accessible, behind auth, or has no contact page (High likelihood / Low impact) — mitigated by silent fallback to the contract-prefilled form.</div>
+<div class="ref-item">Scraped values are wrong or outdated (Medium / Medium) — mitigated by the &ge;0.80 confidence gate plus mandatory Dealer Admin confirmation.</div>
+<div class="ref-item">Dealer website blocks scraping via robots.txt (Medium / Low) — mitigated by a pre-scrape robots.txt check with silent skip.</div>
+<div class="ref-item">Scrape is too slow (&gt;5s) and blocks screen load (Low / High) — mitigated by a hard 5s timeout and async execution so the screen still loads immediately.</div>
+<div class="ref-item">Dealer has no website at all (High likelihood for small dealers / no negative impact) — explicitly treated as a first-class fallback, not a degraded state.</div>
+<div class="ref-item">Dealer Admin provides an intentionally or accidentally wrong URL (Low–Medium / High) — mitigated by domain block-list + business-name fuzzy match.</div>
+<div class="ref-item">Dealer Admin provides a group/HQ site instead of their rooftop's site (Medium / Medium) — mitigated by the borderline fuzzy-match (0.70–0.85) confirmation prompt.</div>
+
+<!-- ============ CONFLICTS & GAPS ============ -->
+<div class="sec-head" id="sec-conflicts" data-loc="Conflicts & Gaps">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>
+  <span class="sec-title">Conflicts &amp; Gaps</span>
+</div>
+<div class="ref-item">The "Dealer Details screen completion time" KPI baseline is explicitly marked "TBD — measure at TAO V1 launch" in the source — the 40% reduction target has no baseline yet. Measurement gap only; no design impact.</div>
+<div class="ref-item">The "Form validation error rate" KPI baseline is likewise explicitly marked "TBD — measure at TAO V1 launch" — the 60% reduction target has no baseline yet. Measurement gap only; no design impact.</div>
+
+<!-- ============ ASSUMPTIONS ============ -->
+<div class="sec-head" id="sec-assumptions">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L14.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+  <span class="sec-title">Assumptions</span>
+  <span class="sec-count">4</span>
+</div>
+<ol class="assumptions-list">
+  <li data-loc="Task 3"><b>Task 3</b> — Assumed: Dealership Banner Logo renders as a simple "✓ Logo found on website" presence indicator with no thumbnail preview in MVP — Why: the brief states logos are "compared as URL presence only, not visually" but doesn't specify exact rendering; carried from Clarifications' Gaps &amp; Assumptions.</li>
+  <li data-loc="Task 7"><b>Task 7</b> — Assumed: A domain block-list rejection does not consume the shared 5-minute rate limit (only actual scrape attempts do) — Why: the source's rate-limit clarification was resolved at a general "shares the rate limit" level without spelling out the validation-vs-scrape distinction in prose; the approved flow's own edge label states retry is immediate after a validation failure.</li>
+  <li data-loc="Task 8"><b>Task 8</b> — Assumed: The rate-limit message is a static string with no live countdown/timer — Why: the source specifies only the static copy "Please wait before retrying," with no countdown UI described; carried from Clarifications' Gaps &amp; Assumptions.</li>
+  <li data-loc="Task 9"><b>Task 9</b> — Assumed: The persistent TOC-sync-failure state shows no raw error code or technical detail, using only a "still preparing" framing plus an escalation path — Why: no copy is specified for this state in the source; inferred from this feature's consistent no-technical-detail treatment of failures elsewhere (silent scrape fallback, rate-limit messaging).</li>
+</ol>
+
+<div class="doc-footer">Powered by Tekion Design</div>
+
+<div id="toc-fab">
+  <div id="toc-menu">
+    <a href="#sec-overview">Overview</a>
+    <a href="#sec-context">Context &amp; environment</a>
+    <a href="#sec-personas">Personas</a>
+    <a href="#sec-tvd">Today vs. with this</a>
+    <a href="#sec-surfaces">Product surfaces</a>
+    <a href="#sec-surface-1" class="toc-sub">Dealer Details Review Screen</a>
+    <a href="#sec-surface-2" class="toc-sub">IM Provisioning / Dealer List</a>
+    <a href="#sec-data">Content &amp; Data</a>
+    <a href="#sec-flows">User Flows</a>
+    <a href="#sec-flow-1" class="toc-sub">1. IM Provisioning Preview</a>
+    <a href="#sec-flow-2" class="toc-sub">2. Diffs Found</a>
+    <a href="#sec-flow-3" class="toc-sub">3. All Fields Match</a>
+    <a href="#sec-flow-4" class="toc-sub">4. No Website</a>
+    <a href="#sec-flow-5" class="toc-sub">5. Silent Scrape Failure</a>
+    <a href="#sec-flow-6" class="toc-sub">6. Alt URL Passes</a>
+    <a href="#sec-flow-7" class="toc-sub">7. Alt URL Fails</a>
+    <a href="#sec-flow-8" class="toc-sub">8. Manual Re-Scrape</a>
+    <a href="#sec-flow-9" class="toc-sub">9. TOC Sync Blocked</a>
+    <a href="#sec-tasks">Tasks &amp; AC</a>
+    <a href="#sec-task-1" class="toc-sub">1. IM Preview Column</a>
+    <a href="#sec-task-2" class="toc-sub">2. Baseline Load</a>
+    <a href="#sec-task-3" class="toc-sub">3. Comparison View</a>
+    <a href="#sec-task-4" class="toc-sub">4. All-Match State</a>
+    <a href="#sec-task-5" class="toc-sub">5. No-Website State</a>
+    <a href="#sec-task-6" class="toc-sub">6. Silent Scrape Failure</a>
+    <a href="#sec-task-7" class="toc-sub">7. Alternate URL Flow</a>
+    <a href="#sec-task-8" class="toc-sub">8. Manual Re-Scrape</a>
+    <a href="#sec-task-9" class="toc-sub">9. TOC Sync Blocked</a>
+    <a href="#sec-global">Global Notes</a>
+    <a href="#sec-constraints">Constraints</a>
+    <a href="#sec-outofscope">Out of Scope</a>
+    <a href="#sec-risks">Risks &amp; Trade-offs</a>
+    <a href="#sec-conflicts">Conflicts &amp; Gaps</a>
+    <a href="#sec-assumptions">Assumptions</a>
+  </div>
+  <button id="toc-btn" onclick="document.getElementById('toc-menu').classList.toggle('open')" title="Jump to section">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+  </button>
+</div>
+
+</div>
+
+<div class="side-toc">
+  <div class="side-toc-title">Jump to section</div>
+  <div class="side-toc-list" id="side-toc-list">
+    <div class="side-toc-indicator" id="side-toc-indicator"></div>
+    <a href="#sec-overview" class="active">Overview</a>
+    <a href="#sec-context">Context &amp; environment</a>
+    <a href="#sec-personas">Personas</a>
+    <a href="#sec-tvd">Today vs. with this</a>
+    <a href="#sec-surfaces">Product surfaces</a>
+    <a href="#sec-surface-1" class="side-toc-sub">Dealer Details Review Screen</a>
+    <a href="#sec-surface-2" class="side-toc-sub">IM Provisioning / Dealer List</a>
+    <a href="#sec-data">Content &amp; Data</a>
+    <a href="#sec-flows">User Flows</a>
+    <a href="#sec-flow-1" class="side-toc-sub">1. IM Provisioning Preview</a>
+    <a href="#sec-flow-2" class="side-toc-sub">2. Diffs Found</a>
+    <a href="#sec-flow-3" class="side-toc-sub">3. All Fields Match</a>
+    <a href="#sec-flow-4" class="side-toc-sub">4. No Website</a>
+    <a href="#sec-flow-5" class="side-toc-sub">5. Silent Scrape Failure</a>
+    <a href="#sec-flow-6" class="side-toc-sub">6. Alt URL Passes</a>
+    <a href="#sec-flow-7" class="side-toc-sub">7. Alt URL Fails</a>
+    <a href="#sec-flow-8" class="side-toc-sub">8. Manual Re-Scrape</a>
+    <a href="#sec-flow-9" class="side-toc-sub">9. TOC Sync Blocked</a>
+    <a href="#sec-tasks">Tasks &amp; AC</a>
+    <a href="#sec-task-1" class="side-toc-sub">1. IM Preview Column</a>
+    <a href="#sec-task-2" class="side-toc-sub">2. Baseline Load</a>
+    <a href="#sec-task-3" class="side-toc-sub">3. Comparison View</a>
+    <a href="#sec-task-4" class="side-toc-sub">4. All-Match State</a>
+    <a href="#sec-task-5" class="side-toc-sub">5. No-Website State</a>
+    <a href="#sec-task-6" class="side-toc-sub">6. Silent Scrape Failure</a>
+    <a href="#sec-task-7" class="side-toc-sub">7. Alternate URL Flow</a>
+    <a href="#sec-task-8" class="side-toc-sub">8. Manual Re-Scrape</a>
+    <a href="#sec-task-9" class="side-toc-sub">9. TOC Sync Blocked</a>
+    <a href="#sec-global">Global Notes</a>
+    <a href="#sec-constraints">Constraints</a>
+    <a href="#sec-outofscope">Out of Scope</a>
+    <a href="#sec-risks">Risks &amp; Trade-offs</a>
+    <a href="#sec-conflicts">Conflicts &amp; Gaps</a>
+    <a href="#sec-assumptions">Assumptions</a>
+  </div>
+</div>
+
+</div>
+
+<!-- ============ Click-to-annotate widgets ============ -->
+<button id="annot-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Add comment</button>
+
+<div id="annot-popover">
+  <div class="annot-quote" id="annot-popover-quote"></div>
+  <textarea id="annot-popover-input" placeholder="What should change here?"></textarea>
+  <div class="annot-popover-actions">
+    <button class="annot-btn-sm annot-btn-cancel" id="annot-cancel-btn">Cancel</button>
+    <button class="annot-btn-sm annot-btn-save" id="annot-save-btn">Save</button>
+  </div>
+</div>
+
+<div id="feedback-fab" onclick="toggleFeedbackPanel()">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+  <span>Feedback</span>
+  <span class="fb-count" id="fb-count">0</span>
+</div>
+
+<div id="feedback-panel">
+  <div id="feedback-panel-head">
+    <span>Feedback</span>
+    <button onclick="toggleFeedbackPanel()" style="background:none;border:none;cursor:pointer;color:var(--tm);display:flex;align-items:center;justify-content:center;padding:2px">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div id="feedback-list"><div class="fb-empty">No annotations yet. Select any text to add one.</div></div>
+  <div id="feedback-panel-foot">
+    <button type="button" id="copy-feedback-btn" onclick="copyFeedback()">Copy Feedback (0)</button>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+  startOnLoad:true,
+  theme:'base',
+  themeVariables:{
+    fontFamily:'Manrope, sans-serif',
+    primaryColor:'#F8F9FA',
+    primaryBorderColor:'#161616',
+    primaryTextColor:'#161616',
+    lineColor:'#6B7280',
+    tertiaryColor:'#fff'
+  },
+  flowchart:{ curve:'basis', htmlLabels:true }
+});
+</script>
+
+<script>
+document.querySelectorAll('.side-toc-list a, #toc-menu a').forEach(function(a){
+  a.addEventListener('click',function(e){
+    e.preventDefault();
+    var target=document.querySelector(a.getAttribute('href'));
+    if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
+    var menu=document.getElementById('toc-menu');
+    if(menu)menu.classList.remove('open');
+  });
+});
+document.addEventListener('click',function(e){
+  if(!e.target.closest('#toc-fab')){
+    var menu=document.getElementById('toc-menu');
+    if(menu)menu.classList.remove('open');
+  }
+});
+
+(function(){
+  var sectionIds=['sec-overview','sec-context','sec-personas','sec-tvd','sec-surfaces','sec-surface-1','sec-surface-2','sec-data','sec-flows','sec-flow-1','sec-flow-2','sec-flow-3','sec-flow-4','sec-flow-5','sec-flow-6','sec-flow-7','sec-flow-8','sec-flow-9','sec-tasks','sec-task-1','sec-task-2','sec-task-3','sec-task-4','sec-task-5','sec-task-6','sec-task-7','sec-task-8','sec-task-9','sec-global','sec-constraints','sec-outofscope','sec-risks','sec-conflicts','sec-assumptions'];
+  var links=Array.from(document.querySelectorAll('.side-toc-list a'));
+  var indicator=document.getElementById('side-toc-indicator');
+  var listEl=document.getElementById('side-toc-list');
+  var REFERENCE_Y=110;
+
+  function setActive(id){
+    links.forEach(function(l){l.classList.toggle('active',l.getAttribute('href')==='#'+id);});
+    var activeLink=links.find(function(l){return l.getAttribute('href')==='#'+id;});
+    if(activeLink&&indicator&&listEl){
+      var listRect=listEl.getBoundingClientRect();
+      var linkRect=activeLink.getBoundingClientRect();
+      indicator.style.top=(linkRect.top-listRect.top)+'px';
+      indicator.style.height=linkRect.height+'px';
+    }
+  }
+
+  function onScroll(){
+    var atBottom=(window.innerHeight+window.scrollY)>=document.documentElement.scrollHeight-2;
+    if(atBottom){
+      setActive(sectionIds[sectionIds.length-1]);
+      return;
+    }
+    var current=sectionIds[0];
+    for(var i=0;i<sectionIds.length;i++){
+      var el=document.getElementById(sectionIds[i]);
+      if(!el)continue;
+      var top=el.getBoundingClientRect().top;
+      if(top<=REFERENCE_Y){
+        current=sectionIds[i];
+      } else {
+        break;
+      }
+    }
+    setActive(current);
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',onScroll);
+  onScroll();
+})();
+
+(function(){
+  var titleEl=document.getElementById('page-title');
+  var header=document.getElementById('sticky-header');
+  if(!titleEl||!header)return;
+  function check(){
+    var rect=titleEl.getBoundingClientRect();
+    header.classList.toggle('vis',rect.bottom<0);
+  }
+  window.addEventListener('scroll',check,{passive:true});
+  window.addEventListener('resize',check);
+  check();
+})();
+</script>
+
+<script>
+(function(){
+  var annotations = [];
+  var nextId = 1;
+  var pendingRange = null;
+
+  var annotBtn = document.getElementById('annot-btn');
+  var popover = document.getElementById('annot-popover');
+  var popoverQuote = document.getElementById('annot-popover-quote');
+  var popoverInput = document.getElementById('annot-popover-input');
+  var pageMain = document.querySelector('.page-main');
+
+  function nearestLoc(node){
+    var el = node.nodeType === 3 ? node.parentElement : node;
+    while(el && el !== document.body){
+      if(el.hasAttribute && el.hasAttribute('data-loc')) return el.getAttribute('data-loc');
+      el = el.parentElement;
+    }
+    return 'Document';
+  }
+
+  function truncate(s, n){
+    s = s.trim().replace(/\s+/g,' ');
+    return s.length > n ? s.slice(0, n) + '…' : s;
+  }
+
+  document.addEventListener('mouseup', function(e){
+    if(e.target.closest('#annot-popover') || e.target.closest('#annot-btn')) return;
+    setTimeout(function(){
+      var sel = window.getSelection();
+      if(!sel || sel.isCollapsed || !sel.toString().trim()){
+        annotBtn.classList.remove('show');
+        return;
+      }
+      var anchorEl = sel.anchorNode && (sel.anchorNode.nodeType === 3 ? sel.anchorNode.parentElement : sel.anchorNode);
+      if(!anchorEl || !pageMain.contains(anchorEl)){
+        annotBtn.classList.remove('show');
+        return;
+      }
+      var range = sel.getRangeAt(0);
+      pendingRange = range.cloneRange();
+      var rect = range.getBoundingClientRect();
+      annotBtn.style.left = (window.scrollX + rect.left + rect.width/2 - 60) + 'px';
+      annotBtn.style.top = (window.scrollY + rect.top - 40) + 'px';
+      annotBtn.classList.add('show');
+    }, 10);
+  });
+
+  annotBtn.addEventListener('click', function(){
+    if(!pendingRange) return;
+    var rect = pendingRange.getBoundingClientRect();
+    popoverQuote.textContent = '"' + truncate(pendingRange.toString(), 200) + '"';
+    popoverInput.value = '';
+    popover.style.left = (window.scrollX + rect.left) + 'px';
+    popover.style.top = (window.scrollY + rect.bottom + 8) + 'px';
+    popover.classList.add('show');
+    annotBtn.classList.remove('show');
+    popoverInput.focus();
+  });
+
+  document.getElementById('annot-cancel-btn').addEventListener('click', function(){
+    popover.classList.remove('show');
+    pendingRange = null;
+  });
+
+  document.getElementById('annot-save-btn').addEventListener('click', function(){
+    if(!pendingRange) return;
+    var comment = popoverInput.value.trim();
+    if(!comment){ popoverInput.focus(); return; }
+
+    var quote = truncate(pendingRange.toString(), 200);
+    var loc = nearestLoc(pendingRange.commonAncestorContainer);
+    var id = nextId++;
+
+    try{
+      var mark = document.createElement('mark');
+      mark.className = 'annot-mark';
+      mark.dataset.annotId = id;
+      var sup = document.createElement('sup');
+      sup.textContent = id;
+      pendingRange.surroundContents(mark);
+      mark.appendChild(sup);
+    } catch(err){
+    }
+
+    annotations.push({id: id, loc: loc, quote: quote, comment: comment});
+    renderFeedbackList();
+    popover.classList.remove('show');
+    pendingRange = null;
+    window.getSelection().removeAllRanges();
+  });
+
+  window.removeAnnotation = function(id){
+    annotations = annotations.filter(function(a){ return a.id !== id; });
+    var mark = document.querySelector('.annot-mark[data-annot-id="'+id+'"]');
+    if(mark){
+      var parent = mark.parentNode;
+      while(mark.firstChild && mark.firstChild.tagName === 'SUP') mark.removeChild(mark.firstChild);
+      while(mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+      parent.removeChild(mark);
+    }
+    renderFeedbackList();
+  };
+
+  function renderFeedbackList(){
+    var list = document.getElementById('feedback-list');
+    var countEls = [document.getElementById('fb-count')];
+    var copyBtn = document.getElementById('copy-feedback-btn');
+    countEls.forEach(function(el){ el.textContent = annotations.length; });
+    copyBtn.textContent = 'Copy Feedback (' + annotations.length + ')';
+
+    if(!annotations.length){
+      list.innerHTML = '<div class="fb-empty">No annotations yet. Select any text to add one.</div>';
+      return;
+    }
+    list.innerHTML = annotations.map(function(a, i){
+      return '<div class="fb-item">' +
+        '<button class="fb-item-del" onclick="removeAnnotation(' + a.id + ')">remove</button>' +
+        '<div class="fb-item-loc">' + (i+1) + '. ' + escapeHtml(a.loc) + '</div>' +
+        '<div class="fb-item-quote">"' + escapeHtml(a.quote) + '"</div>' +
+        '<div class="fb-item-comment">' + escapeHtml(a.comment) + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function escapeHtml(s){
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function buildFeedbackText(){
+    var lines = ['Feedback (' + annotations.length + ' items)', ''];
+    annotations.forEach(function(a, i){
+      lines.push((i+1) + '. Location: ' + a.loc);
+      lines.push('   Quote: "' + a.quote + '"');
+      lines.push('   Comment: ' + a.comment);
+      lines.push('');
+    });
+    return lines.join('\n').trim();
+  }
+
+  window.toggleFeedbackPanel = function(){
+    document.getElementById('feedback-panel').classList.toggle('open');
+  };
+
+  window.copyFeedback = function(){
+    var btn = document.getElementById('copy-feedback-btn');
+    if(!annotations.length){
+      btn.textContent = 'No annotations yet';
+      setTimeout(renderFeedbackList, 1400);
+      return;
+    }
+    var text = buildFeedbackText();
+
+    function settle(ok){
+      btn.textContent = ok ? 'Copied — paste it into chat' : 'Could not copy — select the list above and press Cmd/Ctrl+C';
+      setTimeout(renderFeedbackList, ok ? 1600 : 3000);
+    }
+
+    function manualCopy(){
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try{ ok = document.execCommand('copy'); } catch(err){}
+      document.body.removeChild(ta);
+      settle(ok);
+    }
+
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ settle(true); }).catch(manualCopy);
+    } else {
+      manualCopy();
+    }
+  };
+})();
+</script>
+
+</body>
+</html>

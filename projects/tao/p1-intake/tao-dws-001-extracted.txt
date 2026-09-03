@@ -1,0 +1,15933 @@
+TAO-DWS-001 — Dealer Website Scraping: Pre-fill Dealer Details Review
+
+ISD Layer 1 — Dealer Website Scraping — Pre-fill Dealer Details Review (TAO-
+DWS-001)
+
+1 template_version: ISD-v4.5-standard
+2 layer: 1
+3 isd_template: standard
+4 orbit_version: v2.5
+5 status: Draft
+6 intent_id: TAO-DWS-001
+7 intent_name: Dealer Website Scraping — Pre-fill Dealer Details Review
+8 product_area: Dealer Onboarding / TAO
+9 classification: Internal
+
+10 watermark_id: WM-TAO-DWS-001-2026
+11 generated_by: paper-mcp isd_init (standard)
+
+ISD Standard Template — Mid-tier template for moderate-complexity agents
+
+(A1-A2 autonomy). Includes all 13 base sections plus key v4.0 agent sections,
+
+but NOT enterprise process patterns (saga, batch, timers) or v4.2
+
+completeness depth. For full enterprise coverage, use  template: "full" .
+
+For non-AI features, use  template: "lite" .
+
+§1. Document Metadata
+
+Field
+
+Intent ID
+
+Intent Name
+
+Value
+
+TAO-DWS-001
+
+Dealer Website Scraping — Pre-fill
+
+Dealer Details Review
+
+Product Area
+
+Dealer Onboarding / TAO
+
+Module / Sub-Area
+
+TAO Configure Phase — Dealer Details Review
+
+Screen
+
+Document Owner (PM)
+
+pbihari@tekion.com
+
+Engineering Lead
+
+Status
+
+Nitish Kumar
+
+Draft
+
+Version
+
+Last Updated
+
+Review Date
+
+1.0
+
+Aug 27, 2026
+
+1st September
+
+Source Reference
+
+TAO_User_Journey.md — Dealer Details
+
+Linked Persona(s)
+
+Review screen
+
+Dealer Admin
+
+ORBIT Template Version
+
+ISD-v4.5-standard
+
+1.2 Autonomy Declaration
+
+Required for any intent that can execute without direct user invocation.
+
+Skip for purely reactive intents.
+
+Field
+
+Value
+
+Execution Model
+
+hybrid — event-driven at Dealer Admin screen
+
+load AND proactive at IM provisioning stage
+
+Autonomy Tier (ORBIT S04)
+
+A1 (Suggest-Only) — scraper proposes
+
+prefilled values; human must confirm at every
+
+surface
+
+Target Autonomy Tier (GA)
+
+A1 (suggest-only) — confirmation always
+
+required; no auto-save of scraped data
+
+Trigger Classification
+
+event-triggered (Dealer Admin screen load) +
+
+Context Persistence
+
+proactive (IM provisioning stage)
+
+session-scoped for Dealer Admin path;
+
+provisioning-record-scoped for IM path
+
+(persisted per dealer record)
+
+Execution Surface
+
+TAO backend service — server-side; runs on
+
+both Dealer Admin screen load and IM
+
+provisioning stage
+
+Background Execution
+
+Yes — scrape runs in background; result
+
+cached; neither Dealer Admin screen nor IM
+
+view is blocked
+
+Autonomy Tier Reference (ORBIT S04):
+
+A0 (Tool): Deterministic function, no LLM reasoning
+
+A1 (Suggest-Only): Agent proposes action, human must approve every step
+
+A2 (Supervised): Agent executes routine actions, escalates exceptions to human
+
+§2. Intent Definition
+
+2.1 Primary Intent and Success Criteria
+
+Field
+
+Value
+
+Primary Intent (business verb + scope)
+
+Populate the TAO Dealer Details Review screen
+
+from two sources — (1) contract/Salesforce
+
+data as the always-present baseline, and (2)
+
+website scraping as an enrichment layer —
+
+then present a before/after comparison for
+
+Dealer Admin confirmation
+
+Success Criteria
+
+(1) Dealer Details Review screen is never blank
+
+Value
+
+— contract data always prefills it. (2) If a
+
+website exists, a comparison view shows what
+
+the website found vs. what is already on file,
+
+field by field. (3) Dealer Admin confirms the
+
+final values once; no manual re-typing of data
+
+already known to Tekion.
+
+High — eliminates blank-form experience for all
+
+dealers regardless of website presence;
+
+website enrichment layer adds data quality and
+
+signals intelligence
+
+Frequency
+
+Event-triggered — once per dealership at
+
+Feasibility
+
+provisioning (contract sync) + once per Dealer
+
+Admin session on Dealer Details Review screen
+
+load
+
+High — contract data is always available;
+
+website scraping is additive; no dealer is left
+
+Golden Intent?
+
+Yes
+
+with a blank form
+
+Automation Potential
+
+Partial — contract sync and scraping are fully
+
+automated; Dealer Admin confirmation of final
+
+values is always manual (A1)
+
+Expected Volume
+
+1 contract-sync invocation per dealer
+
+provisioning + 1 scrape per Dealer Admin
+
+session
+
+2.2 User Personas
+
+Persona
+
+Role
+
+Primary Use Case
+
+Dealer Admin
+
+Primary dealership-side
+
+Reviews, edits, and confirms
+
+owner; completes the TAO
+
+prefilled dealer details on the
+
+journey end-to-end
+
+Dealer Details Review screen;
+
+can provide a corrected
+
+website URL if the pre-existing
+
+one is wrong
+
+Implementation Manager (IM) Tekion-side operator who sees
+
+Views scraped dealer details
+
+the dealer pipeline and
+
+during the provisioning stage
+
+provisions dealers
+
+to verify dealer info before the
+
+Dealer Admin journey begins
+
+2.3 Business Context
+
+The Dealer Details Review screen must never be blank. When a dealer signs a contract with
+
+Tekion, their basic details — name, address, phone, website URL — are captured in Salesforce
+
+as part of that contract. Salesforce is already integrated with TOC (Tekion Operating Cloud) —
+
+the internal operational system through which the dealer's instance is provisioned and
+
+configured — and syncs dealer data into TOC as part of the contracting and provisioning
+
+pipeline. TAO connects to TOC only; TAO does not read from Salesforce directly. TOC is
+
+therefore the single source of dealer truth for TAO.
+
+Layer 1 — Internal data sync (baseline, always present): At provisioning stage, TAO reads
+
+dealer details from TOC. TAO writes this record into the TAO dealer record. When the Dealer
+
+Admin opens the Dealer Details Review screen, all fields are already populated from this
+
+baseline. This applies to every dealer — large, small, with or without a website. The no-blank-
+
+field guarantee comes from this layer.
+
+Data flow: Salesforce → TOC ← TAO  — Salesforce pushes dealer data into TOC; TAO reads
+
+from TOC.
+
+Layer 2 — Website scraping (enrichment, additive): For dealers that have a public website,
+
+TAO also scrapes that website and compares what it finds against the merged internal record
+
+already on file. Contract/TOC data may be from months ago and may have a slightly different
+
+address or missing website URL. The website scrape surfaces these differences without
+
+discarding what Tekion already knows.
+
+The Dealer Admin experience — before/after comparison view:
+
+All fields pre-populated from the merged internal record (Salesforce + TOC); labelled “From
+
+your records on file”
+
+Where the website found something different or new, a side-by-side comparison: “On file: 123
+
+Main St | Found on website: 123 Main Street, Suite 100 | Use website version?”
+
+Where the website found the same value → a quiet checkmark (no action needed)
+
+Where the website found nothing new → on-file value shown alone, no comparison row
+
+The Dealer Admin confirms the final state once. They are not re-typing anything — they are
+
+reviewing and accepting/rejecting diffs.
+
+Small dealers with no website: Contract data fills the screen completely. No comparison rows
+
+appear because there is nothing to compare. The experience is: fully prefilled form from
+
+contract, Dealer Admin reviews and confirms.
+
+dealer-admin-corrected website URL: If the website URL in the contract is wrong, missing, or
+
+the Dealer Admin wants to try a different page, the Dealer Details Review screen offers a “Try a
+
+different website” option that allows a fresh scrape. The same URL validation rules apply to any
+
+dealer-admin-provided URL before its scraped data is shown.
+
+§3. Natural Language Triggers
+
+3.1 Example Triggers
+
+Trigger Phrase
+
+Confidence Signal
+
+Context
+
+Dealer Details Review screen
+
+High
+
+load event (system trigger)
+
+Automatically fires when
+
+Dealer Admin opens the
+
+“Prefill my dealership info”
+
+High
+
+“Use my website to fill in these
+
+High
+
+details”
+
+“Look up my dealership”
+
+Medium
+
+“Fill in my address from my
+
+Medium
+
+website”
+
+Dealer Details Review screen
+
+in TAO
+
+Dealer Admin explicitly
+
+requests prefill from dealer
+
+website
+
+Dealer Admin provides intent
+
+to use website as source
+
+Dealer Admin requests lookup
+
+— could be website scrape or
+
+internal lookup
+
+Dealer Admin references a
+
+specific field; scrape is one
+
+resolution path
+
+3.2 Disambiguation Notes
+
+This intent is event-triggered (screen load), not conversational in the primary path. In a
+
+conversational context, “look up my dealership” could refer to internal TAO data lookup, external
+
+directory lookup, or dealer website scraping. Resolve by checking if dealer has a website URL
+
+on file; if yes, default to website scrape. If the Dealer Admin says “look up my address” without
+
+website context, clarify whether to use their website or another source.
+
+3.3 Slash Commands
+
+Command
+
+Description
+
+/prefill-dealer-details
+
+Manually trigger a website scrape to re-
+
+populate the Dealer Details Review screen (for
+
+cases where auto-prefill failed or Dealer Admin
+
+wants a refresh)
+
+3.4 Event Triggers (Autonomous Execution)
+
+Required if Execution Model is proactive, scheduled, or event-driven. Skip
+
+for purely reactive intents.
+
+Trigger Type
+
+Event Source
+
+Condition
+
+Debounce
+
+Exclusion
+
+Window
+
+IM provisioning
+
+TAO IM portal —
+
+Dealer record
+
+Max 1 scrape per
+
+None
+
+stage load
+
+dealer list /
+
+enters
+
+dealer
+
+provisioning
+
+provisioning state
+
+provisioning
+
+queue view
+
+AND
+
+record (re-
+
+dealer_website_u
+
+scraped only if
+
+rl is present in
+
+Dealer Admin
+
+contract data
+
+provides a new
+
+URL)
+
+Dealer Admin
+
+TAO frontend —
+
+Screen renders
+
+Max 1 auto-
+
+None
+
+screen-load
+
+Dealer Details
+
+for the first time
+
+scrape per
+
+event
+
+Review screen
+
+in this session
+
+session; cached
+
+AND
+
+result reused on
+
+dealer_website_u
+
+revisit
+
+rl is available
+
+Dealer Admin
+
+Dealer Admin
+
+Dealer Admin
+
+Max 1 per 5
+
+None
+
+provides
+
+inputs a new URL
+
+submits a URL via
+
+minutes per
+
+alternate URL
+
+on the Dealer
+
+“Use a different
+
+dealership
+
+Details Review
+
+website” field
+
+screen
+
+AND URL passes
+
+validation (DWS-
+
+SI-08)
+
+Manual re-scrape
+
+dealer-admin-
+
+Dealer Admin
+
+Max 1 per 5
+
+None
+
+(/prefill-dealer-
+
+invoked
+
+explicitly
+
+minutes per
+
+details)
+
+requests re-
+
+dealership
+
+scrape with the
+
+current URL
+
+§4. Parameters
+
+Parameter
+
+Type
+
+Required
+
+Source
+
+If Missing
+
+dealership_id
+
+string
+
+Required
+
+TAO session
+
+Block execution
+
+context
+
+session_id
+
+string
+
+Required
+
+TAO session
+
+Block execution
+
+context
+
+— required for
+
+caching
+
+toc_dealer_data
+
+object
+
+Required
+
+TOC dealer
+
+Block execution
+
+record — single
+
+— screen cannot
+
+source for TAO;
+
+render without
+
+holds Salesforce-
+
+TOC baseline
+
+synced contract
+
+data plus
+
+provisioning
+
+updates
+
+dealer_website_u
+
+string (URL)
+
+Optional
+
+TOC dealer
+
+Skip scraping
+
+rl
+
+record ( Dealer
+
+layer; screen still
+
+Website  field,
+
+renders from
+
+sourced from
+
+toc_dealer_data
+
+Salesforce
+
+contract at deal
+
+close)
+
+dealer_provided_
+
+string (URL)
+
+Optional
+
+Dealer Admin
+
+N/A — only
+
+url
+
+input on Dealer
+
+present when
+
+Details Review
+
+Dealer Admin
+
+screen (“Try a
+
+explicitly provides
+
+different
+
+website”)
+
+an alternate URL;
+
+must pass DWS-
+
+SI-08 validation
+
+scrape_timeout_
+
+number
+
+Optional
+
+TAO backend
+
+Use default
+
+ms
+
+config (default:
+
+5000ms
+
+5000ms)
+
+fields_to_compar
+
+string[] (enum)
+
+Optional
+
+TAO
+
+Default:
+
+e
+
+configuration
+
+dealership_name,
+
+dba_name,
+
+address lines,
+
+city, state, zip,
+
+phones, email,
+
+operating hours,
+
+and logo_primary;
+
+see §4.1
+
+trigger_surface
+
+enum:
+
+Required
+
+System context
+
+Default to
+
+“im_provisioning”
+
+/ “da_screen”
+
+“da_screen”
+
+4.1 Field Mapping — TOC → Dealer Master API → Scrape Target
+
+Every field in  fields_to_compare  maps to a specific path in the Dealer Master API
+
+response ( /dealer-master/{dealerId} ) and, where available, a TOC source field used for
+
+Layer 1 prefill. Fields without a TOC source are scrape-only and appear as “New — found on
+
+website” rows when the scraper finds them.
+
+website_url  is NOT in  fields_to_compare  — it is the trigger URL for scraping, not a
+
+field to compare.
+
+4.1.1 Scrapeable Fields
+
+#
+
+1
+
+2
+
+fields_t
+
+Dealer
+
+Dealer
+
+TOC
+
+Layer
+
+Scrape
+
+o_compar
+
+Config UI
+
+Master API
+
+Source
+
+e  Key
+
+Label
+
+Path
+
+Field
+
+Target on
+
+Website
+
+dealersh
+
+Dealer
+
+data.dea
+
+Dealersh
+
+1 + 2
+
+Business
+
+ip_name
+
+Name
+
+lerName
+
+ip Name
+
+(Public)
+
+dba_name Doing
+
+data.dea
+
+—
+
+2 only
+
+Business As
+
+lerDoing
+
+(DBA)
+
+Business
+
+AsName
+
+name in
+
+header,
+
+footer,
+
+About page
+
+Footer
+
+“doing
+
+business
+
+as” /
+
+trading-
+
+name text
+
+Contact
+
+page /
+
+3
+
+address_
+
+Street
+
+data.dea
+
+Primary
+
+1 + 2
+
+line1
+
+Address 1
+
+lerAddre
+
+Physical
+
+— Default
+
+ss[addre
+
+Address
+
+location
+
+ssType=D
+
+EFAULT].
+
+streetAd
+
+dress1
+
+footer
+
+address
+
+block
+
+4
+
+address_
+
+Street
+
+data.dea
+
+—
+
+2 only
+
+Second
+
+line2
+
+Address 2
+
+lerAddre
+
+— Default
+
+ss[addre
+
+location
+
+ssType=D
+
+address line
+
+when
+
+present
+
+EFAULT].
+
+streetAd
+
+dress2
+
+data.dea
+
+City
+
+1 + 2
+
+Contact
+
+page /
+
+footer
+
+address
+
+block
+
+5
+
+city
+
+City —
+
+Default
+
+lerAddre
+
+location
+
+ss[addre
+
+ssType=D
+
+EFAULT].
+
+city
+
+6
+
+state
+
+State —
+
+Default
+
+location
+
+data.dea
+
+State
+
+1 + 2
+
+Contact
+
+lerAddre
+
+ss[addre
+
+ssType=D
+
+EFAULT].
+
+state
+
+page /
+
+footer
+
+address
+
+block
+
+7
+
+zip
+
+ZIP Code
+
+data.dea
+
+Zip Code
+
+1 + 2
+
+Contact
+
+— Default
+
+lerAddre
+
+location
+
+ss[addre
+
+ssType=D
+
+EFAULT].
+
+zipCode
+
+8
+
+phone_ma
+
+Phone —
+
+data.dea
+
+Dealer
+
+1 + 2
+
+in
+
+Default
+
+location
+
+lerAddre
+
+Main
+
+ss[addre
+
+Number
+
+ssType=D
+
+EFAULT].
+
+page /
+
+footer
+
+address
+
+block
+
+Contact
+
+page /
+
+footer /
+
+click-to-call
+
+element
+
+phoneNum
+
+ber
+
+9
+
+phone_sa
+
+Phone —
+
+data.dea
+
+—
+
+2 only
+
+Department
+
+les
+
+Sales
+
+lerAddre
+
+department
+
+ss[addre
+
+ssType=S
+
+ALES].ph
+
+oneNumbe
+
+r
+
+s section /
+
+Contact
+
+page Sales
+
+row
+
+10
+
+phone_se
+
+Phone —
+
+data.dea
+
+—
+
+2 only
+
+Department
+
+rvice
+
+Service
+
+lerAddre
+
+department
+
+ss[addre
+
+ssType=S
+
+ERVICE].
+
+phoneNum
+
+ber
+
+s section /
+
+Contact
+
+page
+
+Service row
+
+11
+
+phone_pa
+
+Phone —
+
+data.dea
+
+—
+
+2 only
+
+Department
+
+rts
+
+Parts
+
+lerAddre
+
+department
+
+ss[addre
+
+12
+
+email
+
+Email —
+
+Default
+
+location
+
+ssType=P
+
+ARTS].ph
+
+oneNumbe
+
+r
+
+data.dea
+
+—
+
+2 only
+
+lerAddre
+
+ss[addre
+
+ssType=D
+
+EFAULT].
+
+email
+
+s section /
+
+Contact
+
+page Parts
+
+row
+
+Contact
+
+page, if
+
+published
+
+13
+
+operatin
+
+Sales
+
+data.dea
+
+—
+
+2 only
+
+Hours page
+
+g_hours_
+
+Operating
+
+lerOpera
+
+sales
+
+Hours
+
+tionSche
+
+(Mon–Sun)
+
+dule[dea
+
+lerOpera
+
+tionType
+
+/ Contact
+
+page Sales
+
+row
+
+=1].busi
+
+nessHour
+
+s[]
+
+14
+
+operatin
+
+Service
+
+data.dea
+
+—
+
+2 only
+
+Hours page
+
+g_hours_
+
+Operating
+
+lerOpera
+
+service
+
+Hours
+
+tionSche
+
+(Mon–Sun)
+
+dule[dea
+
+/ Contact
+
+page
+
+Service row
+
+lerOpera
+
+tionType
+
+=0].busi
+
+nessHour
+
+s[]
+
+15
+
+operatin
+
+Parts
+
+data.dea
+
+—
+
+2 only
+
+Hours page
+
+g_hours_
+
+Operating
+
+lerOpera
+
+parts
+
+Hours
+
+tionSche
+
+(Mon–Sun)
+
+dule[dea
+
+/ Contact
+
+page Parts
+
+row
+
+lerOpera
+
+tionType
+
+=2].busi
+
+nessHour
+
+s[]
+
+16
+
+logo_pri
+
+Dealership
+
+data.dea
+
+—
+
+2 only
+
+Logo image
+
+mary
+
+Banner
+
+Logo
+
+lerLogos
+
+[title=D
+
+EALERSHI
+
+P_BANNER
+
+_IMAGE].
+
+imageUrl
+
+in site
+
+header —
+
+highest-
+
+resolution
+
+image
+
+detected
+
+Layer column: 1 + 2  = TOC prefill baseline exists AND website scrape may update it.  2
+
+only  = no TOC source; field appears only when scraper finds it.
+
+Operating hours schema: each  businessHours[]  entry is  {dayOfWeek:
+
+"MONDAY"…"SUNDAY", openingTime: "HH:mm", closingTime: "HH:mm", closed:
+
+bool} . Scraper returns the same shape; comparator diffs day-by-day.
+
+4.1.2 Fields NOT Scrapeable — Must Be Collected from Dealer or OEM
+
+Dealer Config UI Label
+
+Dealer Master API Path
+
+Collection Method
+
+OEM Dealer ID
+
+data.oemDealerId
+
+Collect from dealer / OEM
+
+portal
+
+Federal EIN / Tax ID
+
+data.einConfiguration.f
+
+Collect from dealer — not
+
+ederalTaxId
+
+public
+
+Bank Details
+
+data.bankDetails[]
+
+Collect from dealer —
+
+ACH/banking setup
+
+OEM + Makes (identity)
+
+data.oemDetails[].oem , 
+
+From TOC; website can
+
+data.supportedMakes[]
+
+confirm but is not the source
+
+§5. Execution Flow
+
+5.1 Sub-Intents
+
+Sub-Intent
+
+Description
+
+Parameters /
+
+Trigger
+
+Safety Gate
+
+Phase
+
+Notes
+
+Condition
+
+DWS-SI-00:
+
+At IM
+
+dealership_id,
+
+Dealer enters
+
+Required —
+
+MVP
+
+Sync TOC
+
+provisioning
+
+toc_dealer_dat
+
+provisioning
+
+blocks Dealer
+
+dealer data to
+
+stage, read
+
+a,
+
+state in TAO
+
+Admin screen
+
+TAO dealer
+
+dealer details
+
+trigger_surfac
+
+record
+
+from TOC and
+
+e="im_provisi
+
+load if not
+
+complete
+
+write the TOC
+
+oning"
+
+dealer record
+
+into the TAO
+
+dealer record.
+
+DWS-SI-00b:
+
+After TOC
+
+dealership_id,
+
+DWS-SI-00
+
+IM preview is
+
+MVP
+
+IM
+
+sync,
+
+dealer_websit
+
+completes
+
+read-only; IM
+
+provisioning
+
+proactively
+
+e_url
+
+AND
+
+cannot
+
+scrape
+
+preview
+
+scrape dealer
+
+website and
+
+surface a
+
+comparison
+
+preview in IM
+
+dealer_websit
+
+confirm or
+
+e_url is
+
+present
+
+save
+
+dealer list
+
+view.
+
+DWS-SI-01a:
+
+On Dealer
+
+dealership_id,
+
+Dealer Admin
+
+Required —
+
+MVP
+
+Load internal
+
+Admin screen
+
+session_id
+
+screen loads
+
+screen must
+
+data prefill
+
+load, read the
+
+TOC-sourced
+
+dealer record
+
+and render it
+
+as the
+
+baseline
+
+prefill.
+
+never be
+
+blank
+
+DWS-SI-01b:
+
+Look up
+
+dealership_id,
+
+DWS-SI-01a
+
+If no URL →
+
+MVP
+
+Resolve
+
+dealer website
+
+session_id
+
+completes
+
+skip to DWS-
+
+dealer website
+
+URL from
+
+URL
+
+contract data;
+
+check for IM
+
+pre-scrape
+
+cache.
+
+SI-04
+
+DWS-SI-02:
+
+Fetch and
+
+dealer_websit
+
+URL resolved
+
+Rate limit; 5s
+
+MVP
+
+Scrape public
+
+parse dealer
+
+e_url OR
+
+or alternate
+
+timeout;
+
+website
+
+website
+
+validated
+
+URL validated
+
+robots.txt;
+
+homepage +
+
+dealer_provid
+
+contact/about
+
+ed_url,
+
+page; read-
+
+scrape_timeo
+
+only GET only.
+
+ut_ms
+
+read-only
+
+GET; silent
+
+fallback
+
+DWS-SI-03:
+
+Classify each
+
+raw_scraped_
+
+Scrape
+
+Only scraped
+
+MVP
+
+Compare
+
+field as Match,
+
+html,
+
+completed
+
+fields >= 0.80
+
+scraped data
+
+Different,
+
+dealer_master
+
+against
+
+New, or
+
+_api_field_ma
+
+contract data
+
+Missing.
+
+p
+
+confidence
+
+enter
+
+comparison
+
+Operating
+
+hours are
+
+compared
+
+day-by-day;
+
+logo is
+
+compared as
+
+URL presence
+
+only.
+
+DWS-SI-04:
+
+Render
+
+structured_co
+
+DWS-SI-03
+
+A1 gate —
+
+MVP
+
+Present
+
+baseline
+
+mparison_ma
+
+complete OR
+
+Dealer Admin
+
+comparison
+
+fields, side-
+
+p,
+
+no scrape ran
+
+must submit;
+
+no value
+
+saved without
+
+explicit action
+
+view to Dealer
+
+by-side
+
+confidence_sc
+
+Admin
+
+diff/new rows,
+
+ores
+
+quiet
+
+checkmarks
+
+for matches,
+
+and baseline-
+
+only fields for
+
+missing
+
+values.
+
+DWS-SI-05:
+
+If dealer has
+
+error_type,
+
+No URL found
+
+No
+
+MVP
+
+No-scrape
+
+no website
+
+fallback_mode
+
+OR DWS-SI-
+
+degradation;
+
+02 fails/times
+
+Dealer Admin
+
+out
+
+confirms what
+
+is there
+
+path
+
+URL, scrape
+
+fails, or times
+
+out, Dealer
+
+Admin sees
+
+contract-
+
+prefilled
+
+screen with
+
+no
+
+comparison
+
+rows.
+
+DWS-SI-06:
+
+Persist Dealer
+
+confirmed_fiel
+
+Dealer Admin
+
+Required field
+
+MVP
+
+Save
+
+Admin-
+
+ds,
+
+submits
+
+validation
+
+confirmed
+
+confirmed
+
+dealership_id,
+
+confirmed
+
+before save
+
+dealer details
+
+final values to
+
+session_id
+
+details
+
+TAO dealer
+
+record.
+
+DWS-SI-07:
+
+Dealer Admin
+
+dealer_provid
+
+Dealer Admin
+
+Route to
+
+MVP
+
+Dealer Admin
+
+inputs a
+
+ed_url
+
+submits a URL
+
+DWS-SI-08
+
+provides
+
+alternate
+
+corrected or
+
+alternate URL
+
+website URL
+
+via “Try a
+
+different
+
+website”.
+
+DWS-SI-08:
+
+Check URL
+
+dealer_provid
+
+DWS-SI-07
+
+Hard gate with
+
+MVP
+
+rejection or
+
+confirmation
+
+prompt
+
+Validate user-
+
+format,
+
+ed_url,
+
+fires
+
+provided URL
+
+domain block-
+
+dealership_id
+
+list, and
+
+fuzzy-match
+
+extracted
+
+business
+
+name against
+
+contract
+
+dealership
+
+name.
+
+§6. Capabilities, Skills & Agent Assignment
+
+6.1 Agent Assignment
+
+Field
+
+Agent
+
+Value
+
+TAO Onboarding Agent (T1 Base)
+
+Agent Description
+
+Handles dealer-side self-service onboarding
+
+steps within TAO; this intent adds a web
+
+scraping sub-capability to the Configure Phase
+
+screen load sequence
+
+6.2 Capability Needs
+
+Capability Need
+
+Business Description
+
+Data Returned
+
+Salesforce contract data read
+
+Read dealer details from
+
+Structured dealer details
+
+Salesforce contract record —
+
+object
+
+captured at contract signature
+
+TOC dealer data read
+
+Read dealer details from TOC
+
+Structured dealer details
+
+dealer record — operational
+
+object
+
+details added or updated
+
+during provisioning setup
+
+TAO dealer record write
+
+Write the TOC-sourced record
+
+Write confirmation
+
+(internal sync)
+
+into the TAO dealer record at
+
+provisioning
+
+Public website fetch
+
+Retrieve HTML content from
+
+Raw HTML
+
+the dealer's public website
+
+URL
+
+HTML text extraction + field
+
+Parse HTML, extract
+
+Structured comparison map
+
+compare
+
+structured text fields, assign
+
+confidence scores, and
+
+compare against on-file
+
+contract data
+
+Comparison view render
+
+Render the before/after
+
+Per-field comparison rows
+
+comparison UI on the Dealer
+
+shown to Dealer Admin
+
+Details Review screen
+
+TAO dealer record write
+
+Persist dealer-admin-
+
+Confirmation receipt
+
+(confirmed)
+
+confirmed final values after
+
+Dealer Admin submits
+
+6.3 Skill Inventory
+
+Skill Name
+
+Knowledge
+
+Description
+
+Capabilities Used
+
+Reusable Across
+
+dealer-web-scrape
+
+Knows how to fetch a
+
+Public website fetch,
+
+Any TAO step that
+
+dealer's public
+
+HTML text extraction
+
+needs dealer info from
+
+public website
+
+website, identify
+
+contact/about
+
+sections, and extract
+
+business name,
+
+address, phone, and
+
+URL fields
+
+dealer-details-mapper Maps raw scraped text
+
+HTML text extraction
+
+Future TAO screens
+
+to the Dealer Master
+
++ field comparison
+
+and Dealer Master API
+
+enrichment flows
+
+API field schema;
+
+handles address
+
+normalization, phone
+
+formatting, operating
+
+hours parsing, logo
+
+URL extraction, and
+
+confidence scoring
+
+6.4 Data Sources
+
+Data Source
+
+Description
+
+Access Pattern
+
+TOC (Tekion Operating Cloud)
+
+Single source of dealer truth
+
+Read via TOC API at
+
+dealer record
+
+for TAO. Holds Salesforce-
+
+provisioning time; TAO does
+
+synced contract data plus
+
+not connect to Salesforce
+
+provisioning-stage updates.
+
+directly
+
+TAO dealer record
+
+TAO internal dealer data store;
+
+Read at Dealer Admin screen
+
+holds the TOC-sourced record
+
+load; written at provisioning
+
+used to prefill the Dealer
+
+sync and after Dealer Admin
+
+Admin screen
+
+confirmation
+
+Dealer's public website
+
+Publicly accessible HTML —
+
+Read-only HTTP GET;
+
+enrichment/comparison layer
+
+respects robots.txt; no auth;
+
+homepage + contact/about
+
+page
+
+6.5 Content Requirements
+
+Content Type
+
+Audience
+
+Format
+
+Notes
+
+Internal-data prefill
+
+Dealer Admin
+
+All fields pre-
+
+Always present; never
+
+baseline
+
+populated from
+
+blank
+
+merged
+
+Salesforce+TOC
+
+record; labelled “From
+
+your records on file”
+
+Comparison diff row
+
+Dealer Admin
+
+Per-field side-by-side
+
+Only shown for
+
+row: “On file / Found
+
+different or new
+
+on your website / Use
+
+website values
+
+website version?”
+
+Match indicator
+
+Dealer Admin
+
+Quiet green
+
+Shown when website
+
+checkmark: “✓
+Matches your website”
+
+confirms the on-file
+
+value
+
+IM comparison
+
+Implementation
+
+Read-only inline row in
+
+Informational only
+
+preview
+
+Manager
+
+dealer list
+
+URL validation
+
+Dealer Admin
+
+Inline error explaining
+
+Shown on failed
+
+rejection
+
+the provided website
+
+business-name fuzzy
+
+does not appear to be
+
+match
+
+for the dealership
+
+Borderline match
+
+Dealer Admin
+
+“We found [scraped
+
+Shown for fuzzy
+
+confirmation prompt
+
+name] on this website
+
+match score 0.70–
+
+— is this your
+
+dealership?”
+
+0.85
+
+§7. Business Rules & Safety
+
+7.1 ECI Contract — Action Safety Levels
+
+Sub-Intent
+
+Risk Level
+
+Autonomous
+
+Requires
+
+Notes
+
+Above
+
+Confirmation
+
+(confidence)
+
+DWS-SI-00:
+
+write (internal)
+
+1.0
+
+false
+
+Internal data
+
+sync to TAO
+
+record
+
+DWS-SI-00b: IM
+
+read-only
+
+1.0
+
+false
+
+provisioning
+
+scrape preview
+
+IM-triggered;
+
+reads TOC; no
+
+dealer
+
+involvement
+
+IM sees
+
+comparison
+
+preview;
+
+informational only
+
+DWS-SI-01a:
+
+read-only
+
+1.0
+
+false
+
+Required
+
+Load contract
+
+prefill
+
+baseline; never
+
+skipped
+
+DWS-SI-02:
+
+read-only
+
+1.0
+
+false
+
+Read-only GET
+
+Scrape public
+
+website
+
+only
+
+DWS-SI-03:
+
+read-only
+
+0.80
+
+false
+
+Scraped fields
+
+Compare scraped
+
+vs. contract data
+
+below 0.80
+
+suppressed
+
+DWS-SI-04:
+
+read-only
+
+N/A
+
+true
+
+A1 gate: no value
+
+Present
+
+(display)
+
+comparison view
+
+DWS-SI-05: No-
+
+read-only
+
+N/A
+
+scrape path
+
+(display)
+
+DWS-SI-06:
+
+write
+
+N/A
+
+true
+
+true
+
+Save confirmed
+
+details
+
+saved without
+
+Dealer Admin
+
+submit
+
+Contract data
+
+already shown
+
+Dealer Admin
+
+submit is the
+
+trigger
+
+DWS-SI-08:
+
+read-only
+
+N/A
+
+true
+
+Hard gate
+
+Validate user-
+
+(validation)
+
+provided URL
+
+7.2 Business Rules — Policy Lake Entries
+
+Policy ID
+
+Rule
+
+Trigger
+
+Dealer-
+
+Scope
+
+Configurable?
+
+POL-TAO-DWS-
+
+The Dealer
+
+Every Dealer
+
+No
+
+001-000
+
+Details Review
+
+Admin screen
+
+DWS-SI-00,
+
+DWS-SI-01a
+
+screen must
+
+load
+
+never be blank:
+
+TOC dealer data
+
+must be synced
+
+before the Dealer
+
+Admin can open
+
+this screen
+
+POL-TAO-DWS-
+
+Data flow is
+
+DWS-SI-00
+
+No
+
+DWS-SI-00
+
+001-000a
+
+Salesforce →
+
+TOC → TAO. TAO
+
+reads from TOC
+
+only; TOC owns
+
+reconciliation.
+
+POL-TAO-DWS-
+
+Scraping is read-
+
+Every scrape
+
+No
+
+001-001
+
+only: HTTP GET
+
+attempt
+
+All scrape
+
+executions
+
+only — never
+
+POST, submit
+
+forms,
+
+authenticate, or
+
+store cookies
+
+POL-TAO-DWS-
+
+Dealer Admin
+
+Every Dealer
+
+No
+
+001-002
+
+must explicitly
+
+Admin session
+
+confirm final
+
+values before
+
+data is saved
+
+DWS-SI-04,
+
+DWS-SI-05,
+
+DWS-SI-06
+
+POL-TAO-DWS-
+
+No-website is not
+
+Dealer has no
+
+No
+
+DWS-SI-05
+
+001-003
+
+a degraded state;
+
+website URL
+
+no website-
+
+related message
+
+appears when no
+
+URL exists
+
+POL-TAO-DWS-
+
+Scrape failure is
+
+Scrape failure or
+
+No
+
+DWS-SI-05
+
+001-004
+
+not a degraded
+
+timeout
+
+state; fallback
+
+silently to
+
+contract-prefilled
+
+form
+
+POL-TAO-DWS-
+
+Only fields with
+
+Post field-
+
+No
+
+001-005
+
+confidence >=
+
+mapping
+
+DWS-SI-03,
+
+DWS-SI-04
+
+0.80 may be
+
+shown as
+
+prefilled without
+
+warning
+
+POL-TAO-DWS-
+
+Scraping must
+
+Pre-scrape
+
+No
+
+DWS-SI-02
+
+001-006
+
+respect
+
+robots.txt check
+
+robots.txt; if
+
+disallowed, skip
+
+the scrape
+
+POL-TAO-DWS-
+
+User-provided
+
+DWS-SI-08
+
+No
+
+DWS-SI-08
+
+001-007
+
+URLs must pass
+
+domain validation
+
+before scraping
+
+POL-TAO-DWS-
+
+User-provided
+
+DWS-SI-08 post-
+
+No
+
+DWS-SI-08
+
+001-008
+
+URL result must
+
+scrape validation
+
+fuzzy-match
+
+known dealership
+
+name at >= 0.70
+
+similarity
+
+POL-TAO-DWS-
+
+IM pre-scraped
+
+IM provisioning
+
+No
+
+DWS-SI-00
+
+001-009
+
+data is
+
+stage
+
+informational
+
+only; only Dealer
+
+Admin can
+
+confirm dealer
+
+details
+
+7.3 Escalation Rules
+
+Condition
+
+Escalation Path
+
+Notification Target
+
+Scrape consistently fails for a
+
+Log to TAO ops dashboard for
+
+TAO ops team (internal only)
+
+dealership across 3+ sessions
+
+review; do not alert Dealer
+
+Admin
+
+Dealer Admin manually
+
+Flag pattern to PM team for
+
+TAO product analytics
+
+overrides all prefilled fields in
+
+review
+
+3+ consecutive sessions
+
+7.4 Compliance & Legal Constraints
+
+Web scraping a publicly accessible website generally does not raise legal issues when done for
+
+reading the business's own published public information. However:
+
+TAO must respect  robots.txt  directives on the dealer's website.
+
+Only the dealer's own website URL may be scraped — no third-party lookups for MVP.
+
+No personal data is scraped; all scraped fields are business-level public details.
+
+Legal review recommended before GA if scope expands beyond MVP fields.
+
+7.5 Data Access Constraints
+
+Required per ORBIT S26 I227. Specify RBAC rules, PII handling, and cross-
+
+dealer isolation.
+
+Constraint Type
+
+Rule
+
+Applies To
+
+Notes
+
+RBAC
+
+Dealer Admin can
+
+DWS-SI-00, DWS-SI-
+
+Module Champions
+
+view and confirm
+
+04, DWS-SI-06
+
+and PSMs do not
+
+prefilled details and
+
+provide alternate URL.
+
+IM can view read-only
+
+scraped preview and
+
+cannot confirm or
+
+save.
+
+interact with either
+
+surface
+
+PII Handling
+
+Scraped fields are
+
+All sub-intents
+
+If future fields include
+
+business-level public
+
+details, not personal
+
+data.
+
+individual contact
+
+names, PII policy
+
+must be revisited
+
+Cross-Dealer Isolation Scrape cache is keyed
+
+DWS-SI-01 through
+
+by (dealership_id,
+
+DWS-SI-06
+
+session_id) — no
+
+cross-dealer data
+
+leakage
+
+Data Residency
+
+Scraped data cached
+
+DWS-SI-02, DWS-SI-
+
+Align with TAO's
+
+and stored in US
+
+03
+
+region only for MVP
+
+existing data
+
+residency policy
+
+7.6 Known Risks
+
+Risk ID
+
+Description
+
+Likelihood
+
+Impact
+
+Mitigation
+
+Owner
+
+R-001
+
+Dealer
+
+High
+
+Low
+
+Silent fallback;
+
+Engineering
+
+website is not
+
+publicly
+
+accessible,
+
+behind auth,
+
+or has no
+
+contact page
+
+no error
+
+shown to
+
+Dealer Admin
+
+R-002
+
+Scraped
+
+Medium
+
+Medium
+
+Confidence
+
+PM + UX
+
+R-003
+
+values are
+
+wrong or
+
+outdated
+
+Dealer
+
+website
+
+blocks
+
+scraping via
+
+robots.txt
+
+gate; Dealer
+
+Admin always
+
+confirms
+
+Medium
+
+Low
+
+robots.txt
+
+Engineering
+
+check before
+
+scraping;
+
+silent skip
+
+R-004
+
+Scrape is too
+
+Low
+
+High
+
+Hard 5s
+
+Engineering
+
+slow (>5s)
+
+and blocks
+
+screen load
+
+timeout; async
+
+execution
+
+R-005
+
+Dealer has no
+
+High for small
+
+None
+
+No-website is
+
+PM +
+
+website at all
+
+dealers
+
+a first-class
+
+Engineering
+
+fallback
+
+R-006
+
+Dealer Admin
+
+Low to
+
+High
+
+Domain block-
+
+Engineering +
+
+provides an
+
+Medium
+
+intentionally
+
+wrong URL
+
+list +
+
+PM
+
+business-
+
+R-007
+
+Dealer Admin
+
+Medium
+
+Medium
+
+Borderline
+
+Engineering
+
+name fuzzy
+
+match
+
+provides
+
+group HQ site
+
+instead of
+
+rooftop site
+
+7.10 Financial Controls
+
+match prompt
+
+for 0.70–0.85
+
+Required for financial process intents. Define tolerance bands, 3-way match
+
+rules, GL coding, reconciliation gates, segregation of duties, and audit trail
+
+requirements. Skip if not applicable.
+
+N/A — this intent does not handle financial transactions. Dealer website scraping is a data pre-
+
+fill feature; no monetary values, GL coding, or financial reconciliation are involved.
+
+§8. Rendering Declaration
+
+8.1 Rendering Mode
+
+Sub-Intent /
+
+Preferred Mode
+
+Fallback
+
+Required Components
+
+Response Type
+
+Prefilled fields on
+
+agui (inline form with
+
+basic
+
+Prefill indicator label;
+
+Dealer Details Review
+
+pre-populated fields,
+
+screen
+
+editable)
+
+Scrape failure
+
+basic (inline advisory
+
+text
+
+message
+
+text, non-blocking)
+
+Manual re-scrape
+
+basic (status
+
+text
+
+trigger (/prefill-dealer-
+
+feedback)
+
+details)
+
+confidence badge;
+
+editable inputs;
+
+confirm/submit button
+
+“We couldn't find your
+
+details automatically
+
+— please fill in below”
+
+label
+
+Inline spinner or
+
+progress indicator;
+
+update fields when
+
+complete
+
+8.2 Orchestration Handoffs
+
+When this intent hands control to another agent mid-flow, declare the handoff
+
+contract here.
+
+Handoff
+
+Trigger
+
+Target Agent /
+
+Context
+
+Return
+
+Handoff Type Notes
+
+Intent
+
+Passed
+
+Expected
+
+Dealer Admin
+
+TAO
+
+Confirmed
+
+Yes —
+
+Blocking
+
+Standard TAO
+
+confirms
+
+Configure
+
+dealer detail
+
+proceed to
+
+dealer details
+
+Phase — next
+
+fields,
+
+next TAO step
+
+step in
+
+journey
+
+dealership_id,
+
+session_id
+
+step-
+
+completion
+
+handoff
+
+§9. Conversation Design & Test Scenarios
+
+9.1 Happy Path Scenarios
+
+#
+
+1
+
+2
+
+3
+
+4
+
+Trigger
+
+Agent Does
+
+Screen Result
+
+IM opens provisioning
+
+DWS-SI-00 → DWS-
+
+IM sees comparison
+
+queue; dealer has
+
+SI-00b → builds
+
+preview inline with
+
+website URL in
+
+comparison map
+
+matches and diffs
+
+contract
+
+Dealer Admin opens
+
+DWS-SI-01a → DWS-
+
+Dealer Admin sees
+
+screen; scrape result
+
+SI-03 → DWS-SI-04
+
+prefilled fields, diff
+
+cached from IM pre-
+
+scrape
+
+rows, and confirms
+
+final values
+
+Dealer Admin opens
+
+DWS-SI-01a → DWS-
+
+All fields populated
+
+screen; small dealer,
+
+SI-01b → DWS-SI-05
+
+from contract; no
+
+no website URL
+
+Website scrape finds
+
+DWS-SI-03 classifies
+
+same values as
+
+all fields as Match
+
+contract on all fields
+
+comparison rows; no
+
+mention of websites
+
+Quiet “✓ Matches
+your website”
+
+indicators; no
+
+comparison rows
+
+5
+
+Dealer Admin provides
+
+DWS-SI-08 shows
+
+Dealer Admin confirms
+
+alternate URL with
+
+confirmation prompt
+
+whether the found
+
+borderline fuzzy
+
+match
+
+website belongs to
+
+their dealership
+
+9.2 Edge Case Scenarios
+
+#
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+Trigger
+
+Condition
+
+Agent Does
+
+Screen Result
+
+Dealer Admin
+
+No website
+
+DWS-SI-01b
+
+All fields pre-
+
+opens screen
+
+finds no URL →
+
+populated from
+
+contract-only
+
+contract; no
+
+view
+
+comparison rows
+
+Dealer Admin
+
+Website returns
+
+Scrape fails →
+
+Same as no-
+
+opens screen
+
+403 / behind auth
+
+DWS-SI-05
+
+website case
+
+Website scrape
+
+Phone
+
+DWS-SI-03
+
+Phone
+
+runs
+
+confidence 0.62
+
+suppresses
+
+comparison row
+
+phone
+
+does not appear
+
+Scrape times out
+
+5s timeout
+
+DWS-SI-05
+
+Screen loads
+
+immediately from
+
+contract data; no
+
+spinner blocking
+
+Dealer Admin
+
+Dealer Admin
+
+Domain on block-
+
+DWS-SI-08
+
+Shows “This
+
+provides
+
+list
+
+rejects
+
+doesn't look like a
+
+alternate URL
+
+immediately
+
+dealership
+
+website.”
+
+Dealer Admin
+
+Business name
+
+DWS-SI-08
+
+Shows “The
+
+provides wrong
+
+mismatch
+
+rejects post-
+
+website you
+
+dealership URL
+
+scrape
+
+provided doesn't
+
+appear to be for
+
+[Dealership
+
+Name].”
+
+Dealer Admin
+
+Contract sync
+
+DWS-SI-01a
+
+Screen shows
+
+opens screen
+
+has not
+
+cannot load
+
+loading state;
+
+completed
+
+contract data
+
+Dealer Admin
+
+cannot proceed
+
+9.3 Edge Case Catalog
+
+ID
+
+Condition
+
+Expected
+
+Behavior
+
+Severity
+
+Test Type
+
+EC-001
+
+Contract sync not
+
+Show loading
+
+Blocking
+
+Dependency
+
+complete
+
+state; block
+
+Dealer Admin
+
+until sync
+
+completes
+
+EC-002
+
+dealer_website_u
+
+Skip scraping
+
+Non-blocking
+
+Negative
+
+rl is null
+
+layer; render
+
+contract-only
+
+view
+
+EC-003
+
+Dealer website
+
+Scraping
+
+Non-blocking
+
+Boundary
+
+behind auth or
+
+skipped;
+
+scrape fails
+
+contract-only
+
+view shown
+
+EC-004
+
+robots.txt
+
+disallows
+
+scraping
+
+Skip scrape
+
+Safety Gate
+
+Security
+
+silently
+
+EC-005
+
+All scraped fields
+
+Suppress
+
+Non-blocking
+
+Happy path
+
+match contract
+
+comparison rows;
+
+variant
+
+data
+
+show quiet match
+
+indicators
+
+EC-006
+
+User-provided
+
+Reject
+
+Blocking
+
+Security
+
+URL on domain
+
+immediately
+
+block-list
+
+EC-007
+
+User-provided
+
+Reject with
+
+Blocking
+
+Data quality
+
+URL similarity <
+
+mismatch
+
+0.70
+
+message
+
+EC-008
+
+Borderline match
+
+Show
+
+Warning
+
+Data quality
+
+(0.70–0.85)
+
+confirmation
+
+prompt
+
+EC-009
+
+Dealer Admin
+
+Block submit;
+
+Blocking
+
+Validation
+
+submits with
+
+required field
+
+required fields
+
+validation error
+
+empty
+
+EC-010
+
+Dealer Admin re-
+
+Reject with
+
+Non-blocking
+
+Rate limit
+
+triggers scrape
+
+“Please wait
+
+within 5 minutes
+
+before retrying”
+
+9.4 Golden Test Cases
+
+Minimum 5 golden test cases per intent (Agentic Testing Principle 3).
+
+Sourced from real production scenarios.
+
+GTC#
+
+Input
+
+Expected Output Quality
+
+Pass Criteria
+
+Dimensions
+
+GTC-001
+
+Dealer with
+
+Address diff row
+
+Accuracy;
+
+Correct diffs
+
+website; address
+
+and “New from
+
+Completeness
+
+surfaced; no
+
+differs from
+
+website” URL row
+
+false-positive diff
+
+contract and
+
+shown; Dealer
+
+website URL is
+
+Admin accepts
+
+found
+
+desired values
+
+rows
+
+GTC-002
+
+Small dealer;
+
+All fields pre-
+
+No-website
+
+Screen fully
+
+dealer_website_u
+
+populated from
+
+baseline
+
+prefilled; zero
+
+rl=null
+
+contract; no
+
+website UI
+
+comparison rows
+
+GTC-003
+
+Website response
+
+Screen loads
+
+Timeout
+
+Screen visible in
+
+time 6s
+
+from contract
+
+enforcement
+
+< 500ms; no
+
+data immediately;
+
+scrape times out
+
+silently
+
+error
+
+GTC-004
+
+Dealer Admin
+
+DWS-SI-08
+
+Domain validation Immediate
+
+provides blocked
+
+rejects
+
+domain
+
+immediately;
+
+comparison view
+
+unchanged
+
+rejection;
+
+contract prefill
+
+unaffected
+
+GTC-005
+
+Dealer Admin
+
+DWS-SI-08
+
+Business-name
+
+Rejection
+
+provides
+
+rejects post-
+
+fuzzy match
+
+message shown
+
+competitor URL
+
+scrape; contract
+
+prefill unaffected
+
+GTC-006
+
+trigger_surface="
+
+IM dealer list row
+
+IM preview
+
+IM sees diff
+
+im_provisioning";
+
+shows contract
+
+address diff
+
+values + address
+
+found
+
+diff highlighted
+
+inline; no IM
+
+action/save
+
+possible
+
+9.5 Quality Dimensions
+
+Explicit quality dimensions with thresholds for every LLM-generated output
+
+(Principle 2).
+
+Dimension
+
+Description
+
+Target Threshold Regression
+
+Eval Method
+
+Threshold
+
+Accuracy
+
+Factual
+
+>= 95%
+
+< 90% blocks
+
+Deterministic +
+
+correctness of
+
+responses
+
+LLM-as-judge
+
+Completeness
+
+All required
+
+>= 90%
+
+< 85% blocks
+
+Schema
+
+information
+
+included
+
+validation
+
+Tone
+
+Professional,
+
+>= 4/5
+
+< 3/5 flags
+
+LLM-as-judge
+
+contextually
+
+appropriate
+
+Safety
+
+No harmful,
+
+100%
+
+< 100% blocks
+
+Deterministic +
+
+private, or
+
+hallucinated
+
+content
+
+red-team
+
+9.6 Failure Mode Coverage
+
+Failure Type
+
+Applicable?
+
+Specific Risk
+
+Mitigation
+
+Test Strategy
+
+Logic
+
+Y
+
+Field mapping
+
+Confidence
+
+Unit tests with
+
+may misidentify
+
+scoring + field-
+
+diverse HTML
+
+fields on non-
+
+type validation
+
+fixtures
+
+standard dealer
+
+websites
+
+Integration
+
+Y
+
+Website
+
+Timeout,
+
+Pipeline tests
+
+Behavioral
+
+Quality
+
+Drift
+
+Context
+
+Safety
+
+N
+
+Y
+
+Y
+
+N
+
+Y
+
+unreachable,
+
+robots.txt check,
+
+with mock HTTP
+
+slow, redirecting,
+
+MIME type guard
+
+responses
+
+or unexpected
+
+content type
+
+No LLM
+
+N/A
+
+N/A
+
+reasoning in
+
+happy path
+
+Scraped values
+
+Confidence
+
+Golden set with
+
+may be outdated
+
+threshold; Dealer
+
+known-correct
+
+or incorrect
+
+Admin always
+
+vs. outdated
+
+confirms
+
+websites
+
+Dealer website
+
+Monitor scrape
+
+Weekly
+
+HTML structure
+
+success rates
+
+regression on
+
+changes over
+
+time
+
+dealer URL
+
+golden set
+
+Intent scoped to
+
+N/A
+
+N/A
+
+Dealer Details
+
+Review screen
+
+Scrape must not
+
+Read-only HTTP
+
+Red-team
+
+write to, submit
+
+GET; no
+
+verification that
+
+forms on, or
+
+cookies/session
+
+no
+
+authenticate with
+
+storage
+
+POST/PUT/auth
+
+dealer website
+
+calls are made
+
+Coordination
+
+N
+
+Intent operates
+
+N/A
+
+N/A
+
+independently
+
+§10. Success Metrics & Evaluation
+
+10.1 Business KPIs
+
+KPI
+
+Current Baseline
+
+Target
+
+Measurement
+
+Timeline
+
+Method
+
+Blank-field rate at
+
+~100% (all fields
+
+0%
+
+TAO analytics —
+
+At TAO V1 launch
+
+screen open
+
+blank today)
+
+blank screen
+
+loads / total loads
+
+Dealer Details
+
+TBD — measure
+
+Reduce by >=
+
+TAO analytics —
+
+30 days post-
+
+screen
+
+at TAO V1 launch
+
+40% vs. baseline
+
+screen open to
+
+launch
+
+completion time
+
+submit
+
+Dealer Admin
+
+N/A
+
+< 15% of
+
+DA_edit events /
+
+30 days post-
+
+field correction
+
+rate
+
+contract-prefilled
+
+total contract
+
+launch
+
+fields manually
+
+fields shown
+
+corrected
+
+Website diff
+
+N/A
+
+Target >= 50%
+
+Accepted
+
+30 days post-
+
+acceptance rate
+
+website diffs /
+
+launch
+
+total diff rows
+
+shown
+
+Dealer Details
+
+TBD — measure
+
+Reduce by >=
+
+TAO analytics —
+
+30 days post-
+
+form validation
+
+at TAO V1 launch
+
+60% vs. baseline
+
+validation errors
+
+launch
+
+error rate
+
+on submit
+
+10.2 Agent Evaluation Criteria
+
+Metric
+
+Definition
+
+Target
+
+Regression
+
+Cadence
+
+Threshold
+
+Intent match rate % correctly
+
+> 95%
+
+< 90% triggers
+
+Weekly
+
+classified
+
+review
+
+Golden set pass
+
+% golden
+
+> 98%
+
+< 95% blocks
+
+Per deploy
+
+rate
+
+scenarios
+
+passing
+
+release
+
+Quality
+
+Per-dimension
+
+Per §9.5 targets
+
+Per §9.5
+
+Per deploy
+
+dimension scores
+
+eval scores
+
+regression
+
+Invariant violation
+
+% operations
+
+0%
+
+> 0% blocks
+
+Continuous
+
+rate
+
+violating
+
+invariants
+
+release
+
+10.3 Invariants (Continuous Checks)
+
+Properties that must ALWAYS hold — checked on every operation, not
+
+periodically (Principle 5).
+
+Invariant
+
+Description
+
+Check Frequency
+
+Enforcement
+
+Layer 1 must precede
+
+Dealer Admin screen
+
+Every screen load
+
+Hard block
+
+Layer 2
+
+must never render
+
+without Layer 1
+
+contract data present
+
+Screen is never blank
+
+Contract values fill
+
+Every render
+
+Hard block
+
+every field; Layer 2
+
+cannot make a field
+
+emptier than Layer 1
+
+left it
+
+Read-only scrape
+
+Scraper never submits
+
+Every scrape
+
+Hard block
+
+forms, writes cookies,
+
+or authenticates
+
+Dealer Admin
+
+No value persisted
+
+Every save
+
+Hard block
+
+confirmation required
+
+without explicit Dealer
+
+before save
+
+Admin submit action
+
+Dealer isolation
+
+Scrape/comparison
+
+Every render
+
+Hard block
+
+results for one
+
+dealership never
+
+shown to another
+
+URL validation before
+
+DWS-SI-02 must
+
+Every relevant scrape Hard block
+
+user-provided scrape
+
+never run on
+
+dealer_provided_url
+
+unless DWS-SI-08
+
+passed it
+
+IM cannot save dealer
+
+IM surface is read-
+
+Every write
+
+Hard block
+
+details
+
+only; write endpoint
+
+rejects IM provisioning
+
+saves
+
+Data integrity
+
+No orphaned
+
+Every write
+
+Hard block
+
+references, append-
+
+only IDs
+
+Privacy
+
+No private content in
+
+Every export
+
+Hard block
+
+external outputs
+
+10.4 Related Intents & Dependencies
+
+Upstream Dependencies
+
+Intent ID
+
+Intent Name
+
+Dependency Type
+
+Notes
+
+TAO-CONTRACT-001
+
+Contract Signature &
+
+Data
+
+(implicit)
+
+Dealer Intake
+
+TAO-COA-001
+
+COA / Financial
+
+Workflow
+
+Statement Upload
+
+(Step 7)
+
+dealer_website_url
+
+must be captured at
+
+contract signature
+
+Same Configure
+
+Phase; no direct
+
+dependency
+
+Downstream Effects
+
+Intent ID
+
+Intent Name
+
+Effect Type
+
+Notes
+
+TAO Configure Phase
+
+Dealer Details
+
+Workflow
+
+DWS-001 completion
+
+— next step
+
+confirmed →
+
+unblocks the next step
+
+Configure Phase
+
+proceeds
+
+§11. Follow-Up Patterns
+
+Pattern
+
+Trigger
+
+Agent Response
+
+Dealer Admin edits a prefilled
+
+Dealer Admin changes a
+
+Accept the edit silently; edited
+
+field
+
+prefilled value in the form
+
+value replaces prefilled value
+
+— Dealer Admin is always the
+
+source of truth
+
+Dealer Admin requests re-
+
+Dealer Admin triggers /prefill-
+
+Check debounce window; if
+
+scrape
+
+dealer-details
+
+allowed, re-run DWS-SI-02
+
+through DWS-SI-04; if within
+
+debounce, show “Please wait
+
+before retrying”
+
+Prefill partially succeeds
+
+DWS-SI-03 returns a partial
+
+Prefill found fields; leave
+
+field map
+
+unfound fields blank with
+
+standard placeholder text; do
+
+not show partial-failure
+
+message
+
+§12. Technical Approach
+
+Standard feature mode — engineering-review format. AI capability mapping
+
+not required.
+
+Architecture — Two-Layer Model
+
+This feature has two independent layers that compose on the Dealer Details Review screen.
+
+Layer 1 — Internal Data Sync (baseline, always runs)
+
+Data flow:  Salesforce → TOC → TAO
+
+1. TOC Sync Service — At IM provisioning stage, reads the dealer record from TOC. TAO does
+
+not connect to Salesforce directly — TOC is the single API call.
+
+2. TAO Dealer Record — Stores the TOC-sourced dealer record. Dealer Admin screen reads
+
+from here. Always populated before the Dealer Admin journey begins.
+
+Layer 2 — Website Scraping + Comparison (enrichment, additive)
+
+3. Scrape Trigger — Resolves the dealer website URL from the TAO dealer record. If no URL,
+
+Layer 2 is skipped entirely.
+
+4. Web Scraper Worker — HTTP GET to target URL (homepage + contact/about page).
+
+Enforces 5s timeout, robots.txt, MIME type guard, and read-only GET.
+
+5. Field Extractor — Parses raw HTML and extracts dealership name, DBA, address, phones,
+
+email, operating hours, and logo URL with confidence scores.
+
+6. Field Comparator — Compares extracted values against contract values and classifies fields
+
+as match, different, new, or missing.
+
+7. Comparison View Renderer — Injects comparison map into the Dealer Details Review
+
+screen.
+
+8. Session Cache — Caches comparison result keyed by (dealership_id, session_id).
+
+9. TAO Dealer Record Write — On Dealer Admin submit, confirmed final values are persisted.
+
+URL Validation (for dealer-admin-provided alternate URLs)
+
+10. URL Validator — Domain block-list check; scrape and fuzzy-match extracted business name
+
+against contract dealership name. Below 0.70 rejects, 0.70–0.85 prompts, and >= 0.85
+
+accepts silently.
+
+Non-Functional Requirements
+
+Screen load latency: Dealer Admin screen must render from Layer 1 data in < 500ms.
+
+Layer 1 is blocking: Dealer Admin cannot open the Dealer Details Review screen until DWS-
+
+SI-00 is complete.
+
+Layer 2 is always additive: Any Layer 2 failure falls back silently to Layer 1 data only.
+
+Rate limiting: Max 1 scrape per (dealership_id, session); max 1 user-triggered re-scrape per 5
+
+minutes per dealership.
+
+Security: Read-only HTTP GET only. No auth. No cookies. No form submissions.
+
+§13. Rollout Plan
+
+Standard feature mode — TAO V1 launch.
+
+Rollout Target: TAO V1
+
+This feature ships with TAO V1. There is no separate phased rollout — the feature is included in
+
+the initial product release. Rollout is controlled by feature flag  dws_prefill_enabled  for
+
+rapid kill-switch.
+
+Gate
+
+Criteria
+
+Owner
+
+Pre-launch
+
+Zero P0/P1 bugs in golden test
+
+Engineering
+
+cases GTC-001 through GTC-
+
+006
+
+Pre-launch
+
+DWS-SI-08 domain block-list
+
+PM
+
+reviewed and approved by PM
+
++ Legal
+
+Pre-launch
+
+Business-name fuzzy match
+
+Engineering + PM
+
+thresholds validated on real
+
+dealer names
+
+Pre-launch
+
+IM provisioning view updated
+
+Engineering
+
+to show scraped preview
+
+column
+
+Pre-launch
+
+“Use a different website” UI
+
+Engineering + UX
+
+component built and tested
+
+Post-launch monitoring
+
+Scrape success rate >= 50%;
+
+PM
+
+timeout rate <= 10%; Dealer
+
+Admin edit rate < 25%
+
+Rollback trigger
+
+P0: any scrape that writes to a
+
+Engineering on-call
+
+dealer website; any prefilled
+
+value saved without Dealer
+
+Admin confirmation
+
+Feature flag: dws_prefill_enabled  — set to  false  disables all scraping immediately. No
+
+data migration needed for rollback.
+
+Appendix A: ISD Versioning
+
+Version
+
+1.0
+
+Date
+
+Author
+
+Change Summary
+
+Aug 27, 2026
+
+Prem Bihari
+
+Initial ISD draft via
+
+(pbihari@tekion.com)
+
+paper-mcp isd_init
+
+(standard)
+
+Appendix B: PM-002 Scoring Rubric — Standard Mode (Reference)
+
+ISD Standard uses the same 13-section base rubric as the full template (100 base points) plus
+
+an 8-point v4.0 autonomy bonus for the two included v4.0 sections.
+
+Section
+
+Weight
+
+Full Credit
+
+Partial Credit
+
+No Credit (0%)
+
+(100%)
+
+(60%)
+
+§1 Metadata
+
+5pts
+
+§2 Intent
+
+Definition
+
+10pts
+
+All fields
+
+complete
+
+All criteria
+
+defined
+
+Missing optional
+
+Missing required
+
+fields
+
+fields
+
+Success criteria
+
+No meaningful
+
+only
+
+definition
+
+§3 NL Triggers
+
+8pts
+
+>= 5 triggers,
+
+3-4 triggers
+
+< 3 triggers
+
+mix,
+
+disambiguation
+
+§4 Parameters
+
+7pts
+
+All params with
+
+Sources defined
+
+Parameter list
+
+source and
+
+fallback
+
+only
+
+§5.1 Sub-Intents
+
+15pts
+
+IMS Recon
+
+Happy path only
+
+< 5 sub-intents
+
+granularity; all
+
+columns
+
+§6
+
+8pts
+
+Business-
+
+Caps listed, eng-
+
+Missing
+
+Capabilities/Skills
+
+language caps;
+
+language
+
+agent clear
+
+§7 Business
+
+10pts
+
+ECI contracts;
+
+ECI thresholds
+
+No safety model
+
+Rules
+
+policies
+
+only
+
+identified; §7.5
+
+present
+
+§8 Rendering
+
+5pts
+
+Mode declared
+
+Primary output
+
+No declaration
+
+for all outputs
+
+only
+
+§9 Conversations 8pts
+
+Happy path +
+
+Happy path only
+
+No scenarios
+
+edge cases +
+
+catalog
+
+§10 Metrics
+
+8pts
+
+KPIs + baselines
+
+KPIs without
+
+No metrics
+
++ attribution
+
+baselines
+
+§11 Follow-up
+
+5pts
+
+>= 2 patterns
+
+1 pattern
+
+None
+
+patterns
+
+§12 Technical
+
+6pts
+
+Constraints +
+
+Constraints only
+
+Absent
+
+Approach
+
+integrations +
+
+NFRs
+
+§13 Rollout Plan
+
+5pts
+
+Phase gates +
+
+Phase list
+
+Absent
+
+flags + rollback
+
+Autonomous Agent Bonus: §1.2 Autonomy Declaration (5pts) and §3.4 Event Triggers (3pts).
+
+Gate: Score >= 70 required for isd_export. Grand total: 108 max.
+
+7.3 Escalation Rules
+
+Condition
+
+Escalation Path
+
+Notification Target
+
+Scrape consistently fails for a
+
+Log to TAO ops dashboard for
+
+TAO ops team (internal only)
+
+dealership across 3+ sessions
+
+review; do not alert Dealer
+
+Admin
+
+Dealer Admin manually
+
+Flag pattern to PM team for
+
+TAO product analytics
+
+overrides all prefilled fields in
+
+review
+
+3+ consecutive sessions
+
+7.4 Compliance & Legal Constraints
+
+Web scraping a publicly accessible website generally does not raise legal issues when done for
+
+reading the business's own published public information. However:
+
+TAO must respect  robots.txt  directives on the dealer's website.
+
+Only the dealer's own website URL may be scraped — no third-party lookups for MVP.
+
+No personal data is scraped; all scraped fields are business-level public details.
+
+Legal review recommended before GA if scope expands beyond MVP fields.
+
+7.5 Data Access Constraints
+
+Required per ORBIT S26 I227. Specify RBAC rules, PII handling, and cross-
+
+dealer isolation.
+
+Constraint Type
+
+Rule
+
+Applies To
+
+Notes
+
+RBAC
+
+Dealer Admin can
+
+DWS-SI-00, DWS-SI-
+
+Module Champions
+
+view and confirm
+
+04, DWS-SI-06
+
+and PSMs do not
+
+prefilled details and
+
+provide alternate URL.
+
+IM can view read-only
+
+scraped preview and
+
+cannot confirm or
+
+save.
+
+interact with either
+
+surface
+
+PII Handling
+
+Scraped fields are
+
+All sub-intents
+
+If future fields include
+
+business-level public
+
+details, not personal
+
+data.
+
+individual contact
+
+names, PII policy
+
+must be revisited
+
+Cross-Dealer Isolation Scrape cache is keyed
+
+DWS-SI-01 through
+
+by (dealership_id,
+
+DWS-SI-06
+
+session_id) — no
+
+cross-dealer data
+
+leakage
+
+Data Residency
+
+Scraped data cached
+
+DWS-SI-02, DWS-SI-
+
+Align with TAO's
+
+and stored in US
+
+03
+
+region only for MVP
+
+existing data
+
+residency policy
+
+7.6 Known Risks
+
+Risk ID
+
+Description
+
+Likelihood
+
+Impact
+
+Mitigation
+
+Owner
+
+R-001
+
+Dealer
+
+High
+
+Low
+
+Silent fallback;
+
+Engineering
+
+website is not
+
+publicly
+
+accessible,
+
+behind auth,
+
+or has no
+
+contact page
+
+no error
+
+shown to
+
+Dealer Admin
+
+R-002
+
+Scraped
+
+Medium
+
+Medium
+
+Confidence
+
+PM + UX
+
+R-003
+
+values are
+
+wrong or
+
+outdated
+
+Dealer
+
+website
+
+blocks
+
+scraping via
+
+robots.txt
+
+gate; Dealer
+
+Admin always
+
+confirms
+
+Medium
+
+Low
+
+robots.txt
+
+Engineering
+
+check before
+
+scraping;
+
+silent skip
+
+R-004
+
+Scrape is too
+
+Low
+
+High
+
+Hard 5s
+
+Engineering
+
+slow (>5s)
+
+and blocks
+
+screen load
+
+timeout; async
+
+execution
+
+R-005
+
+Dealer has no
+
+High for small
+
+None
+
+No-website is
+
+PM +
+
+website at all
+
+dealers
+
+a first-class
+
+Engineering
+
+fallback
+
+R-006
+
+Dealer Admin
+
+Low to
+
+High
+
+Domain block-
+
+Engineering +
+
+provides an
+
+Medium
+
+list +
+
+PM
+
+intentionally
+
+wrong URL
+
+business-
+
+name fuzzy
+
+match
+
+R-007
+
+Dealer Admin
+
+Medium
+
+Medium
+
+Borderline
+
+Engineering
+
+provides
+
+group HQ site
+
+instead of
+
+rooftop site
+
+7.10 Financial Controls
+
+match prompt
+
+for 0.70–0.85
+
+Required for financial process intents. Define tolerance bands, 3-way match
+
+rules, GL coding, reconciliation gates, segregation of duties, and audit trail
+
+requirements. Skip if not applicable.
+
+N/A — this intent does not handle financial transactions. Dealer website scraping is a data pre-
+
+fill feature; no monetary values, GL coding, or financial reconciliation are involved.
+
+§8. Rendering Declaration
+
+8.1 Rendering Mode
+
+Sub-Intent /
+
+Preferred Mode
+
+Fallback
+
+Required Components
+
+Response Type
+
+Prefilled fields on
+
+agui (inline form with
+
+basic
+
+Dealer Details Review
+
+pre-populated fields,
+
+screen
+
+editable)
+
+Scrape failure
+
+basic (inline advisory
+
+text
+
+message
+
+text, non-blocking)
+
+Manual re-scrape
+
+basic (status
+
+text
+
+trigger (/prefill-dealer-
+
+feedback)
+
+details)
+
+8.2 Orchestration Handoffs
+
+Prefill indicator label;
+
+confidence badge;
+
+editable inputs;
+
+confirm/submit button
+
+“We couldn't find your
+
+details automatically
+
+— please fill in below”
+
+label
+
+Inline spinner or
+
+progress indicator;
+
+update fields when
+
+complete
+
+When this intent hands control to another agent mid-flow, declare the handoff
+
+contract here.
+
+Handoff
+
+Trigger
+
+Target Agent /
+
+Context
+
+Return
+
+Handoff Type Notes
+
+Intent
+
+Passed
+
+Expected
+
+Dealer Admin
+
+TAO
+
+Confirmed
+
+Yes —
+
+Blocking
+
+Standard TAO
+
+confirms
+
+Configure
+
+dealer detail
+
+proceed to
+
+dealer details
+
+Phase — next
+
+fields,
+
+next TAO step
+
+step in
+
+journey
+
+dealership_id,
+
+session_id
+
+step-
+
+completion
+
+handoff
+
+§9. Conversation Design & Test Scenarios
+
+9.1 Happy Path Scenarios
+
+#
+
+1
+
+2
+
+3
+
+4
+
+Trigger
+
+Agent Does
+
+Screen Result
+
+IM opens provisioning
+
+DWS-SI-00 → DWS-
+
+IM sees comparison
+
+queue; dealer has
+
+SI-00b → builds
+
+preview inline with
+
+website URL in
+
+comparison map
+
+matches and diffs
+
+contract
+
+Dealer Admin opens
+
+DWS-SI-01a → DWS-
+
+Dealer Admin sees
+
+screen; scrape result
+
+SI-03 → DWS-SI-04
+
+prefilled fields, diff
+
+cached from IM pre-
+
+scrape
+
+rows, and confirms
+
+final values
+
+Dealer Admin opens
+
+DWS-SI-01a → DWS-
+
+All fields populated
+
+screen; small dealer,
+
+SI-01b → DWS-SI-05
+
+from contract; no
+
+no website URL
+
+Website scrape finds
+
+DWS-SI-03 classifies
+
+same values as
+
+all fields as Match
+
+contract on all fields
+
+comparison rows; no
+
+mention of websites
+
+Quiet “✓ Matches
+your website”
+
+indicators; no
+
+comparison rows
+
+5
+
+Dealer Admin provides
+
+DWS-SI-08 shows
+
+Dealer Admin confirms
+
+alternate URL with
+
+confirmation prompt
+
+whether the found
+
+borderline fuzzy
+
+match
+
+website belongs to
+
+their dealership
+
+9.2 Edge Case Scenarios
+
+#
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+Trigger
+
+Condition
+
+Agent Does
+
+Screen Result
+
+Dealer Admin
+
+No website
+
+DWS-SI-01b
+
+All fields pre-
+
+opens screen
+
+finds no URL →
+
+populated from
+
+contract-only
+
+contract; no
+
+view
+
+comparison rows
+
+Dealer Admin
+
+Website returns
+
+Scrape fails →
+
+Same as no-
+
+opens screen
+
+403 / behind auth
+
+DWS-SI-05
+
+website case
+
+Website scrape
+
+Phone
+
+DWS-SI-03
+
+Phone
+
+runs
+
+confidence 0.62
+
+suppresses
+
+comparison row
+
+phone
+
+does not appear
+
+Scrape times out
+
+5s timeout
+
+DWS-SI-05
+
+Screen loads
+
+immediately from
+
+contract data; no
+
+spinner blocking
+
+Dealer Admin
+
+Dealer Admin
+
+Domain on block-
+
+DWS-SI-08
+
+Shows “This
+
+provides
+
+list
+
+rejects
+
+doesn't look like a
+
+alternate URL
+
+immediately
+
+dealership
+
+website.”
+
+Dealer Admin
+
+Business name
+
+DWS-SI-08
+
+Shows “The
+
+provides wrong
+
+mismatch
+
+rejects post-
+
+website you
+
+dealership URL
+
+scrape
+
+provided doesn't
+
+appear to be for
+
+[Dealership
+
+Name].”
+
+Dealer Admin
+
+Contract sync
+
+DWS-SI-01a
+
+Screen shows
+
+opens screen
+
+has not
+
+cannot load
+
+loading state;
+
+completed
+
+contract data
+
+Dealer Admin
+
+cannot proceed
+
+9.3 Edge Case Catalog
+
+ID
+
+Condition
+
+Expected
+
+Behavior
+
+Severity
+
+Test Type
+
+EC-001
+
+Contract sync not
+
+Show loading
+
+Blocking
+
+Dependency
+
+complete
+
+state; block
+
+Dealer Admin
+
+until sync
+
+completes
+
+EC-002
+
+dealer_website_u
+
+Skip scraping
+
+Non-blocking
+
+Negative
+
+rl is null
+
+layer; render
+
+contract-only
+
+view
+
+EC-003
+
+Dealer website
+
+Scraping
+
+Non-blocking
+
+Boundary
+
+behind auth or
+
+skipped;
+
+scrape fails
+
+contract-only
+
+view shown
+
+EC-004
+
+robots.txt
+
+disallows
+
+scraping
+
+Skip scrape
+
+Safety Gate
+
+Security
+
+silently
+
+EC-005
+
+All scraped fields
+
+Suppress
+
+Non-blocking
+
+Happy path
+
+match contract
+
+comparison rows;
+
+variant
+
+data
+
+show quiet match
+
+indicators
+
+EC-006
+
+User-provided
+
+Reject
+
+Blocking
+
+Security
+
+URL on domain
+
+immediately
+
+block-list
+
+EC-007
+
+User-provided
+
+Reject with
+
+Blocking
+
+Data quality
+
+URL similarity <
+
+mismatch
+
+0.70
+
+message
+
+EC-008
+
+Borderline match
+
+Show
+
+Warning
+
+Data quality
+
+(0.70–0.85)
+
+confirmation
+
+prompt
+
+EC-009
+
+Dealer Admin
+
+Block submit;
+
+Blocking
+
+Validation
+
+submits with
+
+required field
+
+required fields
+
+validation error
+
+empty
+
+EC-010
+
+Dealer Admin re-
+
+Reject with
+
+Non-blocking
+
+Rate limit
+
+triggers scrape
+
+“Please wait
+
+within 5 minutes
+
+before retrying”
+
+9.4 Golden Test Cases
+
+Minimum 5 golden test cases per intent (Agentic Testing Principle 3).
+
+Sourced from real production scenarios.
+
+GTC#
+
+Input
+
+Expected Output Quality
+
+Pass Criteria
+
+Dimensions
+
+GTC-001
+
+Dealer with
+
+Address diff row
+
+Accuracy;
+
+Correct diffs
+
+website; address
+
+and “New from
+
+Completeness
+
+surfaced; no
+
+differs from
+
+website” URL row
+
+false-positive diff
+
+contract and
+
+shown; Dealer
+
+website URL is
+
+Admin accepts
+
+found
+
+desired values
+
+rows
+
+GTC-002
+
+Small dealer;
+
+All fields pre-
+
+No-website
+
+Screen fully
+
+dealer_website_u
+
+populated from
+
+baseline
+
+prefilled; zero
+
+rl=null
+
+contract; no
+
+website UI
+
+comparison rows
+
+GTC-003
+
+Website response
+
+Screen loads
+
+Timeout
+
+Screen visible in
+
+time 6s
+
+from contract
+
+enforcement
+
+< 500ms; no
+
+data immediately;
+
+scrape times out
+
+silently
+
+error
+
+GTC-004
+
+Dealer Admin
+
+DWS-SI-08
+
+Domain validation Immediate
+
+provides blocked
+
+rejects
+
+domain
+
+immediately;
+
+comparison view
+
+unchanged
+
+rejection;
+
+contract prefill
+
+unaffected
+
+GTC-005
+
+Dealer Admin
+
+DWS-SI-08
+
+Business-name
+
+Rejection
+
+provides
+
+rejects post-
+
+fuzzy match
+
+message shown
+
+competitor URL
+
+scrape; contract
+
+prefill unaffected
+
+GTC-006
+
+trigger_surface="
+
+IM dealer list row
+
+IM preview
+
+IM sees diff
+
+im_provisioning";
+
+shows contract
+
+address diff
+
+values + address
+
+found
+
+diff highlighted
+
+inline; no IM
+
+action/save
+
+possible
+
+9.5 Quality Dimensions
+
+Explicit quality dimensions with thresholds for every LLM-generated output
+
+(Principle 2).
+
+Dimension
+
+Description
+
+Target Threshold Regression
+
+Eval Method
+
+Threshold
+
+Accuracy
+
+Factual
+
+>= 95%
+
+< 90% blocks
+
+Deterministic +
+
+correctness of
+
+responses
+
+LLM-as-judge
+
+Completeness
+
+All required
+
+>= 90%
+
+< 85% blocks
+
+Schema
+
+information
+
+included
+
+validation
+
+Tone
+
+Professional,
+
+>= 4/5
+
+< 3/5 flags
+
+LLM-as-judge
+
+contextually
+
+appropriate
+
+Safety
+
+No harmful,
+
+100%
+
+< 100% blocks
+
+Deterministic +
+
+private, or
+
+hallucinated
+
+content
+
+red-team
+
+9.6 Failure Mode Coverage
+
+Failure Type
+
+Applicable?
+
+Specific Risk
+
+Mitigation
+
+Test Strategy
+
+Logic
+
+Y
+
+Field mapping
+
+Confidence
+
+Unit tests with
+
+may misidentify
+
+scoring + field-
+
+diverse HTML
+
+fields on non-
+
+type validation
+
+fixtures
+
+standard dealer
+
+websites
+
+Integration
+
+Y
+
+Website
+
+Timeout,
+
+Pipeline tests
+
+Behavioral
+
+Quality
+
+Drift
+
+Context
+
+Safety
+
+N
+
+Y
+
+Y
+
+N
+
+Y
+
+unreachable,
+
+robots.txt check,
+
+with mock HTTP
+
+slow, redirecting,
+
+MIME type guard
+
+responses
+
+or unexpected
+
+content type
+
+No LLM
+
+N/A
+
+N/A
+
+reasoning in
+
+happy path
+
+Scraped values
+
+Confidence
+
+Golden set with
+
+may be outdated
+
+threshold; Dealer
+
+known-correct
+
+or incorrect
+
+Admin always
+
+vs. outdated
+
+confirms
+
+websites
+
+Dealer website
+
+Monitor scrape
+
+Weekly
+
+HTML structure
+
+success rates
+
+regression on
+
+changes over
+
+time
+
+dealer URL
+
+golden set
+
+Intent scoped to
+
+N/A
+
+N/A
+
+Dealer Details
+
+Review screen
+
+Scrape must not
+
+Read-only HTTP
+
+Red-team
+
+write to, submit
+
+GET; no
+
+verification that
+
+forms on, or
+
+cookies/session
+
+no
+
+authenticate with
+
+storage
+
+POST/PUT/auth
+
+dealer website
+
+calls are made
+
+Coordination
+
+N
+
+Intent operates
+
+N/A
+
+N/A
+
+independently
+
+§10. Success Metrics & Evaluation
+
+10.1 Business KPIs
+
+KPI
+
+Current Baseline
+
+Target
+
+Measurement
+
+Timeline
+
+Method
+
+Blank-field rate at
+
+~100% (all fields
+
+0%
+
+TAO analytics —
+
+At TAO V1 launch
+
+screen open
+
+blank today)
+
+blank screen
+
+loads / total loads
+
+Dealer Details
+
+TBD — measure
+
+Reduce by >=
+
+TAO analytics —
+
+30 days post-
+
+screen
+
+at TAO V1 launch
+
+40% vs. baseline
+
+screen open to
+
+launch
+
+completion time
+
+submit
+
+Dealer Admin
+
+N/A
+
+< 15% of
+
+DA_edit events /
+
+30 days post-
+
+field correction
+
+rate
+
+contract-prefilled
+
+total contract
+
+launch
+
+fields manually
+
+fields shown
+
+corrected
+
+Website diff
+
+N/A
+
+Target >= 50%
+
+Accepted
+
+30 days post-
+
+acceptance rate
+
+website diffs /
+
+launch
+
+total diff rows
+
+shown
+
+Dealer Details
+
+TBD — measure
+
+Reduce by >=
+
+TAO analytics —
+
+30 days post-
+
+form validation
+
+at TAO V1 launch
+
+60% vs. baseline
+
+validation errors
+
+launch
+
+error rate
+
+on submit
+
+10.2 Agent Evaluation Criteria
+
+Metric
+
+Definition
+
+Target
+
+Regression
+
+Cadence
+
+Threshold
+
+Intent match rate % correctly
+
+> 95%
+
+< 90% triggers
+
+Weekly
+
+classified
+
+review
+
+Golden set pass
+
+% golden
+
+> 98%
+
+< 95% blocks
+
+Per deploy
+
+rate
+
+scenarios
+
+passing
+
+release
+
+Quality
+
+Per-dimension
+
+Per §9.5 targets
+
+Per §9.5
+
+Per deploy
+
+dimension scores
+
+eval scores
+
+regression
+
+Invariant violation
+
+% operations
+
+0%
+
+> 0% blocks
+
+Continuous
+
+rate
+
+violating
+
+invariants
+
+release
+
+10.3 Invariants (Continuous Checks)
+
+Properties that must ALWAYS hold — checked on every operation, not
+
+periodically (Principle 5).
+
+Invariant
+
+Description
+
+Check Frequency
+
+Enforcement
+
+Layer 1 must precede
+
+Dealer Admin screen
+
+Every screen load
+
+Hard block
+
+Layer 2
+
+must never render
+
+without Layer 1
+
+contract data present
+
+Screen is never blank
+
+Contract values fill
+
+Every render
+
+Hard block
+
+every field; Layer 2
+
+cannot make a field
+
+emptier than Layer 1
+
+left it
+
+Read-only scrape
+
+Scraper never submits
+
+Every scrape
+
+Hard block
+
+forms, writes cookies,
+
+or authenticates
+
+Dealer Admin
+
+No value persisted
+
+Every save
+
+Hard block
+
+confirmation required
+
+without explicit Dealer
+
+before save
+
+Admin submit action
+
+Dealer isolation
+
+Scrape/comparison
+
+Every render
+
+Hard block
+
+results for one
+
+dealership never
+
+shown to another
+
+URL validation before
+
+DWS-SI-02 must
+
+Every relevant scrape Hard block
+
+user-provided scrape
+
+never run on
+
+dealer_provided_url
+
+unless DWS-SI-08
+
+passed it
+
+IM cannot save dealer
+
+IM surface is read-
+
+Every write
+
+Hard block
+
+details
+
+only; write endpoint
+
+rejects IM provisioning
+
+saves
+
+Data integrity
+
+No orphaned
+
+Every write
+
+Hard block
+
+references, append-
+
+only IDs
+
+Privacy
+
+No private content in
+
+Every export
+
+Hard block
+
+external outputs
+
+10.4 Related Intents & Dependencies
+
+Upstream Dependencies
+
+Intent ID
+
+Intent Name
+
+Dependency Type
+
+Notes
+
+TAO-CONTRACT-001
+
+Contract Signature &
+
+Data
+
+(implicit)
+
+Dealer Intake
+
+TAO-COA-001
+
+COA / Financial
+
+Workflow
+
+Statement Upload
+
+(Step 7)
+
+dealer_website_url
+
+must be captured at
+
+contract signature
+
+Same Configure
+
+Phase; no direct
+
+dependency
+
+Downstream Effects
+
+Intent ID
+
+Intent Name
+
+Effect Type
+
+Notes
+
+TAO Configure Phase
+
+Dealer Details
+
+Workflow
+
+DWS-001 completion
+
+— next step
+
+confirmed →
+
+unblocks the next step
+
+Configure Phase
+
+proceeds
+
+§11. Follow-Up Patterns
+
+Pattern
+
+Trigger
+
+Agent Response
+
+Dealer Admin edits a prefilled
+
+Dealer Admin changes a
+
+Accept the edit silently; edited
+
+field
+
+prefilled value in the form
+
+value replaces prefilled value
+
+— Dealer Admin is always the
+
+source of truth
+
+Dealer Admin requests re-
+
+Dealer Admin triggers /prefill-
+
+Check debounce window; if
+
+scrape
+
+dealer-details
+
+allowed, re-run DWS-SI-02
+
+through DWS-SI-04; if within
+
+debounce, show “Please wait
+
+before retrying”
+
+Prefill partially succeeds
+
+DWS-SI-03 returns a partial
+
+Prefill found fields; leave
+
+field map
+
+unfound fields blank with
+
+standard placeholder text; do
+
+not show partial-failure
+
+message
+
+§12. Technical Approach
+
+Standard feature mode — engineering-review format. AI capability mapping
+
+not required.
+
+Architecture — Two-Layer Model
+
+This feature has two independent layers that compose on the Dealer Details Review screen.
+
+Layer 1 — Internal Data Sync (baseline, always runs)
+
+Data flow:  Salesforce → TOC → TAO
+
+1. TOC Sync Service — At IM provisioning stage, reads the dealer record from TOC. TAO does
+
+not connect to Salesforce directly — TOC is the single API call.
+
+2. TAO Dealer Record — Stores the TOC-sourced dealer record. Dealer Admin screen reads
+
+from here. Always populated before the Dealer Admin journey begins.
+
+Layer 2 — Website Scraping + Comparison (enrichment, additive)
+
+3. Scrape Trigger — Resolves the dealer website URL from the TAO dealer record. If no URL,
+
+Layer 2 is skipped entirely.
+
+4. Web Scraper Worker — HTTP GET to target URL (homepage + contact/about page).
+
+Enforces 5s timeout, robots.txt, MIME type guard, and read-only GET.
+
+5. Field Extractor — Parses raw HTML and extracts dealership name, DBA, address, phones,
+
+email, operating hours, and logo URL with confidence scores.
+
+6. Field Comparator — Compares extracted values against contract values and classifies fields
+
+as match, different, new, or missing.
+
+7. Comparison View Renderer — Injects comparison map into the Dealer Details Review
+
+screen.
+
+8. Session Cache — Caches comparison result keyed by (dealership_id, session_id).
+
+9. TAO Dealer Record Write — On Dealer Admin submit, confirmed final values are persisted.
+
+URL Validation (for dealer-admin-provided alternate URLs)
+
+10. URL Validator — Domain block-list check; scrape and fuzzy-match extracted business name
+
+against contract dealership name. Below 0.70 rejects, 0.70–0.85 prompts, and >= 0.85
+
+accepts silently.
+
+Non-Functional Requirements
+
+Screen load latency: Dealer Admin screen must render from Layer 1 data in < 500ms.
+
+Layer 1 is blocking: Dealer Admin cannot open the Dealer Details Review screen until DWS-
+
+SI-00 is complete.
+
+Layer 2 is always additive: Any Layer 2 failure falls back silently to Layer 1 data only.
+
+Rate limiting: Max 1 scrape per (dealership_id, session); max 1 user-triggered re-scrape per 5
+
+minutes per dealership.
+
+Security: Read-only HTTP GET only. No auth. No cookies. No form submissions.
+
+§13. Rollout Plan
+
+Standard feature mode — TAO V1 launch.
+
+Rollout Target: TAO V1
+
+This feature ships with TAO V1. There is no separate phased rollout — the feature is included in
+
+the initial product release. Rollout is controlled by feature flag  dws_prefill_enabled  for
+
+rapid kill-switch.
+
+Gate
+
+Criteria
+
+Owner
+
+Pre-launch
+
+Zero P0/P1 bugs in golden test
+
+Engineering
+
+cases GTC-001 through GTC-
+
+006
+
+Pre-launch
+
+DWS-SI-08 domain block-list
+
+PM
+
+reviewed and approved by PM
+
++ Legal
+
+Pre-launch
+
+Business-name fuzzy match
+
+Engineering + PM
+
+thresholds validated on real
+
+dealer names
+
+Pre-launch
+
+IM provisioning view updated
+
+Engineering
+
+to show scraped preview
+
+column
+
+Pre-launch
+
+“Use a different website” UI
+
+Engineering + UX
+
+component built and tested
+
+Post-launch monitoring
+
+Scrape success rate >= 50%;
+
+PM
+
+timeout rate <= 10%; Dealer
+
+Admin edit rate < 25%
+
+Rollback trigger
+
+P0: any scrape that writes to a
+
+Engineering on-call
+
+dealer website; any prefilled
+
+value saved without Dealer
+
+Admin confirmation
+
+Feature flag: dws_prefill_enabled  — set to  false  disables all scraping immediately. No
+
+data migration needed for rollback.
+
+Appendix A: ISD Versioning
+
+Version
+
+1.0
+
+Date
+
+Author
+
+Change Summary
+
+Aug 27, 2026
+
+Prem Bihari
+
+Initial ISD draft via
+
+(pbihari@tekion.com)
+
+paper-mcp isd_init
+
+(standard)
+
+Appendix B: PM-002 Scoring Rubric — Standard Mode (Reference)
+
+ISD Standard uses the same 13-section base rubric as the full template (100 base points) plus
+
+an 8-point v4.0 autonomy bonus for the two included v4.0 sections.
+
+Section
+
+Weight
+
+Full Credit
+
+Partial Credit
+
+No Credit (0%)
+
+(100%)
+
+(60%)
+
+§1 Metadata
+
+5pts
+
+§2 Intent
+
+Definition
+
+10pts
+
+All fields
+
+complete
+
+All criteria
+
+defined
+
+Missing optional
+
+Missing required
+
+fields
+
+fields
+
+Success criteria
+
+No meaningful
+
+only
+
+definition
+
+§3 NL Triggers
+
+8pts
+
+>= 5 triggers,
+
+3-4 triggers
+
+< 3 triggers
+
+mix,
+
+disambiguation
+
+§4 Parameters
+
+7pts
+
+All params with
+
+Sources defined
+
+Parameter list
+
+source and
+
+fallback
+
+only
+
+§5.1 Sub-Intents
+
+15pts
+
+IMS Recon
+
+Happy path only
+
+< 5 sub-intents
+
+granularity; all
+
+columns
+
+§6
+
+8pts
+
+Business-
+
+Caps listed, eng-
+
+Missing
+
+Capabilities/Skills
+
+language caps;
+
+language
+
+agent clear
+
+§7 Business
+
+10pts
+
+ECI contracts;
+
+ECI thresholds
+
+No safety model
+
+Rules
+
+policies
+
+only
+
+identified; §7.5
+
+present
+
+§8 Rendering
+
+5pts
+
+Mode declared
+
+Primary output
+
+No declaration
+
+for all outputs
+
+only
+
+§9 Conversations 8pts
+
+Happy path +
+
+Happy path only
+
+No scenarios
+
+edge cases +
+
+catalog
+
+§10 Metrics
+
+8pts
+
+KPIs + baselines
+
+KPIs without
+
+No metrics
+
++ attribution
+
+baselines
+
+§11 Follow-up
+
+5pts
+
+>= 2 patterns
+
+1 pattern
+
+None
+
+patterns
+
+§12 Technical
+
+6pts
+
+Constraints +
+
+Constraints only
+
+Absent
+
+Approach
+
+integrations +
+
+NFRs
+
+§13 Rollout Plan
+
+5pts
+
+Phase gates +
+
+Phase list
+
+Absent
+
+flags + rollback
+
+Autonomous Agent Bonus: §1.2 Autonomy Declaration (5pts) and §3.4 Event Triggers (3pts).
+
+Gate: Score >= 70 required for isd_export. Grand total: 108 max.
+
+7.3 Escalation Rules
+
+Condition
+
+Escalation Path
+
+Notification Target
+
+Scrape consistently fails for a
+
+Log to TAO ops dashboard for
+
+TAO ops team (internal only)
+
+dealership across 3+ sessions
+
+review; do not alert Dealer
+
+Admin
+
+Dealer Admin manually
+
+Flag pattern to PM team for
+
+TAO product analytics
+
+overrides all prefilled fields in
+
+review
+
+3+ consecutive sessions
+
+7.4 Compliance & Legal Constraints
+
+Web scraping a publicly accessible website generally does not raise legal issues when done for
+
+reading the business's own published public information. However:
+
+TAO must respect  robots.txt  directives on the dealer's website.
+
+Only the dealer's own website URL may be scraped — no third-party lookups for MVP.
+
+No personal data is scraped; all scraped fields are business-level public details.
+
+Legal review recommended before GA if scope expands beyond MVP fields.
+
+7.5 Data Access Constraints
+
+Required per ORBIT S26 I227. Specify RBAC rules, PII handling, and cross-
+
+dealer isolation.
+
+Constraint Type
+
+Rule
+
+Applies To
+
+Notes
+
+RBAC
+
+Dealer Admin can
+
+DWS-SI-00, DWS-SI-
+
+Module Champions
+
+view and confirm
+
+04, DWS-SI-06
+
+and PSMs do not
+
+prefilled details and
+
+provide alternate URL.
+
+IM can view read-only
+
+scraped preview and
+
+cannot confirm or
+
+save.
+
+interact with either
+
+surface
+
+PII Handling
+
+Scraped fields are
+
+All sub-intents
+
+If future fields include
+
+business-level public
+
+details, not personal
+
+data.
+
+individual contact
+
+names, PII policy
+
+must be revisited
+
+Cross-Dealer Isolation Scrape cache is keyed
+
+DWS-SI-01 through
+
+by (dealership_id,
+
+DWS-SI-06
+
+session_id) — no
+
+cross-dealer data
+
+leakage
+
+Data Residency
+
+Scraped data cached
+
+DWS-SI-02, DWS-SI-
+
+Align with TAO's
+
+and stored in US
+
+03
+
+region only for MVP
+
+existing data
+
+residency policy
+
+7.6 Known Risks
+
+Risk ID
+
+Description
+
+Likelihood
+
+Impact
+
+Mitigation
+
+Owner
+
+R-001
+
+Dealer
+
+High
+
+Low
+
+Silent fallback;
+
+Engineering
+
+website is not
+
+publicly
+
+accessible,
+
+behind auth,
+
+or has no
+
+contact page
+
+no error
+
+shown to
+
+Dealer Admin
+
+R-002
+
+Scraped
+
+Medium
+
+Medium
+
+Confidence
+
+PM + UX
+
+R-003
+
+values are
+
+wrong or
+
+outdated
+
+Dealer
+
+website
+
+blocks
+
+scraping via
+
+robots.txt
+
+gate; Dealer
+
+Admin always
+
+confirms
+
+Medium
+
+Low
+
+robots.txt
+
+Engineering
+
+check before
+
+scraping;
+
+silent skip
+
+R-004
+
+Scrape is too
+
+Low
+
+High
+
+Hard 5s
+
+Engineering
+
+slow (>5s)
+
+and blocks
+
+screen load
+
+timeout; async
+
+execution
+
+R-005
+
+Dealer has no
+
+High for small
+
+None
+
+No-website is
+
+PM +
+
+website at all
+
+dealers
+
+a first-class
+
+Engineering
+
+fallback
+
+R-006
+
+Dealer Admin
+
+Low to
+
+High
+
+Domain block-
+
+Engineering +
+
+provides an
+
+Medium
+
+list +
+
+PM
+
+intentionally
+
+wrong URL
+
+business-
+
+name fuzzy
+
+match
+
+R-007
+
+Dealer Admin
+
+Medium
+
+Medium
+
+Borderline
+
+Engineering
+
+provides
+
+group HQ site
+
+instead of
+
+rooftop site
+
+7.10 Financial Controls
+
+match prompt
+
+for 0.70–0.85
+
+Required for financial process intents. Define tolerance bands, 3-way match
+
+rules, GL coding, reconciliation gates, segregation of duties, and audit trail
+
+requirements. Skip if not applicable.
+
+N/A — this intent does not handle financial transactions. Dealer website scraping is a data pre-
+
+fill feature; no monetary values, GL coding, or financial reconciliation are involved.
+
+§8. Rendering Declaration
+
+8.1 Rendering Mode
+
+Sub-Intent /
+
+Preferred Mode
+
+Fallback
+
+Required Components
+
+Response Type
+
+Prefilled fields on
+
+agui (inline form with
+
+basic
+
+Dealer Details Review
+
+pre-populated fields,
+
+screen
+
+editable)
+
+Scrape failure
+
+basic (inline advisory
+
+text
+
+message
+
+text, non-blocking)
+
+Manual re-scrape
+
+basic (status
+
+text
+
+trigger (/prefill-dealer-
+
+feedback)
+
+details)
+
+8.2 Orchestration Handoffs
+
+Prefill indicator label;
+
+confidence badge;
+
+editable inputs;
+
+confirm/submit button
+
+“We couldn't find your
+
+details automatically
+
+— please fill in below”
+
+label
+
+Inline spinner or
+
+progress indicator;
+
+update fields when
+
+complete
+
+When this intent hands control to another agent mid-flow, declare the handoff
+
+contract here.
+
+Handoff
+
+Trigger
+
+Target Agent /
+
+Context
+
+Return
+
+Handoff Type Notes
+
+Intent
+
+Passed
+
+Expected
+
+Dealer Admin
+
+TAO
+
+Confirmed
+
+Yes —
+
+Blocking
+
+Standard TAO
+
+confirms
+
+Configure
+
+dealer detail
+
+proceed to
+
+dealer details
+
+Phase — next
+
+fields,
+
+next TAO step
+
+step in
+
+journey
+
+dealership_id,
+
+session_id
+
+step-
+
+completion
+
+handoff
+
+§9. Conversation Design & Test Scenarios
+
+9.1 Happy Path Scenarios
+
+#
+
+1
+
+2
+
+3
+
+4
+
+Trigger
+
+Agent Does
+
+Screen Result
+
+IM opens provisioning
+
+DWS-SI-00 → DWS-
+
+IM sees comparison
+
+queue; dealer has
+
+SI-00b → builds
+
+preview inline with
+
+website URL in
+
+comparison map
+
+matches and diffs
+
+contract
+
+Dealer Admin opens
+
+DWS-SI-01a → DWS-
+
+Dealer Admin sees
+
+screen; scrape result
+
+SI-03 → DWS-SI-04
+
+prefilled fields, diff
+
+cached from IM pre-
+
+scrape
+
+rows, and confirms
+
+final values
+
+Dealer Admin opens
+
+DWS-SI-01a → DWS-
+
+All fields populated
+
+screen; small dealer,
+
+SI-01b → DWS-SI-05
+
+from contract; no
+
+no website URL
+
+Website scrape finds
+
+DWS-SI-03 classifies
+
+same values as
+
+all fields as Match
+
+contract on all fields
+
+comparison rows; no
+
+mention of websites
+
+Quiet “✓ Matches
+your website”
+
+indicators; no
+
+comparison rows
+
+5
+
+Dealer Admin provides
+
+DWS-SI-08 shows
+
+Dealer Admin confirms
+
+alternate URL with
+
+confirmation prompt
+
+whether the found
+
+borderline fuzzy
+
+match
+
+website belongs to
+
+their dealership
+
+9.2 Edge Case Scenarios
+
+#
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+Trigger
+
+Condition
+
+Agent Does
+
+Screen Result
+
+Dealer Admin
+
+No website
+
+DWS-SI-01b
+
+All fields pre-
+
+opens screen
+
+finds no URL →
+
+populated from
+
+contract-only
+
+contract; no
+
+view
+
+comparison rows
+
+Dealer Admin
+
+Website returns
+
+Scrape fails →
+
+Same as no-
+
+opens screen
+
+403 / behind auth
+
+DWS-SI-05
+
+website case
+
+Website scrape
+
+Phone
+
+DWS-SI-03
+
+Phone
+
+runs
+
+confidence 0.62
+
+suppresses
+
+comparison row
+
+phone
+
+does not appear
+
+Scrape times out
+
+5s timeout
+
+DWS-SI-05
+
+Screen loads
+
+immediately from
+
+contract data; no
+
+spinner blocking
+
+Dealer Admin
+
+Dealer Admin
+
+Domain on block-
+
+DWS-SI-08
+
+Shows “This
+
+provides
+
+list
+
+rejects
+
+doesn't look like a
+
+alternate URL
+
+immediately
+
+dealership
+
+website.”
+
+Dealer Admin
+
+Business name
+
+DWS-SI-08
+
+Shows “The
+
+provides wrong
+
+mismatch
+
+rejects post-
+
+website you
+
+dealership URL
+
+scrape
+
+provided doesn't
+
+appear to be for
+
+[Dealership
+
+Name].”
+
+Dealer Admin
+
+Contract sync
+
+DWS-SI-01a
+
+Screen shows
+
+opens screen
+
+has not
+
+cannot load
+
+loading state;
+
+completed
+
+contract data
+
+Dealer Admin
+
+cannot proceed
+
+9.3 Edge Case Catalog
+
+ID
+
+Condition
+
+Expected
+
+Behavior
+
+Severity
+
+Test Type
+
+EC-001
+
+Contract sync not
+
+Show loading
+
+Blocking
+
+Dependency
+
+complete
+
+state; block
+
+Dealer Admin
+
+until sync
+
+completes
+
+EC-002
+
+dealer_website_u
+
+Skip scraping
+
+Non-blocking
+
+Negative
+
+rl is null
+
+layer; render
+
+contract-only
+
+view
+
+EC-003
+
+Dealer website
+
+Scraping
+
+Non-blocking
+
+Boundary
+
+behind auth or
+
+skipped;
+
+scrape fails
+
+contract-only
+
+view shown
+
+EC-004
+
+robots.txt
+
+disallows
+
+scraping
+
+Skip scrape
+
+Safety Gate
+
+Security
+
+silently
+
+EC-005
+
+All scraped fields
+
+Suppress
+
+Non-blocking
+
+Happy path
+
+match contract
+
+comparison rows;
+
+variant
+
+data
+
+show quiet match
+
+indicators
+
+EC-006
+
+User-provided
+
+Reject
+
+Blocking
+
+Security
+
+URL on domain
+
+immediately
+
+block-list
+
+EC-007
+
+User-provided
+
+Reject with
+
+Blocking
+
+Data quality
+
+URL similarity <
+
+mismatch
+
+0.70
+
+message
+
+EC-008
+
+Borderline match
+
+Show
+
+Warning
+
+Data quality
+
+(0.70–0.85)
+
+confirmation
+
+prompt
+
+EC-009
+
+Dealer Admin
+
+Block submit;
+
+Blocking
+
+Validation
+
+submits with
+
+required field
+
+required fields
+
+validation error
+
+empty
+
+EC-010
+
+Dealer Admin re-
+
+Reject with
+
+Non-blocking
+
+Rate limit
+
+triggers scrape
+
+“Please wait
+
+within 5 minutes
+
+before retrying”
+
+9.4 Golden Test Cases
+
+Minimum 5 golden test cases per intent (Agentic Testing Principle 3).
+
+Sourced from real production scenarios.
+
+GTC#
+
+Input
+
+Expected Output Quality
+
+Pass Criteria
+
+Dimensions
+
+GTC-001
+
+Dealer with
+
+Address diff row
+
+Accuracy;
+
+Correct diffs
+
+website; address
+
+and “New from
+
+Completeness
+
+surfaced; no
+
+differs from
+
+website” URL row
+
+false-positive diff
+
+contract and
+
+shown; Dealer
+
+website URL is
+
+Admin accepts
+
+found
+
+desired values
+
+rows
+
+GTC-002
+
+Small dealer;
+
+All fields pre-
+
+No-website
+
+Screen fully
+
+dealer_website_u
+
+populated from
+
+baseline
+
+prefilled; zero
+
+rl=null
+
+contract; no
+
+website UI
+
+comparison rows
+
+GTC-003
+
+Website response
+
+Screen loads
+
+Timeout
+
+Screen visible in
+
+time 6s
+
+from contract
+
+enforcement
+
+< 500ms; no
+
+data immediately;
+
+scrape times out
+
+silently
+
+error
+
+GTC-004
+
+Dealer Admin
+
+DWS-SI-08
+
+Domain validation Immediate
+
+provides blocked
+
+rejects
+
+domain
+
+immediately;
+
+comparison view
+
+unchanged
+
+rejection;
+
+contract prefill
+
+unaffected
+
+GTC-005
+
+Dealer Admin
+
+DWS-SI-08
+
+Business-name
+
+Rejection
+
+provides
+
+rejects post-
+
+fuzzy match
+
+message shown
+
+competitor URL
+
+scrape; contract
+
+prefill unaffected
+
+GTC-006
+
+trigger_surface="
+
+IM dealer list row
+
+IM preview
+
+IM sees diff
+
+im_provisioning";
+
+shows contract
+
+address diff
+
+values + address
+
+found
+
+diff highlighted
+
+inline; no IM
+
+action/save
+
+possible
+
+9.5 Quality Dimensions
+
+Explicit quality dimensions with thresholds for every LLM-generated output
+
+(Principle 2).
+
+Dimension
+
+Description
+
+Target Threshold Regression
+
+Eval Method
+
+Threshold
+
+Accuracy
+
+Factual
+
+>= 95%
+
+< 90% blocks
+
+Deterministic +
+
+correctness of
+
+responses
+
+LLM-as-judge
+
+Completeness
+
+All required
+
+>= 90%
+
+< 85% blocks
+
+Schema
+
+information
+
+included
+
+validation
+
+Tone
+
+Professional,
+
+>= 4/5
+
+< 3/5 flags
+
+LLM-as-judge
+
+contextually
+
+appropriate
+
+Safety
+
+No harmful,
+
+100%
+
+< 100% blocks
+
+Deterministic +
+
+private, or
+
+hallucinated
+
+content
+
+red-team
+
+9.6 Failure Mode Coverage
+
+Failure Type
+
+Applicable?
+
+Specific Risk
+
+Mitigation
+
+Test Strategy
+
+Logic
+
+Y
+
+Field mapping
+
+Confidence
+
+Unit tests with
+
+may misidentify
+
+scoring + field-
+
+diverse HTML
+
+fields on non-
+
+type validation
+
+fixtures
+
+standard dealer
+
+websites
+
+Integration
+
+Y
+
+Website
+
+Timeout,
+
+Pipeline tests
+
+Behavioral
+
+Quality
+
+Drift
+
+Context
+
+Safety
+
+N
+
+Y
+
+Y
+
+N
+
+Y
+
+unreachable,
+
+robots.txt check,
+
+with mock HTTP
+
+slow, redirecting,
+
+MIME type guard
+
+responses
+
+or unexpected
+
+content type
+
+No LLM
+
+N/A
+
+N/A
+
+reasoning in
+
+happy path
+
+Scraped values
+
+Confidence
+
+Golden set with
+
+may be outdated
+
+threshold; Dealer
+
+known-correct
+
+or incorrect
+
+Admin always
+
+vs. outdated
+
+confirms
+
+websites
+
+Dealer website
+
+Monitor scrape
+
+Weekly
+
+HTML structure
+
+success rates
+
+regression on
+
+changes over
+
+time
+
+dealer URL
+
+golden set
+
+Intent scoped to
+
+N/A
+
+N/A
+
+Dealer Details
+
+Review screen
+
+Scrape must not
+
+Read-only HTTP
+
+Red-team
+
+write to, submit
+
+GET; no
+
+verification that
+
+forms on, or
+
+cookies/session
+
+no
+
+authenticate with
+
+storage
+
+POST/PUT/auth
+
+dealer website
+
+calls are made
+
+Coordination
+
+N
+
+Intent operates
+
+N/A
+
+N/A
+
+independently
+
+§10. Success Metrics & Evaluation
+
+10.1 Business KPIs
+
+KPI
+
+Current Baseline
+
+Target
+
+Measurement
+
+Timeline
+
+Method
+
+Blank-field rate at
+
+~100% (all fields
+
+0%
+
+TAO analytics —
+
+At TAO V1 launch
+
+screen open
+
+blank today)
+
+blank screen
+
+loads / total loads
+
+Dealer Details
+
+TBD — measure
+
+Reduce by >=
+
+TAO analytics —
+
+30 days post-
+
+screen
+
+at TAO V1 launch
+
+40% vs. baseline
+
+screen open to
+
+launch
+
+completion time
+
+submit
+
+Dealer Admin
+
+N/A
+
+< 15% of
+
+DA_edit events /
+
+30 days post-
+
+field correction
+
+rate
+
+contract-prefilled
+
+total contract
+
+launch
+
+fields manually
+
+fields shown
+
+corrected
+
+Website diff
+
+N/A
+
+Target >= 50%
+
+Accepted
+
+30 days post-
+
+acceptance rate
+
+website diffs /
+
+launch
+
+total diff rows
+
+shown
+
+Dealer Details
+
+TBD — measure
+
+Reduce by >=
+
+TAO analytics —
+
+30 days post-
+
+form validation
+
+at TAO V1 launch
+
+60% vs. baseline
+
+validation errors
+
+launch
+
+error rate
+
+on submit
+
+10.2 Agent Evaluation Criteria
+
+Metric
+
+Definition
+
+Target
+
+Regression
+
+Cadence
+
+Threshold
+
+Intent match rate % correctly
+
+> 95%
+
+< 90% triggers
+
+Weekly
+
+classified
+
+review
+
+Golden set pass
+
+% golden
+
+> 98%
+
+< 95% blocks
+
+Per deploy
+
+rate
+
+scenarios
+
+passing
+
+release
+
+Quality
+
+Per-dimension
+
+Per §9.5 targets
+
+Per §9.5
+
+Per deploy
+
+dimension scores
+
+eval scores
+
+regression
+
+Invariant violation
+
+% operations
+
+0%
+
+> 0% blocks
+
+Continuous
+
+rate
+
+violating
+
+invariants
+
+release
+
+10.3 Invariants (Continuous Checks)
+
+Properties that must ALWAYS hold — checked on every operation, not
+
+periodically (Principle 5).
+
+Invariant
+
+Description
+
+Check Frequency
+
+Enforcement
+
+Layer 1 must precede
+
+Dealer Admin screen
+
+Every screen load
+
+Hard block
+
+Layer 2
+
+must never render
+
+without Layer 1
+
+contract data present
+
+Screen is never blank
+
+Contract values fill
+
+Every render
+
+Hard block
+
+every field; Layer 2
+
+cannot make a field
+
+emptier than Layer 1
+
+left it
+
+Read-only scrape
+
+Scraper never submits
+
+Every scrape
+
+Hard block
+
+forms, writes cookies,
+
+or authenticates
+
+Dealer Admin
+
+No value persisted
+
+Every save
+
+Hard block
+
+confirmation required
+
+without explicit Dealer
+
+before save
+
+Admin submit action
+
+Dealer isolation
+
+Scrape/comparison
+
+Every render
+
+Hard block
+
+results for one
+
+dealership never
+
+shown to another
+
+URL validation before
+
+DWS-SI-02 must
+
+Every relevant scrape Hard block
+
+user-provided scrape
+
+never run on
+
+dealer_provided_url
+
+unless DWS-SI-08
+
+passed it
+
+IM cannot save dealer
+
+IM surface is read-
+
+Every write
+
+Hard block
+
+details
+
+only; write endpoint
+
+rejects IM provisioning
+
+saves
+
+Data integrity
+
+No orphaned
+
+Every write
+
+Hard block
+
+references, append-
+
+only IDs
+
+Privacy
+
+No private content in
+
+Every export
+
+Hard block
+
+external outputs
+
+10.4 Related Intents & Dependencies
+
+Upstream Dependencies
+
+Intent ID
+
+Intent Name
+
+Dependency Type
+
+Notes
+
+TAO-CONTRACT-001
+
+Contract Signature &
+
+Data
+
+(implicit)
+
+Dealer Intake
+
+TAO-COA-001
+
+COA / Financial
+
+Workflow
+
+Statement Upload
+
+(Step 7)
+
+dealer_website_url
+
+must be captured at
+
+contract signature
+
+Same Configure
+
+Phase; no direct
+
+dependency
+
+Downstream Effects
+
+Intent ID
+
+Intent Name
+
+Effect Type
+
+Notes
+
+TAO Configure Phase
+
+Dealer Details
+
+Workflow
+
+DWS-001 completion
+
+— next step
+
+confirmed →
+
+unblocks the next step
+
+Configure Phase
+
+proceeds
+
+§11. Follow-Up Patterns
+
+Pattern
+
+Trigger
+
+Agent Response
+
+Dealer Admin edits a prefilled
+
+Dealer Admin changes a
+
+Accept the edit silently; edited
+
+field
+
+prefilled value in the form
+
+value replaces prefilled value
+
+— Dealer Admin is always the
+
+source of truth
+
+Dealer Admin requests re-
+
+Dealer Admin triggers /prefill-
+
+Check debounce window; if
+
+scrape
+
+dealer-details
+
+allowed, re-run DWS-SI-02
+
+through DWS-SI-04; if within
+
+debounce, show “Please wait
+
+before retrying”
+
+Prefill partially succeeds
+
+DWS-SI-03 returns a partial
+
+Prefill found fields; leave
+
+field map
+
+unfound fields blank with
+
+standard placeholder text; do
+
+not show partial-failure
+
+message
+
+§12. Technical Approach
+
+Standard feature mode — engineering-review format. AI capability mapping
+
+not required.
+
+Architecture — Two-Layer Model
+
+This feature has two independent layers that compose on the Dealer Details Review screen.
+
+Layer 1 — Internal Data Sync (baseline, always runs)
+
+Data flow:  Salesforce → TOC → TAO
+
+1. TOC Sync Service — At IM provisioning stage, reads the dealer record from TOC. TAO does
+
+not connect to Salesforce directly — TOC is the single API call.
+
+2. TAO Dealer Record — Stores the TOC-sourced dealer record. Dealer Admin screen reads
+
+from here. Always populated before the Dealer Admin journey begins.
+
+Layer 2 — Website Scraping + Comparison (enrichment, additive)
+
+3. Scrape Trigger — Resolves the dealer website URL from the TAO dealer record. If no URL,
+
+Layer 2 is skipped entirely.
+
+4. Web Scraper Worker — HTTP GET to target URL (homepage + contact/about page).
+
+Enforces 5s timeout, robots.txt, MIME type guard, and read-only GET.
+
+5. Field Extractor — Parses raw HTML and extracts dealership name, DBA, address, phones,
+
+email, operating hours, and logo URL with confidence scores.
+
+6. Field Comparator — Compares extracted values against contract values and classifies fields
+
+as match, different, new, or missing.
+
+7. Comparison View Renderer — Injects comparison map into the Dealer Details Review
+
+screen.
+
+8. Session Cache — Caches comparison result keyed by (dealership_id, session_id).
+
+9. TAO Dealer Record Write — On Dealer Admin submit, confirmed final values are persisted.
+
+URL Validation (for dealer-admin-provided alternate URLs)
+
+10. URL Validator — Domain block-list check; scrape and fuzzy-match extracted business name
+
+against contract dealership name. Below 0.70 rejects, 0.70–0.85 prompts, and >= 0.85
+
+accepts silently.
+
+Non-Functional Requirements
+
+Screen load latency: Dealer Admin screen must render from Layer 1 data in < 500ms.
+
+Layer 1 is blocking: Dealer Admin cannot open the Dealer Details Review screen until DWS-
+
+SI-00 is complete.
+
+Layer 2 is always additive: Any Layer 2 failure falls back silently to Layer 1 data only.
+
+Rate limiting: Max 1 scrape per (dealership_id, session); max 1 user-triggered re-scrape per 5
+
+minutes per dealership.
+
+Security: Read-only HTTP GET only. No auth. No cookies. No form submissions.
+
+§13. Rollout Plan
+
+Standard feature mode — TAO V1 launch.
+
+Rollout Target: TAO V1
+
+This feature ships with TAO V1. There is no separate phased rollout — the feature is included in
+
+the initial product release. Rollout is controlled by feature flag  dws_prefill_enabled  for
+
+rapid kill-switch.
+
+Gate
+
+Criteria
+
+Owner
+
+Pre-launch
+
+Zero P0/P1 bugs in golden test
+
+Engineering
+
+cases GTC-001 through GTC-
+
+006
+
+Pre-launch
+
+DWS-SI-08 domain block-list
+
+PM
+
+reviewed and approved by PM
+
++ Legal
+
+Pre-launch
+
+Business-name fuzzy match
+
+Engineering + PM
+
+thresholds validated on real
+
+dealer names
+
+Pre-launch
+
+IM provisioning view updated
+
+Engineering
+
+to show scraped preview
+
+column
+
+Pre-launch
+
+“Use a different website” UI
+
+Engineering + UX
+
+component built and tested
+
+Post-launch monitoring
+
+Scrape success rate >= 50%;
+
+PM
+
+timeout rate <= 10%; Dealer
+
+Admin edit rate < 25%
+
+Rollback trigger
+
+P0: any scrape that writes to a
+
+Engineering on-call
+
+dealer website; any prefilled
+
+value saved without Dealer
+
+Admin confirmation
+
+Feature flag: dws_prefill_enabled  — set to  false  disables all scraping immediately. No
+
+data migration needed for rollback.
+
+Appendix A: ISD Versioning
+
+Version
+
+1.0
+
+Date
+
+Author
+
+Change Summary
+
+Aug 27, 2026
+
+Prem Bihari
+
+Initial ISD draft via
+
+(pbihari@tekion.com)
+
+paper-mcp isd_init
+
+(standard)
+
+Appendix B: PM-002 Scoring Rubric — Standard Mode (Reference)
+
+ISD Standard uses the same 13-section base rubric as the full template (100 base points) plus
+
+an 8-point v4.0 autonomy bonus for the two included v4.0 sections.
+
+Section
+
+Weight
+
+Full Credit
+
+Partial Credit
+
+No Credit (0%)
+
+(100%)
+
+(60%)
+
+§1 Metadata
+
+5pts
+
+§2 Intent
+
+Definition
+
+10pts
+
+All fields
+
+complete
+
+All criteria
+
+defined
+
+Missing optional
+
+Missing required
+
+fields
+
+fields
+
+Success criteria
+
+No meaningful
+
+only
+
+definition
+
+§3 NL Triggers
+
+8pts
+
+>= 5 triggers,
+
+3-4 triggers
+
+< 3 triggers
+
+mix,
+
+disambiguation
+
+§4 Parameters
+
+7pts
+
+All params with
+
+Sources defined
+
+Parameter list
+
+source and
+
+fallback
+
+only
+
+§5.1 Sub-Intents
+
+15pts
+
+IMS Recon
+
+Happy path only
+
+< 5 sub-intents
+
+granularity; all
+
+columns
+
+§6
+
+8pts
+
+Business-
+
+Caps listed, eng-
+
+Missing
+
+Capabilities/Skills
+
+language caps;
+
+language
+
+agent clear
+
+§7 Business
+
+10pts
+
+ECI contracts;
+
+ECI thresholds
+
+No safety model
+
+Rules
+
+policies
+
+only
+
+identified; §7.5
+
+present
+
+§8 Rendering
+
+5pts
+
+Mode declared
+
+Primary output
+
+No declaration
+
+for all outputs
+
+only
+
+§9 Conversations 8pts
+
+Happy path +
+
+Happy path only
+
+No scenarios
+
+edge cases +
+
+catalog
+
+§10 Metrics
+
+8pts
+
+KPIs + baselines
+
+KPIs without
+
+No metrics
+
++ attribution
+
+baselines
+
+§11 Follow-up
+
+5pts
+
+>= 2 patterns
+
+1 pattern
+
+None
+
+patterns
+
+§12 Technical
+
+6pts
+
+Constraints +
+
+Constraints only
+
+Absent
+
+Approach
+
+integrations +
+
+NFRs
+
+§13 Rollout Plan
+
+5pts
+
+Phase gates +
+
+Phase list
+
+Absent
+
+flags + rollback
+
+Autonomous Agent Bonus: §1.2 Autonomy Declaration (5pts) and §3.4 Event Triggers (3pts).
+
+Gate: Score >= 70 required for isd_export. Grand total: 108 max.
+
+7.3 Escalation Rules
+
+Condition
+
+Escalation Path
+
+Notification Target
+
+Scrape consistently fails for a
+
+Log to TAO ops dashboard for
+
+TAO ops team (internal only)
+
+dealership across 3+ sessions
+
+review; do not alert Dealer
+
+Admin
+
+Dealer Admin manually
+
+Flag pattern to PM team for
+
+TAO product analytics
+
+overrides all prefilled fields in
+
+review
+
+3+ consecutive sessions
+
+7.4 Compliance & Legal Constraints
+
+Web scraping a publicly accessible website generally does not raise legal issues when done for
+
+reading the business's own published public information. However:
+
+TAO must respect  robots.txt  directives on the dealer's website.
+
+Only the dealer's own website URL may be scraped — no third-party lookups for MVP.
+
+No personal data is scraped; all scraped fields are business-level public details.
+
+Legal review recommended before GA if scope expands beyond MVP fields.
+
+7.5 Data Access Constraints
+
+Required per ORBIT S26 I227. Specify RBAC rules, PII handling, and cross-
+
+dealer isolation.
+
+Constraint Type
+
+Rule
+
+Applies To
+
+Notes
+
+RBAC
+
+Dealer Admin can
+
+DWS-SI-00, DWS-SI-
+
+Module Champions
+
+view and confirm
+
+04, DWS-SI-06
+
+and PSMs do not
+
+prefilled details and
+
+provide alternate URL.
+
+IM can view read-only
+
+scraped preview and
+
+cannot confirm or
+
+save.
+
+interact with either
+
+surface
+
+PII Handling
+
+Scraped fields are
+
+All sub-intents
+
+If future fields include
+
+business-level public
+
+details, not personal
+
+data.
+
+individual contact
+
+names, PII policy
+
+must be revisited
+
+Cross-Dealer Isolation Scrape cache is keyed
+
+DWS-SI-01 through
+
+by (dealership_id,
+
+DWS-SI-06
+
+session_id) — no
+
+cross-dealer data
+
+leakage
+
+Data Residency
+
+Scraped data cached
+
+DWS-SI-02, DWS-SI-
+
+Align with TAO's
+
+and stored in US
+
+03
+
+region only for MVP
+
+existing data
+
+residency policy
+
+7.6 Known Risks
+
+Risk ID
+
+Description
+
+Likelihood
+
+Impact
+
+Mitigation
+
+Owner
+
+R-001
+
+Dealer
+
+High
+
+Low
+
+Silent fallback;
+
+Engineering
+
+website is not
+
+publicly
+
+accessible,
+
+behind auth,
+
+or has no
+
+contact page
+
+no error
+
+shown to
+
+Dealer Admin
+
+R-002
+
+Scraped
+
+Medium
+
+Medium
+
+Confidence
+
+PM + UX
+
+R-003
+
+values are
+
+wrong or
+
+outdated
+
+Dealer
+
+website
+
+blocks
+
+scraping via
+
+robots.txt
+
+gate; Dealer
+
+Admin always
+
+confirms
+
+Medium
+
+Low
+
+robots.txt
+
+Engineering
+
+check before
+
+scraping;
+
+silent skip
+
+R-004
+
+Scrape is too
+
+Low
+
+High
+
+Hard 5s
+
+Engineering
+
+slow (>5s)
+
+and blocks
+
+screen load
+
+timeout; async
+
+execution
+
+R-005
+
+Dealer has no
+
+High for small
+
+None
+
+No-website is
+
+PM +
+
+website at all
+
+dealers
+
+a first-class
+
+Engineering
+
+fallback
+
+R-006
+
+Dealer Admin
+
+Low to
+
+High
+
+Domain block-
+
+Engineering +
+
+provides an
+
+Medium
+
+list +
+
+PM
+
+intentionally
+
+wrong URL
+
+business-
+
+name fuzzy
+
+match
+
+R-007
+
+Dealer Admin
+
+Medium
+
+Medium
+
+Borderline
+
+Engineering
+
+provides
+
+group HQ site
+
+instead of
+
+rooftop site
+
+7.10 Financial Controls
+
+match prompt
+
+for 0.70–0.85
+
+Required for financial process intents. Define tolerance bands, 3-way match
+
+rules, GL coding, reconciliation gates, segregation of duties, and audit trail
+
+requirements. Skip if not applicable.
+
+N/A — this intent does not handle financial transactions. Dealer website scraping is a data pre-
+
+fill feature; no monetary values, GL coding, or financial reconciliation are involved.
+
+§8. Rendering Declaration
+
+8.1 Rendering Mode
+
+Sub-Intent /
+
+Preferred Mode
+
+Fallback
+
+Required Components
+
+Response Type
+
+Prefilled fields on
+
+agui (inline form with
+
+basic
+
+Dealer Details Review
+
+pre-populated fields,
+
+screen
+
+editable)
+
+Scrape failure
+
+basic (inline advisory
+
+text
+
+message
+
+text, non-blocking)
+
+Manual re-scrape
+
+basic (status
+
+text
+
+trigger (/prefill-dealer-
+
+feedback)
+
+details)
+
+8.2 Orchestration Handoffs
+
+Prefill indicator label;
+
+confidence badge;
+
+editable inputs;
+
+confirm/submit button
+
+“We couldn't find your
+
+details automatically
+
+— please fill in below”
+
+label
+
+Inline spinner or
+
+progress indicator;
+
+update fields when
+
+complete
+
+When this intent hands control to another agent mid-flow, declare the handoff
+
+contract here.
+
+Handoff
+
+Trigger
+
+Target Agent /
+
+Context
+
+Return
+
+Handoff Type Notes
+
+Intent
+
+Passed
+
+Expected
+
+Dealer Admin
+
+TAO
+
+Confirmed
+
+Yes —
+
+Blocking
+
+Standard TAO
+
+confirms
+
+Configure
+
+dealer detail
+
+proceed to
+
+dealer details
+
+Phase — next
+
+fields,
+
+next TAO step
+
+step in
+
+journey
+
+dealership_id,
+
+session_id
+
+step-
+
+completion
+
+handoff
+
+§9. Conversation Design & Test Scenarios
+
+9.1 Happy Path Scenarios
+
+#
+
+1
+
+2
+
+3
+
+4
+
+Trigger
+
+Agent Does
+
+Screen Result
+
+IM opens provisioning
+
+DWS-SI-00 → DWS-
+
+IM sees comparison
+
+queue; dealer has
+
+SI-00b → builds
+
+preview inline with
+
+website URL in
+
+comparison map
+
+matches and diffs
+
+contract
+
+Dealer Admin opens
+
+DWS-SI-01a → DWS-
+
+Dealer Admin sees
+
+screen; scrape result
+
+SI-03 → DWS-SI-04
+
+prefilled fields, diff
+
+cached from IM pre-
+
+scrape
+
+rows, and confirms
+
+final values
+
+Dealer Admin opens
+
+DWS-SI-01a → DWS-
+
+All fields populated
+
+screen; small dealer,
+
+SI-01b → DWS-SI-05
+
+from contract; no
+
+no website URL
+
+Website scrape finds
+
+DWS-SI-03 classifies
+
+same values as
+
+all fields as Match
+
+contract on all fields
+
+comparison rows; no
+
+mention of websites
+
+Quiet “✓ Matches
+your website”
+
+indicators; no
+
+comparison rows
+
+5
+
+Dealer Admin provides
+
+DWS-SI-08 shows
+
+Dealer Admin confirms
+
+alternate URL with
+
+confirmation prompt
+
+whether the found
+
+borderline fuzzy
+
+match
+
+website belongs to
+
+their dealership
+
+9.2 Edge Case Scenarios
+
+#
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+Trigger
+
+Condition
+
+Agent Does
+
+Screen Result
+
+Dealer Admin
+
+No website
+
+DWS-SI-01b
+
+All fields pre-
+
+opens screen
+
+finds no URL →
+
+populated from
+
+contract-only
+
+contract; no
+
+view
+
+comparison rows
+
+Dealer Admin
+
+Website returns
+
+Scrape fails →
+
+Same as no-
+
+opens screen
+
+403 / behind auth
+
+DWS-SI-05
+
+website case
+
+Website scrape
+
+Phone
+
+DWS-SI-03
+
+Phone
+
+runs
+
+confidence 0.62
+
+suppresses
+
+comparison row
+
+phone
+
+does not appear
+
+Scrape times out
+
+5s timeout
+
+DWS-SI-05
+
+Screen loads
+
+immediately from
+
+contract data; no
+
+spinner blocking
+
+Dealer Admin
+
+Dealer Admin
+
+Domain on block-
+
+DWS-SI-08
+
+Shows “This
+
+provides
+
+list
+
+rejects
+
+doesn't look like a
+
+alternate URL
+
+immediately
+
+dealership
+
+website.”
+
+Dealer Admin
+
+Business name
+
+DWS-SI-08
+
+Shows “The
+
+provides wrong
+
+mismatch
+
+rejects post-
+
+website you
+
+dealership URL
+
+scrape
+
+provided doesn't
+
+appear to be for
+
+[Dealership
+
+Name].”
+
+Dealer Admin
+
+Contract sync
+
+DWS-SI-01a
+
+Screen shows
+
+opens screen
+
+has not
+
+cannot load
+
+loading state;
+
+completed
+
+contract data
+
+Dealer Admin
+
+cannot proceed
+
+9.3 Edge Case Catalog
+
+ID
+
+Condition
+
+Expected
+
+Behavior
+
+Severity
+
+Test Type
+
+EC-001
+
+Contract sync not
+
+Show loading
+
+Blocking
+
+Dependency
+
+complete
+
+state; block
+
+Dealer Admin
+
+until sync
+
+completes
+
+EC-002
+
+dealer_website_u
+
+Skip scraping
+
+Non-blocking
+
+Negative
+
+rl is null
+
+layer; render
+
+contract-only
+
+view
+
+EC-003
+
+Dealer website
+
+Scraping
+
+Non-blocking
+
+Boundary
+
+behind auth or
+
+skipped;
+
+scrape fails
+
+contract-only
+
+view shown
+
+EC-004
+
+robots.txt
+
+disallows
+
+scraping
+
+Skip scrape
+
+Safety Gate
+
+Security
+
+silently
+
+EC-005
+
+All scraped fields
+
+Suppress
+
+Non-blocking
+
+Happy path
+
+match contract
+
+comparison rows;
+
+variant
+
+data
+
+show quiet match
+
+indicators
+
+EC-006
+
+User-provided
+
+Reject
+
+Blocking
+
+Security
+
+URL on domain
+
+immediately
+
+block-list
+
+EC-007
+
+User-provided
+
+Reject with
+
+Blocking
+
+Data quality
+
+URL similarity <
+
+mismatch
+
+0.70
+
+message
+
+EC-008
+
+Borderline match
+
+Show
+
+Warning
+
+Data quality
+
+(0.70–0.85)
+
+confirmation
+
+prompt
+
+EC-009
+
+Dealer Admin
+
+Block submit;
+
+Blocking
+
+Validation
+
+submits with
+
+required field
+
+required fields
+
+validation error
+
+empty
+
+EC-010
+
+Dealer Admin re-
+
+Reject with
+
+Non-blocking
+
+Rate limit
+
+triggers scrape
+
+“Please wait
+
+within 5 minutes
+
+before retrying”
+
+9.4 Golden Test Cases
+
+Minimum 5 golden test cases per intent (Agentic Testing Principle 3).
+
+Sourced from real production scenarios.
+
+GTC#
+
+Input
+
+Expected Output Quality
+
+Pass Criteria
+
+Dimensions
+
+GTC-001
+
+Dealer with
+
+Address diff row
+
+Accuracy;
+
+Correct diffs
+
+website; address
+
+and “New from
+
+Completeness
+
+surfaced; no
+
+differs from
+
+website” URL row
+
+false-positive diff
+
+contract and
+
+shown; Dealer
+
+website URL is
+
+Admin accepts
+
+found
+
+desired values
+
+rows
+
+GTC-002
+
+Small dealer;
+
+All fields pre-
+
+No-website
+
+Screen fully
+
+dealer_website_u
+
+populated from
+
+baseline
+
+prefilled; zero
+
+rl=null
+
+contract; no
+
+website UI
+
+comparison rows
+
+GTC-003
+
+Website response
+
+Screen loads
+
+Timeout
+
+Screen visible in
+
+time 6s
+
+from contract
+
+enforcement
+
+< 500ms; no
+
+data immediately;
+
+scrape times out
+
+silently
+
+error
+
+GTC-004
+
+Dealer Admin
+
+DWS-SI-08
+
+Domain validation Immediate
+
+provides blocked
+
+rejects
+
+domain
+
+immediately;
+
+comparison view
+
+unchanged
+
+rejection;
+
+contract prefill
+
+unaffected
+
+GTC-005
+
+Dealer Admin
+
+DWS-SI-08
+
+Business-name
+
+Rejection
+
+provides
+
+rejects post-
+
+fuzzy match
+
+message shown
+
+competitor URL
+
+scrape; contract
+
+prefill unaffected
+
+GTC-006
+
+trigger_surface="
+
+IM dealer list row
+
+IM preview
+
+IM sees diff
+
+im_provisioning";
+
+shows contract
+
+address diff
+
+values + address
+
+found
+
+diff highlighted
+
+inline; no IM
+
+action/save
+
+possible
+
+9.5 Quality Dimensions
+
+Explicit quality dimensions with thresholds for every LLM-generated output
+
+(Principle 2).
+
+Dimension
+
+Description
+
+Target Threshold Regression
+
+Eval Method
+
+Threshold
+
+Accuracy
+
+Factual
+
+>= 95%
+
+< 90% blocks
+
+Deterministic +
+
+correctness of
+
+responses
+
+LLM-as-judge
+
+Completeness
+
+All required
+
+>= 90%
+
+< 85% blocks
+
+Schema
+
+information
+
+included
+
+validation
+
+Tone
+
+Professional,
+
+>= 4/5
+
+< 3/5 flags
+
+LLM-as-judge
+
+contextually
+
+appropriate
+
+Safety
+
+No harmful,
+
+100%
+
+< 100% blocks
+
+Deterministic +
+
+private, or
+
+hallucinated
+
+content
+
+red-team
+
+9.6 Failure Mode Coverage
+
+Failure Type
+
+Applicable?
+
+Specific Risk
+
+Mitigation
+
+Test Strategy
+
+Logic
+
+Y
+
+Field mapping
+
+Confidence
+
+Unit tests with
+
+may misidentify
+
+scoring + field-
+
+diverse HTML
+
+fields on non-
+
+type validation
+
+fixtures
+
+standard dealer
+
+websites
+
+Integration
+
+Y
+
+Website
+
+Timeout,
+
+Pipeline tests
+
+Behavioral
+
+Quality
+
+Drift
+
+Context
+
+Safety
+
+N
+
+Y
+
+Y
+
+N
+
+Y
+
+unreachable,
+
+robots.txt check,
+
+with mock HTTP
+
+slow, redirecting,
+
+MIME type guard
+
+responses
+
+or unexpected
+
+content type
+
+No LLM
+
+N/A
+
+N/A
+
+reasoning in
+
+happy path
+
+Scraped values
+
+Confidence
+
+Golden set with
+
+may be outdated
+
+threshold; Dealer
+
+known-correct
+
+or incorrect
+
+Admin always
+
+vs. outdated
+
+confirms
+
+websites
+
+Dealer website
+
+Monitor scrape
+
+Weekly
+
+HTML structure
+
+success rates
+
+regression on
+
+changes over
+
+time
+
+dealer URL
+
+golden set
+
+Intent scoped to
+
+N/A
+
+N/A
+
+Dealer Details
+
+Review screen
+
+Scrape must not
+
+Read-only HTTP
+
+Red-team
+
+write to, submit
+
+GET; no
+
+verification that
+
+forms on, or
+
+cookies/session
+
+no
+
+authenticate with
+
+storage
+
+POST/PUT/auth
+
+dealer website
+
+calls are made
+
+Coordination
+
+N
+
+Intent operates
+
+N/A
+
+N/A
+
+independently
+
+§10. Success Metrics & Evaluation
+
+10.1 Business KPIs
+
+KPI
+
+Current Baseline
+
+Target
+
+Measurement
+
+Timeline
+
+Method
+
+Blank-field rate at
+
+~100% (all fields
+
+0%
+
+TAO analytics —
+
+At TAO V1 launch
+
+screen open
+
+blank today)
+
+blank screen
+
+loads / total loads
+
+Dealer Details
+
+TBD — measure
+
+Reduce by >=
+
+TAO analytics —
+
+30 days post-
+
+screen
+
+at TAO V1 launch
+
+40% vs. baseline
+
+screen open to
+
+launch
+
+completion time
+
+submit
+
+Dealer Admin
+
+N/A
+
+< 15% of
+
+DA_edit events /
+
+30 days post-
+
+field correction
+
+rate
+
+contract-prefilled
+
+total contract
+
+launch
+
+fields manually
+
+fields shown
+
+corrected
+
+Website diff
+
+N/A
+
+Target >= 50%
+
+Accepted
+
+30 days post-
+
+acceptance rate
+
+website diffs /
+
+launch
+
+total diff rows
+
+shown
+
+Dealer Details
+
+TBD — measure
+
+Reduce by >=
+
+TAO analytics —
+
+30 days post-
+
+form validation
+
+at TAO V1 launch
+
+60% vs. baseline
+
+validation errors
+
+launch
+
+error rate
+
+on submit
+
+10.2 Agent Evaluation Criteria
+
+Metric
+
+Definition
+
+Target
+
+Regression
+
+Cadence
+
+Threshold
+
+Intent match rate % correctly
+
+> 95%
+
+< 90% triggers
+
+Weekly
+
+classified
+
+review
+
+Golden set pass
+
+% golden
+
+> 98%
+
+< 95% blocks
+
+Per deploy
+
+rate
+
+scenarios
+
+passing
+
+release
+
+Quality
+
+Per-dimension
+
+Per §9.5 targets
+
+Per §9.5
+
+Per deploy
+
+dimension scores
+
+eval scores
+
+regression
+
+Invariant violation
+
+% operations
+
+0%
+
+> 0% blocks
+
+Continuous
+
+rate
+
+violating
+
+invariants
+
+release
+
+10.3 Invariants (Continuous Checks)
+
+Properties that must ALWAYS hold — checked on every operation, not
+
+periodically (Principle 5).
+
+Invariant
+
+Description
+
+Check Frequency
+
+Enforcement
+
+Layer 1 must precede
+
+Dealer Admin screen
+
+Every screen load
+
+Hard block
+
+Layer 2
+
+must never render
+
+without Layer 1
+
+contract data present
+
+Screen is never blank
+
+Contract values fill
+
+Every render
+
+Hard block
+
+every field; Layer 2
+
+cannot make a field
+
+emptier than Layer 1
+
+left it
+
+Read-only scrape
+
+Scraper never submits
+
+Every scrape
+
+Hard block
+
+forms, writes cookies,
+
+or authenticates
+
+Dealer Admin
+
+No value persisted
+
+Every save
+
+Hard block
+
+confirmation required
+
+without explicit Dealer
+
+before save
+
+Admin submit action
+
+Dealer isolation
+
+Scrape/comparison
+
+Every render
+
+Hard block
+
+results for one
+
+dealership never
+
+shown to another
+
+URL validation before
+
+DWS-SI-02 must
+
+Every relevant scrape Hard block
+
+user-provided scrape
+
+never run on
+
+dealer_provided_url
+
+unless DWS-SI-08
+
+passed it
+
+IM cannot save dealer
+
+IM surface is read-
+
+Every write
+
+Hard block
+
+details
+
+only; write endpoint
+
+rejects IM provisioning
+
+saves
+
+Data integrity
+
+No orphaned
+
+Every write
+
+Hard block
+
+references, append-
+
+only IDs
+
+Privacy
+
+No private content in
+
+Every export
+
+Hard block
+
+external outputs
+
+10.4 Related Intents & Dependencies
+
+Upstream Dependencies
+
+Intent ID
+
+Intent Name
+
+Dependency Type
+
+Notes
+
+TAO-CONTRACT-001
+
+Contract Signature &
+
+Data
+
+(implicit)
+
+Dealer Intake
+
+TAO-COA-001
+
+COA / Financial
+
+Workflow
+
+Statement Upload
+
+(Step 7)
+
+dealer_website_url
+
+must be captured at
+
+contract signature
+
+Same Configure
+
+Phase; no direct
+
+dependency
+
+Downstream Effects
+
+Intent ID
+
+Intent Name
+
+Effect Type
+
+Notes
+
+TAO Configure Phase
+
+Dealer Details
+
+Workflow
+
+DWS-001 completion
+
+— next step
+
+confirmed →
+
+unblocks the next step
+
+Configure Phase
+
+proceeds
+
+§11. Follow-Up Patterns
+
+Pattern
+
+Trigger
+
+Agent Response
+
+Dealer Admin edits a prefilled
+
+Dealer Admin changes a
+
+Accept the edit silently; edited
+
+field
+
+prefilled value in the form
+
+value replaces prefilled value
+
+— Dealer Admin is always the
+
+source of truth
+
+Dealer Admin requests re-
+
+Dealer Admin triggers /prefill-
+
+Check debounce window; if
+
+scrape
+
+dealer-details
+
+allowed, re-run DWS-SI-02
+
+through DWS-SI-04; if within
+
+debounce, show “Please wait
+
+before retrying”
+
+Prefill partially succeeds
+
+DWS-SI-03 returns a partial
+
+Prefill found fields; leave
+
+field map
+
+unfound fields blank with
+
+standard placeholder text; do
+
+not show partial-failure
+
+message
+
+§12. Technical Approach
+
+Standard feature mode — engineering-review format. AI capability mapping
+
+not required.
+
+Architecture — Two-Layer Model
+
+This feature has two independent layers that compose on the Dealer Details Review screen.
+
+Layer 1 — Internal Data Sync (baseline, always runs)
+
+Data flow:  Salesforce → TOC → TAO
+
+1. TOC Sync Service — At IM provisioning stage, reads the dealer record from TOC. TAO does
+
+not connect to Salesforce directly — TOC is the single API call.
+
+2. TAO Dealer Record — Stores the TOC-sourced dealer record. Dealer Admin screen reads
+
+from here. Always populated before the Dealer Admin journey begins.
+
+Layer 2 — Website Scraping + Comparison (enrichment, additive)
+
+3. Scrape Trigger — Resolves the dealer website URL from the TAO dealer record. If no URL,
+
+Layer 2 is skipped entirely.
+
+4. Web Scraper Worker — HTTP GET to target URL (homepage + contact/about page).
+
+Enforces 5s timeout, robots.txt, MIME type guard, and read-only GET.
+
+5. Field Extractor — Parses raw HTML and extracts dealership name, DBA, address, phones,
+
+email, operating hours, and logo URL with confidence scores.
+
+6. Field Comparator — Compares extracted values against contract values and classifies fields
+
+as match, different, new, or missing.
+
+7. Comparison View Renderer — Injects comparison map into the Dealer Details Review
+
+screen.
+
+8. Session Cache — Caches comparison result keyed by (dealership_id, session_id).
+
+9. TAO Dealer Record Write — On Dealer Admin submit, confirmed final values are persisted.
+
+URL Validation (for dealer-admin-provided alternate URLs)
+
+10. URL Validator — Domain block-list check; scrape and fuzzy-match extracted business name
+
+against contract dealership name. Below 0.70 rejects, 0.70–0.85 prompts, and >= 0.85
+
+accepts silently.
+
+Non-Functional Requirements
+
+Screen load latency: Dealer Admin screen must render from Layer 1 data in < 500ms.
+
+Layer 1 is blocking: Dealer Admin cannot open the Dealer Details Review screen until DWS-
+
+SI-00 is complete.
+
+Layer 2 is always additive: Any Layer 2 failure falls back silently to Layer 1 data only.
+
+Rate limiting: Max 1 scrape per (dealership_id, session); max 1 user-triggered re-scrape per 5
+
+minutes per dealership.
+
+Security: Read-only HTTP GET only. No auth. No cookies. No form submissions.
+
+§13. Rollout Plan
+
+Standard feature mode — TAO V1 launch.
+
+Rollout Target: TAO V1
+
+This feature ships with TAO V1. There is no separate phased rollout — the feature is included in
+
+the initial product release. Rollout is controlled by feature flag  dws_prefill_enabled  for
+
+rapid kill-switch.
+
+Gate
+
+Criteria
+
+Owner
+
+Pre-launch
+
+Zero P0/P1 bugs in golden test
+
+Engineering
+
+cases GTC-001 through GTC-
+
+006
+
+Pre-launch
+
+DWS-SI-08 domain block-list
+
+PM
+
+reviewed and approved by PM
+
++ Legal
+
+Pre-launch
+
+Business-name fuzzy match
+
+Engineering + PM
+
+thresholds validated on real
+
+dealer names
+
+Pre-launch
+
+IM provisioning view updated
+
+Engineering
+
+to show scraped preview
+
+column
+
+Pre-launch
+
+“Use a different website” UI
+
+Engineering + UX
+
+component built and tested
+
+Post-launch monitoring
+
+Scrape success rate >= 50%;
+
+PM
+
+timeout rate <= 10%; Dealer
+
+Admin edit rate < 25%
+
+Rollback trigger
+
+P0: any scrape that writes to a
+
+Engineering on-call
+
+dealer website; any prefilled
+
+value saved without Dealer
+
+Admin confirmation
+
+Feature flag: dws_prefill_enabled  — set to  false  disables all scraping immediately. No
+
+data migration needed for rollback.
+
+Appendix A: ISD Versioning
+
+Version
+
+1.0
+
+Date
+
+Author
+
+Change Summary
+
+Aug 27, 2026
+
+Prem Bihari
+
+Initial ISD draft via
+
+(pbihari@tekion.com)
+
+paper-mcp isd_init
+
+(standard)
+
+Appendix B: PM-002 Scoring Rubric — Standard Mode (Reference)
+
+ISD Standard uses the same 13-section base rubric as the full template (100 base points) plus
+
+an 8-point v4.0 autonomy bonus for the two included v4.0 sections.
+
+Section
+
+Weight
+
+Full Credit
+
+Partial Credit
+
+No Credit (0%)
+
+(100%)
+
+(60%)
+
+§1 Metadata
+
+5pts
+
+§2 Intent
+
+Definition
+
+10pts
+
+All fields
+
+complete
+
+All criteria
+
+defined
+
+Missing optional
+
+Missing required
+
+fields
+
+fields
+
+Success criteria
+
+No meaningful
+
+only
+
+definition
+
+§3 NL Triggers
+
+8pts
+
+>= 5 triggers,
+
+3-4 triggers
+
+< 3 triggers
+
+mix,
+
+disambiguation
+
+§4 Parameters
+
+7pts
+
+All params with
+
+Sources defined
+
+Parameter list
+
+source and
+
+fallback
+
+only
+
+§5.1 Sub-Intents
+
+15pts
+
+IMS Recon
+
+Happy path only
+
+< 5 sub-intents
+
+granularity; all
+
+columns
+
+§6
+
+8pts
+
+Business-
+
+Caps listed, eng-
+
+Missing
+
+Capabilities/Skills
+
+language caps;
+
+language
+
+agent clear
+
+§7 Business
+
+10pts
+
+ECI contracts;
+
+ECI thresholds
+
+No safety model
+
+Rules
+
+policies
+
+only
+
+identified; §7.5
+
+present
+
+§8 Rendering
+
+5pts
+
+Mode declared
+
+Primary output
+
+No declaration
+
+for all outputs
+
+only
+
+§9 Conversations 8pts
+
+Happy path +
+
+Happy path only
+
+No scenarios
+
+edge cases +
+
+catalog
+
+§10 Metrics
+
+8pts
+
+KPIs + baselines
+
+KPIs without
+
+No metrics
+
++ attribution
+
+baselines
+
+§11 Follow-up
+
+5pts
+
+>= 2 patterns
+
+1 pattern
+
+None
+
+patterns
+
+§12 Technical
+
+6pts
+
+Constraints +
+
+Constraints only
+
+Absent
+
+Approach
+
+integrations +
+
+NFRs
+
+§13 Rollout Plan
+
+5pts
+
+Phase gates +
+
+Phase list
+
+Absent
+
+flags + rollback
+
+Autonomous Agent Bonus: §1.2 Autonomy Declaration (5pts) and §3.4 Event Triggers (3pts).
+
+Gate: Score >= 70 required for isd_export. Grand total: 108 max.
+
+ORBIT ISD | Intent ID: TAO-DWS-001 | PM-002 Score: 94/100 | Gate:
+
+PASS_GA | Status: Draft | Owner: 
+
+pbihari@tekion.com
+
+ | Eng Lead: Nitish
+
+Kumar | Review Date: 1 Sep 2026
+
+§1. Document Metadata
+
+Field
+
+Intent ID
+
+Value
+
+TAO-DWS-001
+
+Intent Name
+
+Dealer Website Scraping — Pre-fill
+
+Dealer Details Review
+
+Product Area
+
+Dealer Onboarding / TAO
+
+Module / Sub-Area
+
+TAO Configure Phase — Dealer
+
+Details Review Screen
+
+Document Owner (PM)
+
+pbihari@tekion.com
+
+Engineering Lead
+
+Nitish Kumar
+
+Status
+
+Version
+
+Last Updated
+
+Review Date
+
+Draft
+
+1.0
+
+2026-08-27
+
+1st September 2026
+
+Source Reference
+
+TAO_User_Journey.md — Dealer
+
+Details Review screen
+
+Linked Persona(s)
+
+Dealer Admin
+
+ORBIT Template Version
+
+ISD-v4.5-standard
+
+1.2 Autonomy Declaration
+
+Field
+
+Value
+
+Execution Model
+
+hybrid — event-driven at Dealer
+
+Admin screen load AND proactive at
+
+IM provisioning stage
+
+Autonomy Tier (ORBIT S04)
+
+A1 (Suggest-Only) — scraper
+
+proposes prefilled values; human
+
+must confirm at every surface
+
+Target Autonomy Tier (GA)
+
+A1 (suggest-only) — confirmation
+
+always required; no auto-save of
+
+scraped data
+
+Trigger Classification
+
+event-triggered (Dealer Admin
+
+screen load) + proactive (IM
+
+provisioning stage)
+
+Context Persistence
+
+session-scoped for Dealer Admin
+
+path; provisioning-record-scoped
+
+for IM path
+
+Execution Surface
+
+TAO backend service — server-side
+
+Background Execution
+
+Yes — scrape runs in background;
+
+result cached; neither Dealer Admin
+
+screen nor IM view is blocked
+
+§2. Intent Definition
+
+2.1 Primary Intent and Success Criteria
+
+Field
+
+Value
+
+Primary Intent
+
+Populate the TAO Dealer Details
+
+Review screen from two sources —
+
+(1) TOC/contract data as the
+
+always-present baseline, and (2)
+
+website scraping as an enrichment
+
+layer — then present a before/after
+
+comparison for Dealer Admin
+
+confirmation
+
+Success Criteria
+
+(1) Dealer Details Review screen is
+
+never blank — TOC/contract data
+
+always prefills it. (2) If a website
+
+exists, a comparison view shows
+
+what the website found vs. what is
+
+already on file, field by field. (3)
+
+Dealer Admin confirms the final
+
+values once; no manual re-typing of
+
+data already known to Tekion.
+
+High — eliminates blank-form
+
+experience for all dealers regardless
+
+of website presence
+
+Value
+
+Golden Intent?
+
+Yes
+
+Automation Potential
+
+Partial — TOC sync and scraping
+
+are fully automated; Dealer Admin
+
+confirmation is always manual (A1)
+
+Expected Volume
+
+1 TOC-sync invocation per dealer
+
+provisioning + 1 scrape per Dealer
+
+Admin session
+
+2.2 User Personas
+
+Persona
+
+Role
+
+Primary Use Case
+
+Dealer Admin
+
+Primary dealership-
+
+Reviews, edits, and
+
+side owner
+
+confirms prefilled
+
+dealer details; can
+
+provide a corrected
+
+website URL
+
+Implementation
+
+Tekion-side operator
+
+Views scraped dealer
+
+Manager (IM)
+
+details during
+
+provisioning to verify
+
+info before the Dealer
+
+Admin journey begins
+
+2.3 Business Context
+
+The Dealer Details Review screen must never be blank. When a dealer signs a contract with
+
+Tekion, their basic details — name, address, phone, website URL — are captured in Salesforce.
+
+Salesforce is already integrated with TOC (Tekion Operating Cloud) and syncs dealer data into
+
+TOC as part of the contracting and provisioning pipeline. TAO connects to TOC only; TAO does
+
+not read from Salesforce directly.
+
+Data flow: Salesforce → TOC → TAO
+
+Layer 1 — Internal data sync (baseline, always present): At provisioning stage, TAO reads
+
+dealer details from TOC (which already holds the Salesforce-synced contract data plus any
+
+provisioning-stage updates). When the Dealer Admin opens the Dealer Details Review screen,
+
+all fields are already populated. There is no TAO-side merge step — TOC owns the
+
+reconciliation.
+
+Layer 2 — Website scraping (enrichment, additive): For dealers with a public website, TAO
+
+scrapes it and compares what it finds against the on-file record. The website scrape surfaces
+
+differences without discarding what Tekion already knows.
+
+The Dealer Admin experience: When the Dealer Admin opens the screen they see:
+
+All fields pre-populated from TOC record, labelled "From your records on file"
+
+Where the website found something different or new: "On file: 123 Main St | Found on
+
+website: 123 Main Street, Suite 100 | Use website version?"
+
+Where the website found the same value → a quiet checkmark
+
+Where the website found nothing → on-file value shown alone
+
+Small dealers with no website: TOC/contract data fills the screen completely. No comparison
+
+rows. This is the ideal baseline — not a degraded experience.
+
+§3. Natural Language Triggers
+
+3.1 Example Triggers
+
+Trigger Phrase
+
+Confidence
+
+Context
+
+Dealer Details Review
+
+High
+
+Fires automatically on
+
+screen load event
+
+(system trigger)
+
+screen load
+
+"Prefill my dealership
+
+High
+
+info"
+
+Dealer Admin requests
+
+prefill from website
+
+"Use my website to fill
+
+High
+
+Dealer Admin provides
+
+in these details"
+
+"Look up my
+
+dealership"
+
+Medium
+
+intent
+
+Could be website
+
+scrape or internal
+
+lookup
+
+"Fill in my address from
+
+Medium
+
+Field-specific request
+
+my website"
+
+3.2 Disambiguation Notes
+
+This intent is event-triggered (screen load), not conversational in the primary path. Resolve
+
+ambiguous lookup requests by: checking if dealer has a website URL on file; if yes, default to
+
+website scrape.
+
+3.3 Slash Commands
+
+Command
+
+Description
+
+/prefill-dealer-details
+
+Manually trigger a website scrape to
+
+re-populate the screen
+
+3.4 Event Triggers
+
+Trigger Type
+
+Event Source
+
+Condition
+
+Debounce
+
+IM provisioning
+
+TAO IM portal
+
+Dealer record
+
+Max 1 scrape per
+
+stage load
+
+enters
+
+dealer
+
+provisioning
+
+provisioning
+
+state AND
+
+record
+
+dealer_website_u
+
+rl is present
+
+Dealer Admin
+
+TAO frontend —
+
+Screen renders
+
+Max 1 auto-
+
+screen-load
+
+Dealer Details
+
+for the first time
+
+scrape per
+
+event
+
+Review screen
+
+in this session
+
+session
+
+AND
+
+dealer_website_u
+
+rl is available
+
+Dealer Admin
+
+Dealer Admin
+
+Dealer Admin
+
+Max 1 per 5
+
+provides
+
+input on screen
+
+submits a URL
+
+minutes per
+
+alternate URL
+
+AND URL passes
+
+dealership
+
+validation (DWS-
+
+SI-08)
+
+Manual re-
+
+Dealer Admin-
+
+Dealer Admin
+
+Max 1 per 5
+
+scrape (/prefill-
+
+invoked
+
+explicitly
+
+minutes per
+
+dealer-details)
+
+requests re-
+
+dealership
+
+scrape
+
+§4. Parameters
+
+Parameter
+
+Type
+
+Required
+
+Source
+
+If Missing
+
+dealership_id string
+
+Required
+
+TAO session
+
+Block
+
+context
+
+execution
+
+session_id
+
+string
+
+Required
+
+TAO session
+
+Block
+
+context
+
+execution
+
+toc_dealer_d
+
+object
+
+Required
+
+TOC dealer
+
+Block
+
+ata
+
+record
+
+(single
+
+execution —
+
+screen
+
+source; holds
+
+cannot
+
+Salesforce-
+
+render
+
+synced
+
+without TOC
+
+contract data
+
+baseline
+
++
+
+provisioning
+
+updates)
+
+dealer_websi
+
+string (URL)
+
+Optional
+
+TOC dealer
+
+Skip
+
+te_url
+
+record (from
+
+scraping
+
+Salesforce
+
+layer; screen
+
+contract at
+
+renders from
+
+deal close)
+
+toc_dealer_d
+
+ata
+
+dealer_provi
+
+string (URL)
+
+Optional
+
+Dealer Admin
+
+N/A — must
+
+ded_url
+
+input ("Try a
+
+pass DWS-
+
+different
+
+SI-08
+
+website")
+
+validation
+
+scrape_timeo
+
+number
+
+Optional
+
+TAO backend
+
+Use default
+
+ut_ms
+
+5000ms
+
+config
+
+(default:
+
+5000ms)
+
+fields_to_co
+
+string[]
+
+Optional
+
+TAO
+
+Default:
+
+mpare
+
+configuration
+
+dealership_n
+
+ame,
+
+address, city,
+
+state, zip,
+
+trigger_surfa
+
+enum
+
+Required
+
+ce
+
+System
+
+context
+
+phone,
+
+website_url
+
+Default to
+
+"da_screen"
+
+§5. Execution Flow
+
+5.1 Sub-Intents
+
+Sub-Intent
+
+Description
+
+Trigger
+
+Safety Gate
+
+Phase
+
+Condition
+
+DWS-SI-00:
+
+Read dealer
+
+Dealer enters
+
+Required —
+
+MVP
+
+Sync TOC
+
+details from
+
+provisioning
+
+blocks
+
+dealer data
+
+TOC; write
+
+state
+
+to TAO
+
+into TAO
+
+dealer record
+
+dealer
+
+Dealer Admin
+
+screen load if
+
+not complete
+
+record. No
+
+TAO-side
+
+merge —
+
+TOC is single
+
+source.
+
+DWS-SI-
+
+After TOC
+
+DWS-SI-00
+
+IM preview is
+
+MVP
+
+00b: IM
+
+sync,
+
+completes
+
+read-only;
+
+provisioning
+
+proactively
+
+AND
+
+IM cannot
+
+scrape
+
+preview
+
+scrape
+
+dealer
+
+dealer_websi
+
+confirm or
+
+te_url is
+
+save
+
+website (if
+
+present
+
+URL present)
+
+and surface
+
+comparison
+
+preview in
+
+IM dealer list
+
+view
+
+DWS-SI-01a:
+
+On Dealer
+
+Dealer Admin
+
+Required —
+
+MVP
+
+Load internal
+
+Admin
+
+Dealer
+
+screen must
+
+data prefill
+
+screen load,
+
+Details
+
+never be
+
+read TOC-
+
+Review
+
+blank; blocks
+
+sourced
+
+screen loads
+
+if DWS-SI-
+
+dealer record
+
+and render
+
+as baseline
+
+prefill
+
+00 has not
+
+run
+
+DWS-SI-01b:
+
+Look up
+
+DWS-SI-01a
+
+If no URL →
+
+MVP
+
+Resolve
+
+dealer
+
+completes
+
+skip to DWS-
+
+dealer
+
+website URL
+
+website URL
+
+from TOC
+
+record;
+
+check for IM
+
+pre-scrape
+
+cache
+
+SI-04
+
+(contract-
+
+only view)
+
+DWS-SI-02:
+
+Fetch and
+
+URL resolved
+
+Rate limit;
+
+MVP
+
+Scrape
+
+public
+
+website
+
+parse dealer
+
+OR Dealer
+
+robots.txt
+
+website;
+
+Admin-
+
+check; read-
+
+read-only
+
+provided
+
+only GET
+
+GET only; 5s
+
+URL after
+
+only; scrape
+
+timeout
+
+DWS-SI-08
+
+failure →
+
+passes
+
+silent
+
+fallback
+
+DWS-SI-03:
+
+For each
+
+Scrape
+
+Confidence
+
+MVP
+
+Compare
+
+field: classify
+
+completed
+
+gate: only
+
+scraped data
+
+as Match /
+
+against on-
+
+Different /
+
+file data
+
+New /
+
+Missing
+
+fields >=
+
+0.80
+
+confidence
+
+enter
+
+comparison
+
+DWS-SI-04:
+
+Render
+
+DWS-SI-03
+
+A1 gate —
+
+MVP
+
+Present
+
+baseline +
+
+complete OR
+
+Dealer Admin
+
+comparison
+
+comparison
+
+no scrape
+
+must submit;
+
+view to
+
+diff rows +
+
+ran
+
+Dealer Admin
+
+no value
+
+saved
+
+match
+
+indicators
+
+without
+
+explicit
+
+Dealer Admin
+
+action
+
+DWS-SI-05:
+
+Dealer Admin
+
+No URL
+
+None —
+
+MVP
+
+No-scrape
+
+sees
+
+found OR
+
+contract data
+
+path
+
+contract-
+
+scrape
+
+already
+
+prefilled
+
+fails/times
+
+shown; no
+
+screen with
+
+out
+
+degradation
+
+no
+
+comparison
+
+rows; no
+
+error shown
+
+DWS-SI-06:
+
+Persist
+
+Dealer Admin
+
+Required
+
+MVP
+
+Save
+
+Dealer
+
+submits
+
+field
+
+confirmed
+
+Admin-
+
+confirmed
+
+validation;
+
+dealer details
+
+confirmed
+
+details
+
+block if
+
+final values
+
+to TAO
+
+dealer record
+
+mandatory
+
+fields empty
+
+DWS-SI-07:
+
+Dealer Admin
+
+Dealer Admin
+
+Route to
+
+MVP
+
+Dealer Admin
+
+inputs a
+
+submits a
+
+DWS-SI-08
+
+provides
+
+corrected
+
+URL
+
+for validation
+
+alternate
+
+URL via "Try
+
+website URL
+
+a different
+
+website"
+
+DWS-SI-08:
+
+Domain
+
+DWS-SI-07
+
+Hard gate:
+
+MVP
+
+Validate
+
+block-list
+
+fires
+
+user-
+
+check; post-
+
+provided
+
+scrape
+
+URL
+
+business-
+
+name fuzzy
+
+match >=
+
+0.70 against
+
+contract
+
+rejection or
+
+confirmation
+
+prompt
+
+shown to
+
+Dealer Admin
+
+dealership
+
+name
+
+§6. Capabilities, Skills & Agent Assignment
+
+6.1 Agent Assignment
+
+Field
+
+Agent
+
+Value
+
+TAO Onboarding Agent (T1 Base)
+
+Agent Description
+
+Handles dealer-side self-service
+
+onboarding steps within TAO; this
+
+intent adds a web scraping sub-
+
+capability to the Configure Phase
+
+screen load sequence
+
+6.2 Capability Needs
+
+Capability Need
+
+Business Description
+
+Data Returned
+
+TOC dealer data read
+
+Read dealer details
+
+Structured dealer
+
+from TOC dealer
+
+details object
+
+record (holds
+
+Salesforce-synced
+
+contract data +
+
+provisioning updates)
+
+TAO dealer record write
+
+Write TOC-sourced
+
+Write confirmation
+
+(internal sync)
+
+record into TAO dealer
+
+record at provisioning
+
+Public website fetch
+
+Retrieve HTML from
+
+Raw HTML
+
+dealer's public website
+
+(homepage +
+
+contact/about page)
+
+HTML text extraction +
+
+Parse HTML, extract
+
+Structured comparison
+
+field compare
+
+fields, assign
+
+map
+
+confidence scores,
+
+compare against on-
+
+(Match/Different/New/
+
+file data
+
+Missing)
+
+Comparison view
+
+Render before/after
+
+Per-field comparison
+
+render
+
+comparison UI on
+
+rows
+
+Dealer Details Review
+
+screen
+
+TAO dealer record write
+
+Persist Dealer Admin-
+
+Confirmation receipt
+
+(confirmed)
+
+confirmed final values
+
+after Dealer Admin
+
+submits
+
+6.3 Skill Inventory
+
+Skill Name
+
+Knowledge Description Reusable Across
+
+dealer-web-scrape
+
+Fetches dealer's public
+
+Any TAO step needing
+
+website; extracts
+
+dealer info from their
+
+business name,
+
+public website
+
+address, phone, URL
+
+fields
+
+dealer-details-mapper Maps raw scraped text
+
+Future TAO screens
+
+to TAO field schema;
+
+showing dealer info
+
+handles address
+
+normalization, phone
+
+formatting, confidence
+
+scoring
+
+6.4 Data Sources
+
+Data Source
+
+Description
+
+Access Pattern
+
+TOC (Tekion Operating
+
+Single source of dealer
+
+Read via TOC API at
+
+Cloud) dealer record
+
+truth for TAO. Holds
+
+provisioning time
+
+Salesforce-synced
+
+(DWS-SI-00); TAO
+
+contract data plus
+
+does not connect to
+
+provisioning-stage
+
+Salesforce directly
+
+updates.
+
+Salesforce→TOC sync
+
+is upstream of TAO.
+
+TAO dealer record
+
+TAO's internal dealer
+
+Read at Dealer Admin
+
+data store; holds the
+
+screen load (DWS-SI-
+
+TOC-sourced record
+
+01a); Written at
+
+used to prefill the
+
+provisioning sync
+
+Dealer Admin screen
+
+(DWS-SI-00) and after
+
+Dealer Admin
+
+confirmation (DWS-SI-
+
+06)
+
+Dealer's public website Publicly accessible
+
+Read-only HTTP GET;
+
+HTML —
+
+respects robots.txt; no
+
+enrichment/compariso
+
+auth; homepage +
+
+n layer (Layer 2)
+
+contact/about page
+
+6.5 Content Requirements
+
+Content Type
+
+Audience
+
+Format
+
+Internal-data prefill
+
+Dealer Admin
+
+All fields pre-populated
+
+baseline
+
+from TOC record;
+
+labelled "From your
+
+records on file"
+
+Comparison diff row
+
+Dealer Admin
+
+"On file: [value] / Found
+
+on your website:
+
+[value] / Use website
+
+version? [Yes] [Keep on
+
+file]"
+
+Match indicator
+
+Dealer Admin
+
+Quiet green
+
+checkmark: "✓
+Matches your website"
+
+IM comparison preview Implementation
+
+Read-only inline row in
+
+Manager
+
+dealer list: contract
+
+value vs. website value
+
+per field
+
+URL validation rejection Dealer Admin
+
+"The website you
+
+provided doesn't
+
+appear to be for
+
+[Dealership Name].
+
+Please check the URL
+
+and try again."
+
+Borderline match
+
+Dealer Admin
+
+"We found [scraped
+
+confirmation
+
+name] on this website
+
+— is this your
+
+dealership? [Yes, use
+
+this website] [No, try a
+
+different URL]"
+
+§7. Business Rules & Safety
+
+7.1 ECI Contract — Action Safety Levels
+
+Sub-Intent
+
+Risk Level
+
+Requires
+
+Notes
+
+Confirmation
+
+DWS-SI-00:
+
+write (internal)
+
+false
+
+TOC sync to TAO
+
+record
+
+DWS-SI-00b: IM
+
+read-only
+
+false
+
+provisioning
+
+scrape preview
+
+IM-triggered;
+
+deterministic
+
+IM sees result;
+
+cannot confirm
+
+or save
+
+DWS-SI-01a:
+
+read-only
+
+false
+
+Required
+
+Load internal
+
+data prefill
+
+baseline; never
+
+skipped
+
+DWS-SI-02:
+
+read-only
+
+false
+
+Read-only GET
+
+Scrape public
+
+website
+
+DWS-SI-03:
+
+read-only
+
+false
+
+Compare
+
+only
+
+Fields < 0.80
+
+confidence
+
+suppressed
+
+scraped vs. on-
+
+file data
+
+DWS-SI-04:
+
+read-only
+
+true — Dealer
+
+A1 gate
+
+Present
+
+(display)
+
+Admin must
+
+comparison view
+
+submit to save
+
+DWS-SI-05: No-
+
+read-only
+
+true — Dealer
+
+Contract data
+
+scrape path
+
+(display)
+
+Admin must still
+
+shown; Dealer
+
+submit
+
+Admin confirms
+
+DWS-SI-06:
+
+write
+
+true — Dealer
+
+Never auto-
+
+Save confirmed
+
+details
+
+Admin submit is
+
+saved
+
+the trigger
+
+DWS-SI-07:
+
+read-only (input)
+
+false
+
+Routes to DWS-
+
+Dealer Admin
+
+provides
+
+alternate URL
+
+SI-08
+
+DWS-SI-08:
+
+read-only
+
+true — result
+
+Hard gate
+
+Validate user-
+
+(validation)
+
+shown to Dealer
+
+provided URL
+
+Admin
+
+7.2 Business Rules — Policy Lake
+
+Policy ID
+
+Rule
+
+Scope
+
+POL-TAO-DWS-001-
+
+Screen must never be
+
+DWS-SI-00, DWS-SI-
+
+000
+
+blank: TOC data must
+
+01a
+
+be synced to TAO
+
+dealer record before
+
+Dealer Admin opens
+
+screen
+
+POL-TAO-DWS-001-
+
+Data flow is Salesforce
+
+DWS-SI-00
+
+000a
+
+→ TOC → TAO. TAO
+
+reads from TOC only.
+
+TOC owns
+
+reconciliation of
+
+Salesforce +
+
+provisioning data.
+
+POL-TAO-DWS-001-
+
+Scraping is read-only:
+
+All scrape executions
+
+001
+
+HTTP GET only —
+
+never POST, submit
+
+forms, authenticate, or
+
+store cookies
+
+POL-TAO-DWS-001-
+
+Dealer Admin must
+
+DWS-SI-04, DWS-SI-
+
+002
+
+explicitly confirm final
+
+05, DWS-SI-06
+
+values before save —
+
+no auto-save
+
+POL-TAO-DWS-001-
+
+No-website is not a
+
+DWS-SI-05
+
+003
+
+degraded state: Dealer
+
+Admin sees fully
+
+prefilled form from
+
+TOC/contract data with
+
+no website-related UI
+
+POL-TAO-DWS-001-
+
+Scrape failure is not a
+
+DWS-SI-05
+
+004
+
+degraded state: on
+
+failure, Dealer Admin
+
+sees the prefilled form
+
+with no comparison
+
+rows — no error
+
+POL-TAO-DWS-001-
+
+Only fields with
+
+DWS-SI-03, DWS-SI-
+
+005
+
+confidence >= 0.80
+
+04
+
+shown as prefilled
+
+without warning; fields
+
+below 0.80 display
+
+warning badge
+
+POL-TAO-DWS-001-
+
+Scraping must respect
+
+DWS-SI-02
+
+006
+
+robots.txt: if disallowed,
+
+skip scrape silently
+
+POL-TAO-DWS-001-
+
+User-provided URLs
+
+DWS-SI-08
+
+007
+
+must pass domain
+
+block-list check before
+
+scraping (blocks
+
+Google, Facebook,
+
+Yelp, etc.)
+
+POL-TAO-DWS-001-
+
+User-provided URL
+
+DWS-SI-08
+
+008
+
+scrape must fuzzy-
+
+match dealership name
+
+>= 0.70; below
+
+threshold → reject with
+
+message
+
+POL-TAO-DWS-001-
+
+IM pre-scraped data is
+
+DWS-SI-00
+
+009
+
+informational only —
+
+IM cannot confirm or
+
+save dealer details
+
+7.3 Escalation Rules
+
+Condition
+
+Escalation Path
+
+Notification Target
+
+Scrape consistently
+
+Log to TAO ops
+
+TAO ops team (internal
+
+fails for a dealership
+
+dashboard
+
+only)
+
+across 3+ sessions
+
+Dealer Admin manually
+
+Flag to PM for data
+
+TAO product analytics
+
+overrides all prefilled
+
+quality review
+
+fields in 3+
+
+consecutive sessions
+
+7.4 Compliance & Legal
+
+TAO must respect  robots.txt  on the dealer's website.
+
+Only the dealer's own website URL (from contract) may be scraped — no third-party lookups
+
+for MVP.
+
+No personal data is scraped; all fields are business-level public details.
+
+Legal review recommended before GA if scope expands beyond MVP fields.
+
+7.5 Data Access Constraints
+
+Constraint Type
+
+Rule
+
+Applies To
+
+RBAC
+
+Dealer Admin: view and
+
+DWS-SI-00 (IM),
+
+confirm prefilled
+
+DWS-SI-04/DWS-SI-
+
+details; may provide
+
+06 (Dealer Admin)
+
+alternate URL. IM: view
+
+read-only scrape
+
+preview; cannot
+
+confirm or save
+
+PII Handling
+
+Scraped fields are
+
+All sub-intents
+
+business-level public
+
+details — no PII
+
+masking required
+
+Cross-Dealer Isolation
+
+Scrape cache keyed by
+
+DWS-SI-01 through
+
+(dealership_id,
+
+DWS-SI-06
+
+session_id) — no
+
+cross-dealer data
+
+leakage
+
+Data Residency
+
+Scraped data cached
+
+DWS-SI-02, DWS-SI-
+
+and stored in US region
+
+03
+
+only for MVP
+
+7.6 Known Risks
+
+Risk ID
+
+Description
+
+Likelihood
+
+Impact
+
+Mitigation
+
+R-001
+
+Dealer
+
+High
+
+Low
+
+Silent
+
+website not
+
+publicly
+
+accessible,
+
+behind auth,
+
+or has no
+
+contact page
+
+fallback to
+
+TOC-
+
+prefilled form
+
+(DWS-SI-05)
+
+R-002
+
+Scraped
+
+Medium
+
+Medium
+
+Confidence
+
+values are
+
+wrong or
+
+outdated
+
+gate
+
+(>=0.80);
+
+Dealer Admin
+
+always
+
+confirms
+
+Medium
+
+Low
+
+robots.txt
+
+R-003
+
+Dealer
+
+website
+
+blocks
+
+scraping via
+
+robots.txt
+
+R-004
+
+Scrape >5s
+
+Low
+
+High
+
+blocks
+
+screen load
+
+R-005
+
+Dealer has
+
+High
+
+None
+
+no website
+
+(small/rural
+
+dealers)
+
+R-006
+
+Dealer Admin
+
+Low–Medium High
+
+provides
+
+wrong URL
+
+intentionally
+
+or
+
+accidentally
+
+check before
+
+scraping;
+
+silent skip
+
+Hard 5s
+
+timeout;
+
+async
+
+execution;
+
+screen loads
+
+immediately
+
+No-website
+
+is first-class
+
+fallback; no
+
+degraded UI
+
+DWS-SI-08
+
+block-list +
+
+fuzzy match
+
+(>=0.70)
+
+R-007
+
+Dealer Admin
+
+Medium
+
+Medium
+
+Fuzzy match;
+
+provides
+
+group HQ
+
+URL instead
+
+of rooftop
+
+URL
+
+borderline
+
+(0.70–0.85)
+
+→
+
+confirmation
+
+prompt
+
+7.10 Financial Controls
+
+N/A — this intent does not handle financial transactions. Dealer website scraping is a data pre-
+
+fill feature; no monetary values, GL coding, or financial reconciliation are involved.
+
+§8. Rendering Declaration
+
+8.1 Rendering Mode
+
+Response Type
+
+Preferred Mode
+
+Required Components
+
+Prefilled fields on
+
+agui (inline form, pre-
+
+Prefill indicator label;
+
+Dealer Details Review
+
+populated, editable)
+
+confidence badge;
+
+screen
+
+editable inputs;
+
+confirm/submit button
+
+Scrape failure message basic (inline advisory,
+
+"We couldn't find your
+
+non-blocking)
+
+details automatically —
+
+please fill in below"
+
+Manual re-scrape
+
+basic (status feedback)
+
+Inline spinner; update
+
+trigger
+
+fields when complete
+
+8.2 Orchestration Handoffs
+
+Handoff Trigger
+
+Target
+
+Context Passed
+
+Handoff Type
+
+Dealer Admin
+
+TAO Configure
+
+Confirmed fields
+
+Blocking —
+
+confirms dealer
+
+Phase — next
+
+(name, address,
+
+Dealer Admin
+
+details
+
+step
+
+phone,
+
+must confirm
+
+website_url),
+
+before TAO
+
+dealership_id,
+
+advances
+
+session_id
+
+§9. Test Scenarios
+
+9.1 Happy Path Scenarios
+
+#
+
+1
+
+Trigger
+
+Agent Does
+
+Screen Result
+
+IM opens
+
+DWS-SI-00
+
+IM sees
+
+provisioning
+
+(TOC sync) →
+
+comparison
+
+queue; dealer
+
+DWS-SI-00b
+
+preview: on-file
+
+has website URL
+
+(proactive
+
+values vs.
+
+in TOC record
+
+scrape) →
+
+website values
+
+comparison map
+
+per field
+
+2
+
+Dealer Admin
+
+DWS-SI-01a →
+
+Dealer Admin
+
+opens screen;
+
+DWS-SI-03 →
+
+sees prefilled
+
+TOC sync
+
+DWS-SI-04
+
+fields + diff rows
+
+complete; scrape
+
+result cached
+
+from IM pre-
+
+scrape
+
+for changed
+
+fields;
+
+accepts/rejects
+
+per field; clicks
+
+Confirm
+
+Dealer Admin
+
+DWS-SI-01a →
+
+All fields
+
+opens screen;
+
+DWS-SI-01b (no
+
+populated from
+
+small dealer, no
+
+URL) → DWS-
+
+TOC; no
+
+website URL
+
+SI-05 →
+
+comparison
+
+contract-only
+
+rows; no website
+
+view
+
+mention
+
+Scrape finds
+
+DWS-SI-03
+
+All fields pre-
+
+same values as
+
+classifies all as
+
+populated with
+
+TOC on all fields
+
+Match
+
+"✓ Matches your
+website"
+
+indicator; no diff
+
+rows
+
+Dealer Admin
+
+DWS-SI-08
+
+"We found
+
+provides
+
+shows
+
+[name] on this
+
+alternate URL;
+
+confirmation
+
+website — is this
+
+fuzzy match 0.82
+
+prompt
+
+your dealership?
+
+(borderline)
+
+[Yes] [No]"
+
+Condition
+
+Agent Does
+
+Screen Result
+
+dealer_website_u
+
+DWS-SI-05 →
+
+All fields from
+
+rl is null (no
+
+contract-only
+
+TOC; no
+
+website)
+
+view
+
+comparison rows
+
+Dealer website
+
+Scrape fails →
+
+Same as no-
+
+returns 403 /
+
+DWS-SI-05
+
+website case
+
+behind auth
+
+3
+
+4
+
+5
+
+9.2 Edge Case Scenarios
+
+#
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+Scraped phone
+
+DWS-SI-03
+
+Phone
+
+confidence 0.62
+
+suppresses
+
+comparison row
+
+(below 0.80)
+
+phone
+
+not shown
+
+Scrape times out
+
+DWS-SI-05 →
+
+Screen loads
+
+at 5s
+
+contract-only
+
+immediately; no
+
+view
+
+spinner; no error
+
+Dealer Admin
+
+DWS-SI-08
+
+"This doesn't
+
+provides
+
+rejects
+
+look like a
+
+"
+
+www.google.co
+
+immediately
+
+dealership
+
+m
+
+" (block-list)
+
+website."
+
+Scraped name
+
+DWS-SI-08
+
+"The website
+
+similarity 0.21 vs.
+
+rejects post-
+
+you provided
+
+contract name
+
+scrape
+
+doesn't appear
+
+to be for
+
+[Dealership
+
+Name]."
+
+TOC sync (DWS-
+
+DWS-SI-01a
+
+Screen shows
+
+SI-00) not yet
+
+blocked
+
+complete when
+
+Dealer Admin
+
+opens screen
+
+loading state;
+
+Dealer Admin
+
+cannot proceed
+
+9.3 Edge Case Catalog
+
+ID
+
+Condition
+
+Expected
+
+Behavior
+
+Severity
+
+EC-001
+
+TOC sync not
+
+Show loading
+
+Blocking
+
+complete when
+
+state; block
+
+Dealer Admin
+
+Dealer Admin;
+
+opens screen
+
+notify IM if
+
+delayed
+
+EC-002
+
+dealer_website_u
+
+Skip scraping;
+
+Non-blocking
+
+rl is null
+
+render contract-
+
+only view
+
+EC-003
+
+Dealer website
+
+Scraping
+
+Non-blocking
+
+behind auth /
+
+skipped;
+
+scrape fails
+
+contract-only
+
+view
+
+EC-004
+
+robots.txt
+
+disallows
+
+scraping
+
+Skip silently;
+
+Safety Gate
+
+contract-only
+
+view
+
+EC-005
+
+All scraped fields
+
+Suppress diff
+
+Non-blocking
+
+match on-file
+
+data
+
+rows; show "✓
+Matches your
+
+website" per
+
+field
+
+EC-006
+
+User-provided
+
+Reject
+
+Blocking
+
+URL on domain
+
+immediately
+
+block-list
+
+EC-007
+
+Scraped
+
+Reject; show
+
+Blocking
+
+business name
+
+rejection
+
+similarity < 0.70
+
+message
+
+EC-008
+
+Borderline match
+
+Show
+
+Warning
+
+(0.70–0.85)
+
+confirmation
+
+prompt
+
+EC-009
+
+Dealer Admin
+
+Block submit;
+
+Blocking
+
+submits with
+
+validation error
+
+required fields
+
+empty
+
+EC-010
+
+Dealer Admin re-
+
+Reject; "Please
+
+Non-blocking
+
+triggers scrape
+
+wait before
+
+within 5-minute
+
+retrying"
+
+debounce
+
+9.4 Golden Test Cases
+
+GTC#
+
+Input
+
+Expected Output Pass Criteria
+
+GTC-001
+
+Dealer with
+
+Address diff row
+
+Correct diffs
+
+website; address
+
+shown; Dealer
+
+surfaced; no
+
+differs from TOC
+
+Admin confirms
+
+false positives
+
+record
+
+website version
+
+GTC-002
+
+Small dealer;
+
+All 5 fields
+
+Screen fully
+
+dealer_website_u
+
+prefilled from
+
+prefilled; zero
+
+rl=null
+
+TOC; zero
+
+blank fields
+
+comparison rows
+
+GTC-003
+
+Website
+
+Screen loads
+
+Screen visible in
+
+response time 6s
+
+from TOC
+
+< 500ms; no
+
+(timeout)
+
+immediately; no
+
+error
+
+comparison rows
+
+GTC-004
+
+Dealer Admin
+
+Immediate
+
+Immediate
+
+provides
+
+rejection;
+
+rejection
+
+"
+
+www.google.co
+
+contract prefill
+
+m
+
+" (block-list)
+
+unaffected
+
+GTC-005
+
+Dealer Admin
+
+Post-scrape
+
+Rejection
+
+provides
+
+rejection;
+
+message shown
+
+competitor URL
+
+contract prefill
+
+(scraped name
+
+unaffected
+
+similarity 0.08)
+
+GTC-006
+
+trigger_surface=
+
+IM sees diff
+
+IM read-only
+
+"im_provisioning
+
+inline; no save
+
+view works
+
+"; 1 address diff
+
+possible
+
+correctly
+
+found
+
+9.5 Quality Dimensions
+
+Dimension
+
+Target
+
+Regression
+
+Eval Method
+
+Accuracy
+
+Completeness
+
+= 95%
+
+= 90%
+
+Threshold
+
+< 90% blocks
+
+Deterministic +
+
+LLM-as-judge
+
+< 85% blocks
+
+Schema
+
+validation
+
+Tone
+
+= 4/5
+
+< 3/5 flags
+
+LLM-as-judge
+
+Safety
+
+100%
+
+< 100% blocks
+
+Deterministic +
+
+red-team
+
+9.6 Failure Mode Coverage
+
+Failure Type
+
+Applicable?
+
+Mitigation
+
+Logic
+
+Integration
+
+Behavioral
+
+Quality
+
+Drift
+
+Context
+
+Safety
+
+Coordination
+
+Y
+
+Y
+
+N
+
+Y
+
+Y
+
+N
+
+Y
+
+N
+
+§10. Success Metrics & Evaluation
+
+10.1 Business KPIs
+
+Confidence scoring +
+
+field-type validation
+
+5s timeout, robots.txt
+
+check, MIME type
+
+guard
+
+No LLM reasoning in
+
+happy path
+
+Confidence threshold;
+
+Dealer Admin always
+
+confirms
+
+Monitor scrape
+
+success rates; alert if <
+
+60%
+
+Intent scoped to single
+
+screen
+
+Read-only HTTP GET;
+
+no cookie/session
+
+storage
+
+Operates
+
+independently
+
+KPI
+
+Current Baseline Target
+
+Timeline
+
+Blank-field rate
+
+~100% (all fields
+
+0%
+
+At TAO V1 launch
+
+at screen open
+
+blank today)
+
+Dealer Details
+
+TBD — measure
+
+Reduce >= 40%
+
+30 days post-
+
+screen
+
+at TAO V1 launch
+
+vs. baseline
+
+launch
+
+completion time
+
+Dealer Admin
+
+N/A
+
+< 15% of
+
+30 days post-
+
+field correction
+
+rate
+
+Website diff
+
+N/A
+
+acceptance rate
+
+prefilled fields
+
+launch
+
+corrected
+
+30 days post-
+
+launch
+
+= 50%
+
+(Dealer
+
+Admin
+
+accepts
+
+website
+
+value
+
+when
+
+shown a
+
+diff)
+
+Form validation
+
+TBD — measure
+
+Reduce >= 60%
+
+30 days post-
+
+error rate
+
+at TAO V1 launch
+
+vs. baseline
+
+launch
+
+10.2 Agent Evaluation Criteria
+
+Metric
+
+Target
+
+Regression
+
+Cadence
+
+Intent match rate
+
+Golden set pass
+
+rate
+
+95%
+
+98%
+
+Threshold
+
+< 90% triggers
+
+Weekly
+
+review
+
+< 95% blocks
+
+Per deploy
+
+release
+
+Invariant
+
+0%
+
+violation rate
+
+Continuous
+
+0% blocks
+
+release
+
+10.3 Invariants (Continuous Checks)
+
+Invariant
+
+Description
+
+Enforcement
+
+Layer 1 must precede
+
+Screen must never
+
+Hard block — DWS-SI-
+
+Layer 2
+
+render without Layer 1
+
+01a must succeed
+
+(TOC data) present
+
+before DWS-SI-04
+
+renders
+
+Screen is never blank
+
+TOC values fill every
+
+Hard block
+
+field; Layer 2 cannot
+
+leave a field emptier
+
+than Layer 1 left it
+
+Read-only scrape
+
+Scraper NEVER
+
+Hard block — reject if
+
+submits forms, writes
+
+non-GET HTTP method
+
+cookies, or
+
+authenticates
+
+used
+
+Dealer Admin
+
+No value persisted
+
+Hard block — DWS-SI-
+
+confirmation required
+
+without explicit Dealer
+
+06 must receive a
+
+Admin submit
+
+Dealer Admin-triggered
+
+event
+
+Dealer isolation
+
+Results for
+
+Hard block — validate
+
+dealership_id=X never
+
+session dealership_id
+
+shown to session for
+
+matches cached result
+
+dealership_id=Y
+
+URL validation before
+
+DWS-SI-02 must never
+
+Hard block
+
+user-provided scrape
+
+run on
+
+dealer_provided_url
+
+unless DWS-SI-08
+
+passed it
+
+IM cannot save
+
+DWS-SI-06 rejects
+
+Hard block
+
+calls where
+
+trigger_surface="im_pr
+
+ovisioning"
+
+10.4 Related Intents & Dependencies
+
+Upstream: TAO-CONTRACT-001 (dealer_website_url must be captured at contract signature);
+
+TAO-COA-001 (same Configure Phase, no direct dependency)
+
+Downstream: TAO Configure Phase next step — DWS-001 completion unblocks the next step
+
+in the Configure Phase sequence.
+
+§11. Follow-Up Patterns
+
+Pattern
+
+Trigger
+
+Agent Response
+
+Dealer Admin edits a
+
+Dealer Admin changes
+
+Accept silently; edited
+
+prefilled field
+
+a prefilled value
+
+value replaces prefilled
+
+value — Dealer Admin
+
+is always the source of
+
+truth
+
+Dealer Admin requests
+
+Dealer Admin triggers
+
+Check debounce (5
+
+re-scrape
+
+/prefill-dealer-details
+
+min); if allowed, re-run
+
+DWS-SI-02→DWS-SI-
+
+04; if within debounce,
+
+show "Please wait
+
+before retrying"
+
+Prefill partially
+
+DWS-SI-03 returns
+
+Prefill found fields;
+
+succeeds
+
+partial field map
+
+leave unfound fields
+
+blank with placeholder
+
+text; no partial-failure
+
+message
+
+§12. Technical Approach
+
+Architecture — Two-Layer Model
+
+Data flow:  Salesforce → TOC → TAO
+
+Layer 1 — Internal Data Sync (baseline, always runs)
+
+1. TOC Sync Service — At IM provisioning stage, reads the dealer record from TOC. TOC
+
+already holds the Salesforce-synced contract data (legal name, address, phone, website URL)
+
+plus any provisioning-stage updates. TAO does not connect to Salesforce directly.
+
+2. TAO Dealer Record — Stores the TOC-sourced dealer record. Dealer Admin screen reads
+
+from here. Always populated before the Dealer Admin journey begins. This is a blocking
+
+dependency for the Dealer Admin screen load.
+
+Layer 2 — Website Scraping + Comparison (enrichment, additive)
+
+3. Scrape Trigger — Resolves dealer website URL from TAO dealer record. If no URL → Layer 2
+
+skipped entirely; Layer 1 data shown alone.
+
+4. Web Scraper Worker — HTTP GET to target URL. Enforces: 5s timeout, robots.txt check,
+
+MIME type guard (HTML only), read-only GET only. On failure → Layer 1 shown alone; no
+
+error to Dealer Admin.
+
+5. Field Extractor — Parses raw HTML; extracts dealership name, address, phone, website URL.
+
+Assigns confidence score (0.0–1.0) per field. Fields below 0.80 suppressed.
+
+6. Field Comparator — Classifies each field as: match / different / new / missing. Returns
+
+structured comparison map.
+
+7. Comparison View Renderer — Injects comparison map into screen. TOC values always
+
+shown as baseline. Diff/new rows shown for Dealer Admin decision. Match fields show quiet
+
+checkmark.
+
+8. Session Cache — Caches comparison result by (dealership_id, session_id). IM pre-scrape
+
+result reused on Dealer Admin screen load if not stale.
+
+9. TAO Dealer Record Write — On Dealer Admin submit, confirmed values (TOC baseline + any
+
+website values accepted) persisted via existing dealer details save endpoint.
+
+URL Validation (Dealer Admin-provided alternate URLs)
+
+10. URL Validator — Domain block-list check (immediate). If passes → scrape → business name
+
+fuzzy-match against contract name. < 0.70 → reject. 0.70–0.85 → confirmation prompt. >=
+
+0.85 → accept silently.
+
+Non-Functional Requirements
+
+Screen load latency: Dealer Admin screen must render from Layer 1 data in < 500ms. Layer 2
+
+runs asynchronously; never blocks the screen.
+
+Layer 1 is blocking: Dealer Admin cannot open the screen until TOC sync (DWS-SI-00) is
+
+complete.
+
+Layer 2 is always additive: Any Layer 2 failure falls back silently to Layer 1 data. No Dealer
+
+Admin-visible error.
+
+Rate limiting: Max 1 scrape per (dealership_id, session). Max 1 user-triggered re-scrape per 5
+
+minutes.
+
+Security: Read-only HTTP GET only. No auth. No cookies. No form submissions.
+
+§13. Rollout Plan
+
+Rollout Target: TAO V1
+
+Ships with TAO V1. Controlled by feature flag  dws_prefill_enabled  for rapid kill-switch.
+
+Gate
+
+Criteria
+
+Owner
+
+Pre-launch
+
+Zero P0/P1 bugs in
+
+Engineering
+
+GTC-001 through GTC-
+
+006
+
+Pre-launch
+
+DWS-SI-08 domain
+
+PM
+
+block-list reviewed and
+
+approved
+
+Pre-launch
+
+Fuzzy match
+
+Engineering + PM
+
+thresholds (0.70/0.85)
+
+validated on sample of
+
+real dealer names
+
+Pre-launch
+
+IM provisioning view
+
+Engineering
+
+updated with scraped
+
+preview column
+
+Pre-launch
+
+"Use a different
+
+Engineering + UX
+
+website" UI component
+
+built and tested
+
+Post-launch monitoring Scrape success rate
+
+PM
+
+>= 50%; timeout rate
+
+<= 10%; Dealer Admin
+
+edit rate on prefilled
+
+fields < 25%
+
+Rollback trigger
+
+P0: any scrape that
+
+Engineering on-call
+
+writes to a dealer
+
+website; any prefilled
+
+value saved without
+
+Dealer Admin
+
+confirmation
+
+Feature flag: dws_prefill_enabled  — set to  false  disables all scraping immediately. No
+
+data migration needed for rollback.
+
+Appendix A: ISD Versioning
+
+Version
+
+Date
+
+Author
+
+Change
+
+Summary
+
+1.0
+
+1.1
+
+2026-08-27
+
+Prem Bihari
+
+Initial ISD draft
+
+(
+
+pbihari@tekion.
+
+com
+
+)
+
+2026-08-27
+
+Prem Bihari
+
+Expanded DA
+
+(
+
+pbihari@tekion.
+
+abbreviation to
+
+com
+
+)
+
+Dealer Admin
+
+throughout
+
+

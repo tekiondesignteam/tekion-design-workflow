@@ -1,0 +1,57 @@
+{
+  "slug": "tao",
+  "feature": "TAO — Dealer Website Scraping: Pre-fill Dealer Details Review",
+  "product": "ARC",
+  "thoroughness": "medium",
+  "started_at": "2026-09-03T00:00:00.000Z",
+  "last_updated": "2026-09-03T02:15:00.000Z",
+  "ds_repo": "/Users/gokuljayabalan/Documents/GitHub/tekiondesignsystem-alloy",
+  "current_phase": 6,
+  "phases": {
+    "1": {
+      "status": "complete",
+      "completed_at": "2026-09-03T00:30:00.000Z",
+      "outputs": [
+        "/Users/gokuljayabalan/projects/tao/p1-intake/design-brief-tao.md",
+        "/Users/gokuljayabalan/projects/tao/p1-intake/design-brief-tao.html"
+      ]
+    },
+    "2": {
+      "status": "complete",
+      "completed_at": "2026-09-03T00:45:00.000Z",
+      "gate_score": 78,
+      "outputs": [
+        "/Users/gokuljayabalan/projects/tao/p2-clarify/clarifications-tao.md",
+        "/Users/gokuljayabalan/projects/tao/p2-clarify/clarify-tao.html"
+      ]
+    },
+    "3": {
+      "status": "complete",
+      "completed_at": "2026-09-03T01:15:00.000Z",
+      "outputs": [
+        "/Users/gokuljayabalan/projects/tao/p3-flows/flows-tao.md",
+        "/Users/gokuljayabalan/projects/tao/p3-flows/flows-tao.html"
+      ]
+    },
+    "4": {
+      "status": "complete",
+      "completed_at": "2026-09-03T01:45:00.000Z",
+      "prd_score": 78,
+      "outputs": [
+        "/Users/gokuljayabalan/projects/tao/p4-spec/spec-tao.md",
+        "/Users/gokuljayabalan/projects/tao/p4-spec/spec-tao.html",
+        "/Users/gokuljayabalan/projects/tao/p4-spec/tasks.md"
+      ]
+    },
+    "5": {
+      "status": "complete",
+      "completed_at": "2026-09-03T02:15:00.000Z",
+      "outputs": [
+        "/Users/gokuljayabalan/projects/tao/p5-wireframes/wireframes-tao.md",
+        "/Users/gokuljayabalan/projects/tao/p5-wireframes/wireframes-tao.html"
+      ]
+    },
+    "6": { "status": "in_progress", "outputs": [], "kit": null, "brand": null },
+    "7": { "status": "pending", "outputs": [] }
+  }
+}

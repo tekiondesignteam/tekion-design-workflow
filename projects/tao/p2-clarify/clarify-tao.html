@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TAO Dealer Details Review — Clarify</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--s2:#F8F9FA;--bd:#EDEEF0;--bds:#D4D5D6;
+  --t:#161616;--ts:#444F5C;--tm:#6B7280;--td:#9BA5B4;
+  --ok:#16A34A;--okbg:#DCFCE7;--warn:#D97706;--warnbg:#FEF3C7;--err:#DC2626;--errbg:#FEF2F2;--errbd:#FECACA;
+  --font-body:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);color:var(--t);line-height:1.65;font-size:14px;background:#fff;font-weight:500}
+
+.sec-head{display:flex;align-items:center;gap:10px;margin:44px 0 14px;padding-bottom:10px;border-bottom:2px solid var(--t)}
+.sec-head:first-of-type{margin-top:0}
+.sec-head svg{flex-shrink:0;color:var(--t)}
+.sec-title{font-size:17px;font-weight:700;letter-spacing:-.1px;color:var(--t)}
+.sec-count{font-size:10px;font-weight:500;color:var(--td);background:var(--s2);padding:2px 8px;border-radius:20px;font-family:var(--font-mono);margin-left:auto}
+
+.meta-line{font-size:11px;color:var(--td);font-family:var(--font-mono);margin-bottom:4px}
+.score-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;font-weight:700;border-radius:20px;padding:4px 10px;margin-left:auto}
+.score-high{background:var(--okbg);color:var(--ok)}
+.score-medium{background:var(--warnbg);color:var(--warn)}
+.score-low{background:var(--errbg);color:var(--err)}
+
+.approval-banner{background:#EEF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:14px 16px;margin-bottom:8px;font-size:13px;color:#1D4ED8;line-height:1.6}
+
+.page-wrap{display:flex;gap:56px;align-items:flex-start;width:100%;padding:0 32px 150px}
+.page-main{flex:1;min-width:0;padding-top:28px}
+
+#sticky-header{position:fixed;top:0;left:0;right:0;background:rgba(255,255,255,.97);backdrop-filter:blur(6px);border-bottom:1px solid var(--bd);padding:14px 32px;font-size:14px;font-weight:700;color:var(--t);z-index:50;transform:translateY(-100%);transition:transform .18s ease;display:flex;align-items:center;gap:10px;height:53px}
+#sticky-header.vis{transform:translateY(0)}
+#sticky-header-sub{font-size:10px;font-weight:500;color:var(--td);font-family:var(--font-mono);margin-left:auto;text-align:right}
+
+.side-toc{width:210px;flex-shrink:0;position:sticky;top:65px;display:none;margin-top:98px}
+.side-toc-title{font-size:13px;font-weight:700;color:var(--t);margin-bottom:16px}
+.side-toc-list{position:relative;padding-left:16px;border-left:1px solid var(--bd)}
+.side-toc-list a{display:block;font-size:13px;color:var(--tm);text-decoration:none;padding:9px 0;line-height:1.3}
+.side-toc-list a.active{color:var(--t);font-weight:700}
+.side-toc-indicator{position:absolute;left:-1px;width:2px;background:var(--t);border-radius:1px;transition:top .2s ease,height .2s ease;top:0;height:0}
+
+@media (min-width: 900px){
+  .side-toc{display:block}
+  #toc-fab{display:none}
+}
+
+#toc-fab{position:fixed;right:24px;bottom:32px;z-index:40}
+#toc-menu{display:none;position:absolute;bottom:52px;right:0;min-width:230px;max-height:60vh;overflow-y:auto;background:#fff;border:1px solid var(--bd);border-radius:10px;box-shadow:0 10px 28px rgba(17,20,23,.14);padding:6px}
+#toc-menu.open{display:block}
+#toc-menu a{display:block;padding:8px 12px;font-size:12px;color:var(--t);text-decoration:none;border-radius:6px;white-space:nowrap}
+#toc-menu a:hover{background:var(--s2)}
+#toc-btn{width:44px;height:44px;border-radius:50%;background:var(--t);color:#fff;border:none;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center}
+[id^="sec-"]{scroll-margin-top:96px}
+
+.question-block{margin-bottom:36px}
+.question-block:last-child{margin-bottom:0}
+.question-head{display:flex;gap:12px;align-items:flex-start;margin-bottom:5px}
+.question-num{width:24px;height:24px;border-radius:50%;background:var(--t);color:#fff;font-size:11px;font-weight:700;font-family:var(--font-mono);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.question-text{font-size:15px;font-weight:700;color:var(--t);line-height:1.5;flex:1;padding-top:1px}
+.question-check{font-size:15px;color:var(--ok);flex-shrink:0;opacity:0;transition:opacity .15s ease;padding-top:2px}
+.question-block.answered .question-check{opacity:1}
+.question-kind{font-size:12px;color:var(--td);margin:0 0 12px 36px}
+.question-body{margin-left:36px}
+
+.hint-line{font-size:12px;color:var(--td);font-style:italic;margin-bottom:8px}
+
+.option-list{display:flex;flex-direction:column;gap:7px;margin-bottom:9px}
+.option-row{display:flex;align-items:center;gap:11px;background:var(--s2);border:1.5px solid transparent;border-radius:9px;padding:11px 14px;cursor:pointer;transition:all .12s ease}
+.option-row:hover{border-color:var(--bds)}
+.option-row.selected{background:#fff;border-color:var(--t)}
+.option-letter{width:20px;height:20px;border-radius:5px;background:#fff;border:1px solid var(--bd);color:var(--tm);font-size:10.5px;font-weight:700;font-family:var(--font-mono);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.option-row.selected .option-letter{background:var(--t);border-color:var(--t);color:#fff}
+.option-row-text{font-size:13.5px;color:var(--ts);line-height:1.5}
+.option-row.selected .option-row-text{color:var(--t);font-weight:600}
+
+.custom-answer-row{display:flex;gap:9px;margin-top:3px}
+.custom-answer-input{flex:1;border:1.5px solid var(--bd);border-radius:9px;padding:10px 13px;font-family:var(--font-body);font-size:13px}
+.custom-answer-input:focus{border-color:var(--t);outline:none}
+.custom-answer-add{width:40px;flex-shrink:0;border:1.5px solid var(--bd);border-radius:9px;background:#fff;cursor:pointer;font-size:16px;color:var(--t);display:flex;align-items:center;justify-content:center}
+.custom-answer-add:hover{border-color:var(--t)}
+
+.answer-textarea{width:100%;min-height:62px;border:1.5px solid var(--bd);border-radius:9px;padding:10px 13px;font-family:var(--font-body);font-size:13px;resize:vertical}
+.answer-textarea:focus{border-color:var(--t);outline:none}
+
+.ref-item{font-size:13.5px;line-height:1.7;color:var(--ts);margin-bottom:6px;padding-left:14px;position:relative}
+.ref-item::before{content:'\2014';color:var(--td);position:absolute;left:0;top:0}
+.gap-item{margin-bottom:16px}
+.gap-item:last-child{margin-bottom:0}
+.gap-resolution-input{margin-left:14px;width:calc(100% - 14px);border:1px solid var(--bd);border-radius:8px;padding:8px 12px;font-family:var(--font-body);font-size:12.5px;margin-top:6px}
+.gap-resolution-input:focus{border-color:var(--t);outline:none}
+.gaps-empty{font-size:13px;color:var(--td);font-style:italic}
+
+.notes-block textarea{width:100%;min-height:60px;border:1.5px solid var(--bd);border-radius:9px;padding:10px 13px;font-family:var(--font-body);font-size:13px;resize:vertical}
+
+#progress-bar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:#fff;border-top:1px solid var(--bd);padding:12px 32px;display:flex;align-items:center;gap:16px;box-shadow:0 -6px 20px rgba(0,0,0,.06)}
+#progress-track{flex:1;height:6px;background:var(--s2);border-radius:4px;overflow:hidden;max-width:260px}
+#progress-fill{height:100%;background:var(--ok);border-radius:4px;width:0%;transition:width .2s ease}
+#progress-text{font-size:11.5px;font-weight:700;font-family:var(--font-mono);color:var(--ts);white-space:nowrap}
+#copy-answers-btn{margin-left:auto;background:var(--t);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:var(--font-body)}
+</style>
+</head>
+<body>
+
+<div id="sticky-header">
+  <span>TAO Dealer Details Review — Clarify</span>
+  <span id="sticky-header-sub">Score: 78% &middot; Medium</span>
+</div>
+
+<div class="page-wrap">
+<div class="page-main">
+
+<div id="page-title" style="font-size:24px;font-weight:700;letter-spacing:-.3px;margin-bottom:6px">TAO Dealer Details Review — Clarify</div>
+<div class="meta-line" style="margin-bottom:20px">Product: ARC &middot; generated 2026-09-03</div>
+
+<div class="approval-banner">
+  There are some questions about this feature before we go further. Answer them here or in chat.
+</div>
+
+<!-- ============ CLARIFY REQUIREMENTS ============ -->
+<div class="sec-head" id="sec-questions">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 1 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+  <span class="sec-title">Clarify Requirements</span>
+  <span class="score-badge score-medium">Score: 78% — Medium</span>
+</div>
+
+<div class="question-block" data-qid="q1">
+  <div class="question-head">
+    <span class="question-num">1</span>
+    <span class="question-text">On scrape failure, no website, or timeout — should the Dealer Admin ever see the "We couldn't find your details automatically" fallback message, given the Constraints &amp; Requirements section and DWS-SI-05 / POL-TAO-DWS-001-004 state this must be a silent, message-free fallback?</span>
+    <span class="question-check">✓</span>
+  </div>
+  <div class="question-kind">Choose one</div>
+  <div class="question-body">
+    <div class="option-list">
+      <div class="option-row" data-value="Silent fallback governs for the whole screen — never show this message when there's no website, a failed scrape, or a timeout. Treat the message in §8.1 as legacy/incorrect and drop it from scope."><span class="option-letter">A</span><span class="option-row-text">Silent fallback governs for the whole screen — never show this message when there's no website, a failed scrape, or a timeout. Treat the §8.1 text as legacy/incorrect and drop it from scope.</span></div>
+      <div class="option-row" data-value="Show the message whenever Layer 2 produces zero usable data (no website / failure / timeout), replacing the silent fallback described in the constraints."><span class="option-letter">B</span><span class="option-row-text">Show the message whenever Layer 2 produces zero usable data (no website / failure / timeout), replacing the silent fallback described in the constraints.</span></div>
+      <div class="option-row" data-value="Show the message only at the individual-field level, if a field is missing from both TOC and the scrape (a true blank field) — not as a whole-screen state."><span class="option-letter">C</span><span class="option-row-text">Show the message only at the individual-field level, if a field is missing from both TOC and the scrape (a true blank field) — not as a whole-screen state.</span></div>
+    </div>
+    <div class="custom-answer-row">
+      <input type="text" class="custom-answer-input" placeholder="Add custom answer...">
+      <button class="custom-answer-add" type="button" title="Add as an answer option">+</button>
+    </div>
+  </div>
+</div>
+
+<div class="question-block" data-qid="q2">
+  <div class="question-head">
+    <span class="question-num">2</span>
+    <span class="question-text">Once the Dealer Admin clicks Confirm/Submit and final values persist, can they still change these details on the same screen — or is the screen locked after submission?</span>
+    <span class="question-check">✓</span>
+  </div>
+  <div class="question-kind">Choose one</div>
+  <div class="question-body">
+    <div class="option-list">
+      <div class="option-row" data-value="Locked/read-only after submit — any further changes require a separate change-request or support flow outside this screen."><span class="option-letter">A</span><span class="option-row-text">Locked/read-only after submit — any further changes require a separate change-request or support flow outside this screen.</span></div>
+      <div class="option-row" data-value="Dealer Admin can reopen and edit confirmed details freely at any time before the next Configure Phase step is completed."><span class="option-letter">B</span><span class="option-row-text">Dealer Admin can reopen and edit confirmed details freely at any time before the next Configure Phase step is completed.</span></div>
+      <div class="option-row" data-value="Dealer Admin can edit and resubmit even after later Configure Phase steps have started, with no re-scrape triggered — just re-validation and re-save."><span class="option-letter">C</span><span class="option-row-text">Dealer Admin can edit and resubmit even after later Configure Phase steps have started, with no re-scrape triggered — just re-validation and re-save.</span></div>
+    </div>
+    <div class="custom-answer-row">
+      <input type="text" class="custom-answer-input" placeholder="Add custom answer...">
+      <button class="custom-answer-add" type="button" title="Add as an answer option">+</button>
+    </div>
+  </div>
+</div>
+
+<div class="question-block" data-qid="q3">
+  <div class="question-head">
+    <span class="question-num">3</span>
+    <span class="question-text">The brief specifies a loading state when TOC sync "is not yet complete," but doesn't say what happens if TOC sync fails outright and never completes. What should the Dealer Admin see?</span>
+    <span class="question-check">✓</span>
+  </div>
+  <div class="question-kind">Choose one</div>
+  <div class="question-body">
+    <div class="option-list">
+      <div class="option-row" data-value="A blocking error state with a manual Retry action — no auto-retry."><span class="option-letter">A</span><span class="option-row-text">A blocking error state with a manual Retry action — no auto-retry.</span></div>
+      <div class="option-row" data-value="Silent auto-retry in the background — Dealer Admin keeps seeing the loading state indefinitely, no visible error."><span class="option-letter">B</span><span class="option-row-text">Silent auto-retry in the background — Dealer Admin keeps seeing the loading state indefinitely, no visible error.</span></div>
+      <div class="option-row" data-value="An error state that directs the Dealer Admin to contact support / their Implementation Manager rather than retry themselves."><span class="option-letter">C</span><span class="option-row-text">An error state that directs the Dealer Admin to contact support / their Implementation Manager rather than retry themselves.</span></div>
+    </div>
+    <div class="custom-answer-row">
+      <input type="text" class="custom-answer-input" placeholder="Add custom answer...">
+      <button class="custom-answer-add" type="button" title="Add as an answer option">+</button>
+    </div>
+  </div>
+</div>
+
+<div class="question-block" data-qid="q4">
+  <div class="question-head">
+    <span class="question-num">4</span>
+    <span class="question-text">For dealers where many fields differ from the website (up to 16 comparable fields), should the Dealer Admin be able to accept/reject all diffs at once, or only field-by-field?</span>
+    <span class="question-check">✓</span>
+  </div>
+  <div class="question-kind">Choose one</div>
+  <div class="question-body">
+    <div class="option-list">
+      <div class="option-row" data-value="Field-by-field only — no bulk action in MVP, matching the per-row Use website version? [Yes] [Keep on file] pattern described."><span class="option-letter">A</span><span class="option-row-text">Field-by-field only — no bulk action in MVP, matching the per-row "Use website version? [Yes] [Keep on file]" pattern described.</span></div>
+      <div class="option-row" data-value="Add a single bulk Use all website values / Keep all on file control at the top of the comparison list, in addition to per-field control."><span class="option-letter">B</span><span class="option-row-text">Add a single bulk "Use all website values" / "Keep all on file" control at the top of the comparison list, in addition to per-field control.</span></div>
+      <div class="option-row" data-value="Bulk control only appears once diffs exceed a threshold (e.g., more than 5 fields differ) — otherwise field-by-field."><span class="option-letter">C</span><span class="option-row-text">Bulk control only appears once diffs exceed a threshold (e.g., more than 5 fields differ) — otherwise field-by-field.</span></div>
+    </div>
+    <div class="custom-answer-row">
+      <input type="text" class="custom-answer-input" placeholder="Add custom answer...">
+      <button class="custom-answer-add" type="button" title="Add as an answer option">+</button>
+    </div>
+  </div>
+</div>
+
+<div class="question-block" data-qid="q5">
+  <div class="question-head">
+    <span class="question-num">5</span>
+    <span class="question-text">Does submitting an alternate URL via "Try a different website" share the same 5-minute rate limit as the manual re-scrape trigger (/prefill-dealer-details), or is it a separate action?</span>
+    <span class="question-check">✓</span>
+  </div>
+  <div class="question-kind">Choose one</div>
+  <div class="question-body">
+    <div class="option-list">
+      <div class="option-row" data-value="Shares the same 5-minute limiter — one combined re-scrape budget per dealership regardless of whether it's a manual re-scrape or a new URL."><span class="option-letter">A</span><span class="option-row-text">Shares the same 5-minute limiter — one combined re-scrape budget per dealership regardless of whether it's a manual re-scrape or a new URL.</span></div>
+      <div class="option-row" data-value="Separate and unlimited — Dealer Admin can try as many alternate URLs as needed without waiting."><span class="option-letter">B</span><span class="option-row-text">Separate and unlimited — Dealer Admin can try as many alternate URLs as needed without waiting.</span></div>
+      <div class="option-row" data-value="Separate action, but with its own independent rate limit/cooldown."><span class="option-letter">C</span><span class="option-row-text">Separate action, but with its own independent rate limit/cooldown.</span></div>
+    </div>
+    <div class="custom-answer-row">
+      <input type="text" class="custom-answer-input" placeholder="Add custom answer...">
+      <button class="custom-answer-add" type="button" title="Add as an answer option">+</button>
+    </div>
+  </div>
+</div>
+
+<div class="question-block" data-qid="q6">
+  <div class="question-head">
+    <span class="question-num">6</span>
+    <span class="question-text">Operating Hours are tracked per department (Sales/Service/Parts) across all 7 days — how should the website comparison for this structured field render on the comparison screen?</span>
+    <span class="question-check">✓</span>
+  </div>
+  <div class="question-kind">Choose one</div>
+  <div class="question-body">
+    <div class="option-list">
+      <div class="option-row" data-value="One comparison row per department (Sales/Service/Parts), showing the full week as a single value, expandable to see day-by-day differences."><span class="option-letter">A</span><span class="option-row-text">One comparison row per department (Sales/Service/Parts), showing the full week as a single value, expandable to see day-by-day differences.</span></div>
+      <div class="option-row" data-value="One comparison row per day per department, matching the field list literally — up to 21 rows."><span class="option-letter">B</span><span class="option-row-text">One comparison row per day per department, matching the field list literally — up to 21 rows.</span></div>
+      <div class="option-row" data-value="Operating Hours comparison lives in its own expandable section/modal, separate from the simple single-value fields."><span class="option-letter">C</span><span class="option-row-text">Operating Hours comparison lives in its own expandable section/modal, separate from the simple single-value fields.</span></div>
+    </div>
+    <div class="custom-answer-row">
+      <input type="text" class="custom-answer-input" placeholder="Add custom answer...">
+      <button class="custom-answer-add" type="button" title="Add as an answer option">+</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ GAPS & ASSUMPTIONS ============ -->
+<div class="sec-head" id="sec-gaps">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L14.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+  <span class="sec-title">Gaps &amp; Assumptions</span>
+  <span class="sec-count" id="gaps-count">0 of 5 resolved</span>
+</div>
+
+<div class="gap-item" data-loc="Gap 1">
+  <div class="ref-item">Dealer Details screen completion time KPI baseline is marked "TBD — measure at TAO V1 launch" in the source. The 40% reduction target has no baseline yet, but this doesn't change any screen or flow decision — it's a post-launch measurement gap only.</div>
+  <input type="text" class="gap-resolution-input" placeholder="Add a resolution (optional) — leave blank to keep as an assumption">
+</div>
+<div class="gap-item" data-loc="Gap 2">
+  <div class="ref-item">Form validation error rate KPI baseline is likewise marked "TBD — measure at TAO V1 launch." Same as above — no design impact.</div>
+  <input type="text" class="gap-resolution-input" placeholder="Add a resolution (optional) — leave blank to keep as an assumption">
+</div>
+<div class="gap-item" data-loc="Gap 3">
+  <div class="ref-item">Banner Logo is "compared as URL presence only, not visually" per the source. Assumption: render this as a simple presence indicator (e.g., "✓ Logo found on website") with no thumbnail preview in MVP.</div>
+  <input type="text" class="gap-resolution-input" placeholder="Add a resolution (optional) — leave blank to keep as an assumption">
+</div>
+<div class="gap-item" data-loc="Gap 4">
+  <div class="ref-item">The rate-limit copy ("Please wait before retrying") has no countdown specified. Assumption: a static message is sufficient for MVP — no live countdown/timer UI required.</div>
+  <input type="text" class="gap-resolution-input" placeholder="Add a resolution (optional) — leave blank to keep as an assumption">
+</div>
+<div class="gap-item" data-loc="Gap 5">
+  <div class="ref-item">After a domain block-list or business-name-mismatch rejection on an alternate URL, the source doesn't say whether the Dealer Admin can immediately retry. Assumption: yes, immediately — these are validation failures, not scrapes, so they aren't subject to the 5-minute scrape rate limit (pending the answer to Question 5 above, which could change this).</div>
+  <input type="text" class="gap-resolution-input" placeholder="Add a resolution (optional) — leave blank to keep as an assumption">
+</div>
+
+<!-- ============ GENERAL NOTES ============ -->
+<div class="sec-head" id="sec-notes">
+  <span class="sec-title">General notes</span>
+</div>
+<div class="notes-block">
+  <textarea id="general-notes" placeholder="Anything else to flag that isn't covered above? (optional)"></textarea>
+</div>
+
+<div id="toc-fab">
+  <div id="toc-menu">
+    <a href="#sec-questions">Clarify Requirements</a>
+    <a href="#sec-gaps">Gaps &amp; Assumptions</a>
+    <a href="#sec-notes">General notes</a>
+  </div>
+  <button id="toc-btn" onclick="document.getElementById('toc-menu').classList.toggle('open')" title="Jump to section">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+  </button>
+</div>
+
+</div>
+
+<div class="side-toc">
+  <div class="side-toc-title">Jump to section</div>
+  <div class="side-toc-list" id="side-toc-list">
+    <div class="side-toc-indicator" id="side-toc-indicator"></div>
+    <a href="#sec-questions" class="active">Clarify Requirements</a>
+    <a href="#sec-gaps">Gaps &amp; Assumptions</a>
+    <a href="#sec-notes">General notes</a>
+  </div>
+</div>
+
+</div>
+
+<div id="progress-bar">
+  <span id="progress-text">0 of 6 answered</span>
+  <div id="progress-track"><div id="progress-fill"></div></div>
+  <button type="button" id="copy-answers-btn" onclick="copyAnswers()">Copy Answers</button>
+</div>
+
+
+<script>
+document.querySelectorAll('.side-toc-list a, #toc-menu a').forEach(function(a){
+  a.addEventListener('click',function(e){
+    e.preventDefault();
+    var target=document.querySelector(a.getAttribute('href'));
+    if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
+    var menu=document.getElementById('toc-menu');
+    if(menu)menu.classList.remove('open');
+  });
+});
+document.addEventListener('click',function(e){
+  if(!e.target.closest('#toc-fab')){
+    var menu=document.getElementById('toc-menu');
+    if(menu)menu.classList.remove('open');
+  }
+});
+
+(function(){
+  var sectionIds=['sec-questions','sec-gaps','sec-notes'];
+  var links=Array.from(document.querySelectorAll('.side-toc-list a'));
+  var indicator=document.getElementById('side-toc-indicator');
+  var listEl=document.getElementById('side-toc-list');
+  var REFERENCE_Y=110;
+
+  function setActive(id){
+    links.forEach(function(l){l.classList.toggle('active',l.getAttribute('href')==='#'+id);});
+    var activeLink=links.find(function(l){return l.getAttribute('href')==='#'+id;});
+    if(activeLink&&indicator&&listEl){
+      var listRect=listEl.getBoundingClientRect();
+      var linkRect=activeLink.getBoundingClientRect();
+      indicator.style.top=(linkRect.top-listRect.top)+'px';
+      indicator.style.height=linkRect.height+'px';
+    }
+  }
+
+  function onScroll(){
+    var atBottom=(window.innerHeight+window.scrollY)>=document.documentElement.scrollHeight-2;
+    if(atBottom){
+      setActive(sectionIds[sectionIds.length-1]);
+      return;
+    }
+    var current=sectionIds[0];
+    for(var i=0;i<sectionIds.length;i++){
+      var el=document.getElementById(sectionIds[i]);
+      if(!el)continue;
+      var top=el.getBoundingClientRect().top;
+      if(top<=REFERENCE_Y){
+        current=sectionIds[i];
+      } else {
+        break;
+      }
+    }
+    setActive(current);
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',onScroll);
+  onScroll();
+})();
+
+(function(){
+  var titleEl=document.getElementById('page-title');
+  var header=document.getElementById('sticky-header');
+  if(!titleEl||!header)return;
+  function check(){
+    var rect=titleEl.getBoundingClientRect();
+    header.classList.toggle('vis',rect.bottom<0);
+  }
+  window.addEventListener('scroll',check,{passive:true});
+  window.addEventListener('resize',check);
+  check();
+})();
+</script>
+
+<script>
+(function(){
+  var LETTERS = 'ABCDEFGHIJ';
+  var blocks = Array.from(document.querySelectorAll('.question-block'));
+  var total = blocks.length;
+  var gapItems = Array.from(document.querySelectorAll('.gap-item'));
+
+  function isMulti(block){ return block.getAttribute('data-select') === 'multi'; }
+
+  function updateProgress(){
+    var answered = blocks.filter(function(b){ return b.classList.contains('answered'); }).length;
+    document.getElementById('progress-text').textContent = answered + ' of ' + total + ' answered';
+    document.getElementById('progress-fill').style.width = (total ? (answered/total*100) : 0) + '%';
+  }
+
+  function relabel(list){
+    Array.from(list.querySelectorAll('.option-row')).forEach(function(row, i){
+      row.querySelector('.option-letter').textContent = LETTERS[i] || '?';
+    });
+  }
+
+  blocks.forEach(function(block){
+    var list = block.querySelector('.option-list');
+    var textarea = block.querySelector('.answer-textarea');
+    var addBtn = block.querySelector('.custom-answer-add');
+    var customInput = block.querySelector('.custom-answer-input');
+    var multi = isMulti(block);
+
+    function markAnswered(has){
+      block.classList.toggle('answered', !!has);
+      updateProgress();
+    }
+
+    function activateRow(row){
+      if(multi){
+        row.classList.toggle('selected');
+      } else {
+        Array.from(list.querySelectorAll('.option-row')).forEach(function(r){ r.classList.remove('selected'); });
+        row.classList.add('selected');
+      }
+      var anySelected = list.querySelector('.option-row.selected') !== null;
+      markAnswered(anySelected);
+    }
+
+    if(list){
+      Array.from(list.querySelectorAll('.option-row')).forEach(function(row){
+        row.addEventListener('click', function(){ activateRow(row); });
+      });
+    }
+
+    if(addBtn && customInput && list){
+      addBtn.addEventListener('click', function(){
+        var val = customInput.value.trim();
+        if(!val) { customInput.focus(); return; }
+        var row = document.createElement('div');
+        row.className = 'option-row';
+        row.setAttribute('data-value', val);
+        row.innerHTML = '<span class="option-letter"></span><span class="option-row-text"></span>';
+        row.querySelector('.option-row-text').textContent = val;
+        row.addEventListener('click', function(){ activateRow(row); });
+        list.appendChild(row);
+        relabel(list);
+        activateRow(row);
+        customInput.value = '';
+      });
+      customInput.addEventListener('keydown', function(e){
+        if(e.key === 'Enter'){ e.preventDefault(); addBtn.click(); }
+      });
+    }
+
+    if(textarea){
+      textarea.addEventListener('input', function(){
+        markAnswered(textarea.value.trim().length > 0);
+      });
+    }
+  });
+
+  var gapTotal = gapItems.length;
+  gapItems.forEach(function(item){
+    var input = item.querySelector('.gap-resolution-input');
+    if(!input) return;
+    input.addEventListener('input', function(){
+      var resolved = gapItems.filter(function(g){
+        var i = g.querySelector('.gap-resolution-input');
+        return i && i.value.trim().length > 0;
+      }).length;
+      var badge = document.getElementById('gaps-count');
+      if(badge) badge.textContent = resolved + ' of ' + gapTotal + ' resolved';
+    });
+  });
+
+  function getAnswer(block){
+    var list = block.querySelector('.option-list');
+    var textarea = block.querySelector('.answer-textarea');
+    if(list){
+      var selected = Array.from(list.querySelectorAll('.option-row.selected'));
+      if(!selected.length) return '';
+      return selected.map(function(r){ return r.getAttribute('data-value'); }).join('; ');
+    }
+    if(textarea) return textarea.value.trim();
+    return '';
+  }
+
+  function buildAnswersText(){
+    var answered = blocks.filter(function(b){ return b.classList.contains('answered'); }).length;
+    var lines = ['Clarify Answers (' + answered + ' of ' + total + ' answered)', ''];
+    blocks.forEach(function(block, i){
+      var q = block.querySelector('.question-text').textContent.trim();
+      var a = getAnswer(block) || '(not answered)';
+      lines.push((i+1) + '. Q: ' + q);
+      lines.push('   A: ' + a);
+      lines.push('');
+    });
+
+    var resolvedGaps = gapItems.filter(function(g){
+      var i = g.querySelector('.gap-resolution-input');
+      return i && i.value.trim().length > 0;
+    });
+    if(resolvedGaps.length){
+      lines.push('Gap Resolutions (' + resolvedGaps.length + ' of ' + gapTotal + '):');
+      resolvedGaps.forEach(function(g, i){
+        var gapText = g.querySelector('.ref-item').textContent.trim();
+        var resolution = g.querySelector('.gap-resolution-input').value.trim();
+        lines.push((i+1) + '. Gap: ' + gapText);
+        lines.push('   Resolution: ' + resolution);
+      });
+      lines.push('');
+    }
+
+    var notes = document.getElementById('general-notes').value.trim();
+    if(notes){
+      lines.push('General notes: ' + notes);
+    }
+    return lines.join('\n').trim();
+  }
+
+  window.copyAnswers = function(){
+    var btn = document.getElementById('copy-answers-btn');
+    var text = buildAnswersText();
+    function done(ok){
+      btn.textContent = ok ? 'Copied!' : 'Copy Answers';
+      if(ok) setTimeout(function(){ btn.textContent = 'Copy Answers'; }, 2000);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ done(true); }).catch(function(){ done(false); });
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      try{ done(document.execCommand('copy')); } catch(e){ done(false); }
+      document.body.removeChild(ta);
+    }
+  };
+
+  updateProgress();
+})();
+</script>
+
+</body>
+</html>

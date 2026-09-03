@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TAO — Dealer Website Scraping Wireframes</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'monospace'],
+        }
+      }
+    }
+  }
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--s2:#F8F9FA;--bd:#EDEEF0;--bds:#D4D5D6;
+  --t:#161616;--ts:#444F5C;--tm:#6B7280;--td:#9BA5B4;
+  --ok:#16A34A;--okbg:#DCFCE7;--okbd:#BBF7D0;
+  --err:#DC2626;--errbg:#FEF2F2;--errbd:#FECACA;
+  --warn:#D97706;--warnbg:#FFFBEB;--warnbd:#FDE68A;
+  --info:#1D4ED8;--infobg:#EEF6FF;--infobd:#BFDBFE;
+  --font-body:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);color:var(--t);line-height:1.65;font-size:14px;background:#fff;font-weight:500}
+
+.sec-head{display:flex;align-items:center;gap:10px;margin:44px 0 14px;padding-bottom:10px;border-bottom:2px solid var(--t)}
+.sec-head:first-of-type{margin-top:0}
+.sec-head svg{flex-shrink:0;color:var(--t)}
+.sec-title{font-size:17px;font-weight:700;letter-spacing:-.1px;color:var(--t)}
+.sec-count{font-size:10px;font-weight:500;color:var(--td);background:var(--s2);padding:2px 8px;border-radius:20px;font-family:var(--font-mono);margin-left:auto}
+.sec-desc{font-size:13px;color:var(--tm);margin:-6px 0 18px}
+
+.page-wrap{display:flex;gap:56px;align-items:flex-start;width:100%;padding:0 32px 160px}
+.page-main{flex:1;min-width:0;padding-top:28px}
+
+#sticky-header{position:fixed;top:0;left:0;right:0;background:rgba(255,255,255,.97);backdrop-filter:blur(6px);border-bottom:1px solid var(--bd);padding:14px 32px;font-size:14px;font-weight:700;color:var(--t);z-index:50;transform:translateY(-100%);transition:transform .18s ease;display:flex;align-items:center;gap:10px;height:53px}
+#sticky-header.vis{transform:translateY(0)}
+#sticky-header-sub{font-size:10px;font-weight:500;color:var(--td);font-family:var(--font-mono);margin-left:auto;text-align:right}
+
+.side-toc{width:220px;flex-shrink:0;position:sticky;top:65px;display:none;margin-top:98px}
+.side-toc-title{font-size:13px;font-weight:700;color:var(--t);margin-bottom:16px}
+.side-toc-list{position:relative;padding-left:16px;border-left:1px solid var(--bd)}
+.side-toc-list a{display:block;font-size:13px;color:var(--tm);text-decoration:none;padding:9px 0;line-height:1.3}
+.side-toc-list a.active{color:var(--t);font-weight:700}
+.side-toc-list a.side-toc-sub{padding-left:16px;font-size:12px;color:var(--td)}
+.side-toc-list a.side-toc-sub.active{color:var(--t);font-weight:600}
+.side-toc-indicator{position:absolute;left:-1px;width:2px;background:var(--t);border-radius:1px;transition:top .2s ease,height .2s ease;top:0;height:0}
+
+@media (min-width: 900px){
+  .side-toc{display:block}
+  #toc-fab{display:none}
+}
+
+#toc-fab{position:fixed;right:24px;bottom:32px;z-index:40}
+#toc-menu{display:none;position:absolute;bottom:52px;right:0;min-width:230px;max-height:60vh;overflow-y:auto;background:#fff;border:1px solid var(--bd);border-radius:10px;box-shadow:0 10px 28px rgba(17,20,23,.14);padding:6px}
+#toc-menu.open{display:block}
+#toc-menu a{display:block;padding:8px 12px;font-size:12px;color:var(--t);text-decoration:none;border-radius:6px;white-space:nowrap}
+#toc-menu a:hover{background:var(--s2)}
+#toc-menu a.toc-sub{padding-left:26px;font-size:11.5px;color:var(--tm)}
+#toc-btn{width:44px;height:44px;border-radius:50%;background:var(--t);color:#fff;border:none;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center}
+[id^="sec-"]{scroll-margin-top:96px}
+
+.approval-banner{background:#EEF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:14px 16px;margin-bottom:8px;font-size:13px;color:#1D4ED8;line-height:1.6}
+.concepts-banner{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:12px 16px;margin-bottom:28px;font-size:12.5px;color:var(--ts);line-height:1.6}
+.doc-footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--bd);text-align:center;font-size:12px;color:var(--td);font-style:italic}
+
+.flow-section{margin-bottom:44px}
+.flow-section-name{font-size:15px;font-weight:700;color:var(--t);margin-bottom:4px}
+.flow-section-desc{font-size:12.5px;color:var(--tm);margin-bottom:16px}
+
+.wf-row{display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding-bottom:12px}
+.wf-card-wrap{flex-shrink:0;width:340px}
+.wf-card-label{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tm);margin-bottom:8px;font-family:var(--font-mono)}
+.wf-card-num{font-size:10px;font-weight:700;font-family:var(--font-mono);color:#fff;background:var(--t);border-radius:4px;padding:1px 6px;flex-shrink:0}
+.wf-card-hint{font-size:10px;color:var(--td);margin-top:8px;line-height:1.4}
+.wf-card{border:1px solid var(--bd);border-radius:8px;background:#fff;padding:0;overflow:hidden;box-shadow:0 1px 3px rgba(17,20,23,.06)}
+.wf-already-shown{border:1.5px dashed var(--bd);border-radius:8px;background:#fff;padding:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:140px;text-align:center}
+.wf-already-shown a{font-size:11.5px;color:#1D4ED8;text-decoration:none;font-weight:700;margin-top:4px}
+.wf-already-shown span{font-size:11px;color:var(--tm)}
+
+.wf-connector{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding-top:60px;flex-shrink:0;width:76px}
+.wf-connector-label{font-size:10px;color:var(--tm);text-align:center;line-height:1.3}
+.wf-connector-label.err{color:var(--err)}
+
+.doc-section{margin-bottom:8px;font-size:13.5px;color:var(--ts);line-height:1.7}
+
+.annot-mark{background:#FEF3C7;border-bottom:2px solid #D97706;border-radius:2px;cursor:default;position:relative}
+.annot-mark sup{font-family:var(--font-mono);font-size:9px;font-weight:700;color:#D97706;margin-left:1px}
+
+#annot-btn{position:absolute;display:none;z-index:60;background:var(--t);color:#fff;border:none;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:700;font-family:var(--font-body);cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.22);align-items:center;gap:6px}
+#annot-btn.show{display:flex}
+#annot-btn svg{flex-shrink:0}
+
+#annot-popover{position:absolute;display:none;z-index:61;background:#fff;border:1px solid var(--bd);border-radius:10px;box-shadow:0 10px 28px rgba(17,20,23,.16);padding:12px;width:280px}
+#annot-popover.show{display:block}
+#annot-popover .annot-quote{font-size:11.5px;color:var(--tm);font-style:italic;margin-bottom:8px;max-height:60px;overflow-y:auto;border-left:2px solid var(--bd);padding-left:8px}
+#annot-popover textarea{width:100%;min-height:64px;border:1px solid var(--bd);border-radius:6px;padding:8px;font-family:var(--font-body);font-size:12.5px;resize:vertical}
+#annot-popover .annot-popover-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
+.annot-btn-sm{border:none;border-radius:6px;padding:6px 12px;font-size:11.5px;font-weight:700;font-family:var(--font-body);cursor:pointer}
+.annot-btn-save{background:var(--t);color:#fff}
+.annot-btn-cancel{background:var(--s2);color:var(--ts)}
+
+#feedback-fab{position:fixed;left:24px;bottom:32px;z-index:40;background:#fff;border:1.5px solid var(--t);border-radius:26px;padding:10px 16px;font-size:12.5px;font-weight:700;color:var(--t);cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.14);display:flex;align-items:center;gap:8px}
+#feedback-fab svg{flex-shrink:0}
+#feedback-fab .fb-count{background:var(--t);color:#fff;border-radius:12px;padding:1px 8px;font-family:var(--font-mono);font-size:11px}
+
+#feedback-panel{position:fixed;left:24px;bottom:82px;z-index:41;background:#fff;border:1px solid var(--bd);border-radius:12px;box-shadow:0 12px 32px rgba(17,20,23,.18);width:320px;max-height:50vh;display:none;flex-direction:column;overflow:hidden}
+#feedback-panel.open{display:flex}
+#feedback-panel-head{padding:12px 14px;border-bottom:1px solid var(--bd);font-size:12.5px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+#feedback-list{overflow-y:auto;padding:8px 14px;flex:1}
+.fb-item{border-bottom:1px dashed var(--bd);padding:10px 0;font-size:12px}
+.fb-item-loc{font-family:var(--font-mono);font-size:10px;color:var(--td);text-transform:uppercase;letter-spacing:.02em}
+.fb-item-quote{font-style:italic;color:var(--tm);margin:4px 0;font-size:11.5px}
+.fb-item-comment{color:var(--t)}
+.fb-item-del{float:right;color:var(--err);background:none;border:none;cursor:pointer;font-size:11px;font-weight:700}
+#feedback-panel-foot{padding:12px 14px;border-top:1px solid var(--bd)}
+#copy-feedback-btn{width:100%;background:var(--t);color:#fff;border:none;border-radius:8px;padding:10px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:var(--font-body)}
+.fb-empty{color:var(--td);font-size:12px;font-style:italic;padding:16px 0;text-align:center}
+
+/* ---- small structural helpers used inside .wf-card content (kit-adapted markup) ---- */
+.field-tag-onfile{font-size:9px;font-weight:700;color:var(--tm);background:var(--s2);border:1px solid var(--bd);border-radius:4px;padding:1px 6px;font-family:var(--font-mono);letter-spacing:.02em}
+</style>
+</head>
+<body>
+
+<div id="sticky-header">
+  <span>TAO — Dealer Website Scraping — Wireframes</span>
+  <span id="sticky-header-sub">9 tasks · 9 flows</span>
+</div>
+
+<div class="page-wrap">
+<div class="page-main">
+
+<div id="page-title" style="font-size:24px;font-weight:700;letter-spacing:-.3px;margin-bottom:6px">TAO — Dealer Website Scraping — Wireframes</div>
+<div style="font-size:11px;color:var(--td);font-family:var(--font-mono);margin-bottom:20px">ARC &middot; 9 tasks &middot; generated 2026-09-03</div>
+
+<div class="approval-banner">
+  Select any card to leave a comment. Then click <b>Copy Feedback</b> (bottom-left) and paste it into chat — say what to change, or that it's approved.
+</div>
+<div class="concepts-banner">
+  Want layout alternatives for a specific task instead of a direct edit? Say so in your feedback (e.g. "give me a few layout options for Task 3") — that spins up a separate <code>concepts-tao-task[N].html</code> for you to review and pick from, and this page updates once you paste back your selection. That file is kept permanently, even after you pick.
+</div>
+
+<!-- ============ FLOW 1: IM Provisioning Preview ============ -->
+<div class="flow-section" id="sec-flow-1" data-loc="Flow 1: IM Provisioning Preview">
+  <div class="sec-head" style="margin-top:0">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    <span class="sec-title">Flow 1: IM Provisioning Preview</span>
+  </div>
+  <div class="flow-section-desc">Implementation Manager views a read-only contract-vs-website comparison in the dealer list before the Dealer Admin journey begins.</div>
+
+  <div class="wf-row">
+
+    <div class="wf-card-wrap" style="width:1020px" id="sec-task-1" data-loc="Task 1: IM Dealer List — Scrape Preview Column">
+      <div class="wf-card-label"><span class="wf-card-num">1</span>IM Dealer List — Scrape Preview Column (read-only)</div>
+      <div class="wf-card">
+        <!-- Adapted from ui-kit.html #13 App Header (breadcrumb strip) + #24 Data Table (filter/rows/pagination)
+             + #3 Badges & Tags (sync status + diff classification) + #23 Empty States pattern (used inline
+             for "no comparison available" / "no website on file" cells). Strictly no action column — AC-6/7. -->
+        <div class="text-xs font-sans">
+          <div class="px-4 py-2 border-b border-slate-200 bg-slate-50 flex items-center gap-2 text-[11px] text-slate-500 font-mono">
+            <i data-lucide="grip" class="w-3.5 h-3.5 text-slate-400"></i>
+            <span>ARC</span><i data-lucide="chevron-right" class="w-3 h-3"></i><span>Provisioning Queue</span><i data-lucide="chevron-right" class="w-3 h-3"></i><span class="text-slate-800 font-semibold">Dealer List</span>
+          </div>
+          <div class="p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="text-sm font-bold text-slate-900">Dealer Provisioning Queue</div>
+              <div class="text-[10px] text-slate-400 font-mono">Showing 3 of 3 dealers</div>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="relative">
+                <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-2 text-slate-400"></i>
+                <input type="text" placeholder="Filter dealers..." class="pl-8 pr-3 py-1.5 text-xs border border-slate-300 rounded bg-white outline-none w-56" />
+              </div>
+            </div>
+            <div class="border border-slate-300 rounded-lg overflow-hidden">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-100 text-slate-600 font-mono text-[10px] border-b border-slate-200">
+                  <tr>
+                    <th class="p-3 w-56">DEALER (BUSINESS NAME)</th>
+                    <th class="p-3 w-32">TOC SYNC</th>
+                    <th class="p-3">WEBSITE PREVIEW — CONTRACT / TOC VALUE vs. WEBSITE-FOUND VALUE</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 text-[11px] align-top">
+                  <tr>
+                    <td class="p-3 font-semibold text-slate-800">[Dealer Business Name — on file]</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">COMPLETE</span></td>
+                    <td class="p-3">
+                      <div class="space-y-2">
+                        <div class="flex items-center justify-between p-2 rounded border border-slate-200 bg-slate-50">
+                          <div class="flex-1">
+                            <div class="text-[9px] font-mono text-slate-400 uppercase">Phone — Main</div>
+                            <div class="flex gap-3 mt-0.5"><span class="text-slate-500">On file: <b class="text-slate-800">[value on file]</b></span><span class="text-slate-500">Website: <b class="text-slate-800">[value found]</b></span></div>
+                          </div>
+                          <span class="px-2 py-0.5 rounded border border-dashed border-slate-400 text-slate-600 font-mono text-[9px] shrink-0 ml-2">DIFFERENT</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded border border-slate-200 bg-slate-50">
+                          <div class="flex-1">
+                            <div class="text-[9px] font-mono text-slate-400 uppercase">Email</div>
+                            <div class="flex gap-3 mt-0.5"><span class="text-slate-500">On file: <b class="text-slate-800">— none on file —</b></span><span class="text-slate-500">Website: <b class="text-slate-800">[value found]</b></span></div>
+                          </div>
+                          <span class="px-2 py-0.5 rounded bg-slate-200 text-slate-700 font-mono text-[9px] shrink-0 ml-2">NEW</span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-semibold text-slate-800">[Dealer Business Name — on file]</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded border border-dashed border-slate-400 text-slate-600 font-mono text-[10px] font-bold">SYNCING</span></td>
+                    <td class="p-3 text-slate-400 italic">No comparison available — TOC sync in progress</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 font-semibold text-slate-800">[Dealer Business Name — on file]</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px] font-bold">COMPLETE</span></td>
+                    <td class="p-3 text-slate-400 italic">No website on file — contract/TOC values only, no comparison preview</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="flex items-center gap-1.5 text-[10px] text-slate-400 italic">
+              <i data-lucide="lock" class="w-3 h-3"></i>
+              <span>Read-only preview — Implementation Managers cannot edit, confirm, or save dealer details from this view.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="wf-card-hint">Want a different layout for this screen? Select the card and comment "give me a few options" instead of describing an edit.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ FLOW 2: Dealer Admin Reviews Prefill With Website Diffs ============ -->
+<div class="flow-section" id="sec-flow-2" data-loc="Flow 2: Dealer Admin Reviews Prefill With Website Diffs">
+  <div class="sec-head">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    <span class="sec-title">Flow 2: Dealer Admin Reviews Prefill With Website Diffs</span>
+  </div>
+  <div class="flow-section-desc">Dealer Admin opens the review screen, sees the TOC baseline plus per-field website comparison rows, accepts or rejects each diff, and confirms final values.</div>
+
+  <div class="wf-row">
+
+    <div class="wf-card-wrap" style="width:620px" id="sec-task-2" data-loc="Task 2: Dealer Details Review — Baseline Load + Contract Prefill">
+      <div class="wf-card-label"><span class="wf-card-num">2</span>Baseline Load — Loading State (TOC sync pending)</div>
+      <div class="wf-card">
+        <!-- Adapted from ui-kit.html #5 Media Placeholders & Skeletons (text skeleton bars standing in for
+             blocked form fields) + #1 Button Variants (disabled primary, screen cannot proceed). -->
+        <div class="text-xs font-sans">
+          <div class="px-4 py-2 border-b border-slate-200 bg-slate-50 flex items-center gap-2 text-[11px] text-slate-500 font-mono">
+            <span>ARC</span><i data-lucide="chevron-right" class="w-3 h-3"></i><span>Configure Phase</span><i data-lucide="chevron-right" class="w-3 h-3"></i><span class="text-slate-800 font-semibold">Dealer Details Review</span>
+          </div>
+          <div class="p-6 space-y-5">
+            <div class="flex flex-col items-center text-center gap-2 py-4">
+              <div class="w-10 h-10 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center text-slate-500">
+                <i data-lucide="loader-circle" class="w-5 h-5"></i>
+              </div>
+              <div class="font-bold text-slate-900 text-sm">Preparing your dealer details…</div>
+              <p class="text-slate-500 text-[11px]">Syncing your records on file. This won't take long.</p>
+            </div>
+            <div class="space-y-3 opacity-60">
+              <div class="h-2.5 bg-slate-200 rounded w-1/3"></div>
+              <div class="h-8 bg-slate-100 border border-slate-200 rounded w-full"></div>
+              <div class="h-2.5 bg-slate-200 rounded w-1/4"></div>
+              <div class="h-8 bg-slate-100 border border-slate-200 rounded w-full"></div>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="h-8 bg-slate-100 border border-slate-200 rounded"></div>
+                <div class="h-8 bg-slate-100 border border-slate-200 rounded"></div>
+              </div>
+            </div>
+            <div class="flex justify-end">
+              <button disabled class="px-4 py-2 rounded-md bg-slate-100 text-slate-400 text-xs font-semibold cursor-not-allowed border border-slate-200">Confirm/Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="wf-card-hint">Want a different layout for this screen? Select the card and comment "give me a few options" instead of describing an edit.</div>
+    </div>
+
+    <div class="wf-connector">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--td)"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      <div class="wf-connector-label">TOC sync completes,<br/>scrape runs — diffs found</div>
+    </div>
+
+    <div class="wf-card-wrap" style="width:980px" id="sec-task-3" data-loc="Task 3: Dealer Details Review — Website Comparison View With Diffs">
+      <div class="wf-card-label"><span class="wf-card-num">3</span>Website Comparison View — Diffs Found (per-field accept/reject)</div>
+      <div class="wf-card">
+        <!-- Adapted from ui-kit.html #7 Textfields (field values) + #3 Badges (match/diff classification) +
+             #1 Button Variants (Yes / Keep on file) + #22 Accordions & Panels (Operating Hours collapsible
+             departments, expanded to a Mon–Sun day grid) + #23 Empty States motif (presence-only Logo check). -->
+        <div class="text-xs font-sans">
+          <div class="px-4 py-2 border-b border-slate-200 bg-slate-50 flex items-center gap-2 text-[11px] text-slate-500 font-mono">
+            <span>ARC</span><i data-lucide="chevron-right" class="w-3 h-3"></i><span>Configure Phase</span><i data-lucide="chevron-right" class="w-3 h-3"></i><span class="text-slate-800 font-semibold">Dealer Details Review</span>
+          </div>
+          <div class="p-5 space-y-5">
+            <div class="flex items-center justify-between">
+              <div class="text-sm font-bold text-slate-900">Dealer Details Review</div>
+              <span class="field-tag-onfile">From your records on file</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6">
+              <!-- LEFT: field label + on-file value column header context -->
+              <div class="text-[10px] font-mono text-slate-400 uppercase">On file</div>
+              <div class="text-[10px] font-mono text-slate-400 uppercase">Found on your website</div>
+            </div>
+
+            <div class="space-y-3">
+              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Business Information</div>
+
+              <div class="flex items-center gap-2 p-2.5 rounded border border-slate-200 bg-slate-50">
+                <i data-lucide="check-circle" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span class="font-medium text-slate-600">Dealer Business Name (Public) — ✓ Matches your website</span>
+              </div>
+
+              <div class="p-3 rounded-lg border border-slate-200 bg-slate-50">
+                <div class="text-[10px] font-mono text-slate-400 uppercase mb-1">DBA (Doing Business As)</div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="text-slate-500">On file: <b class="text-slate-800">— none on file —</b></div>
+                  <div class="text-slate-500">Found on your website: <b class="text-slate-800">[value found]</b></div>
+                </div>
+                <div class="flex items-center justify-between pt-2 mt-2 border-t border-slate-200">
+                  <span class="text-[11px] text-slate-500">Use website version?</span>
+                  <div class="flex gap-2">
+                    <button class="px-3 py-1 rounded-md bg-slate-900 text-white text-[11px] font-semibold">Yes</button>
+                    <button class="px-3 py-1 rounded-md border border-slate-300 text-[11px] font-medium">Keep on file</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-3">
+              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Address</div>
+
+              <div class="p-3 rounded-lg border border-slate-200 bg-slate-50">
+                <div class="text-[10px] font-mono text-slate-400 uppercase mb-1">Street Address 1</div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="text-slate-500">On file: <b class="text-slate-800">[value on file]</b></div>
+                  <div class="text-slate-500">Found on your website: <b class="text-slate-800">[value found]</b></div>
+                </div>
+                <div class="flex items-center justify-between pt-2 mt-2 border-t border-slate-200">
+                  <span class="text-[11px] text-slate-500">Use website version?</span>
+                  <div class="flex gap-2">
+                    <button class="px-3 py-1 rounded-md bg-slate-900 text-white text-[11px] font-semibold">Yes</button>
+                    <button class="px-3 py-1 rounded-md border border-slate-300 text-[11px] font-medium">Keep on file</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="p-3 rounded-lg border border-slate-200 bg-slate-50">
+                <div class="text-[10px] font-mono text-slate-400 uppercase mb-1">Street Address 2</div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="text-slate-500">On file: <b class="text-slate-800">— none on file —</b></div>
+                  <div class="text-slate-500">Found on your website: <b class="text-slate-800">[value found]</b></div>
+                </div>
+                <div class="flex items-center justify-between pt-2 mt-2 border-t border-slate-200">
+                  <span class="text-[11px] text-slate-500">Use website version?</span>
+                  <div class="flex gap-2">
+                    <button class="px-3 py-1 rounded-md bg-slate-900 text-white text-[11px] font-semibold">Yes</button>
+                    <button class="px-3 py-1 rounded-md border border-slate-300 text-[11px] font-medium">Keep on file</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 p-2.5 rounded border border-slate-200 bg-slate-50">
+                <i data-lucide="check-circle" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span class="font-medium text-slate-600">City, State, ZIP Code — ✓ Matches your website</span>
+              </div>
+            </div>
+
+            <div class="space-y-3">
+              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Phone Numbers</div>
+
+              <div class="p-3 rounded-lg border border-slate-200 bg-slate-50">
+                <div class="text-[10px] font-mono text-slate-400 uppercase mb-1">Phone — Main</div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="text-slate-500">On file: <b class="text-slate-800">[value on file]</b></div>
+                  <div class="text-slate-500">Found on your website: <b class="text-slate-800">[value found]</b></div>
+                </div>
+                <div class="flex items-center justify-between pt-2 mt-2 border-t border-slate-200">
+                  <span class="text-[11px] text-slate-500">Use website version?</span>
+                  <div class="flex gap-2">
+                    <button class="px-3 py-1 rounded-md bg-slate-900 text-white text-[11px] font-semibold">Yes</button>
+                    <button class="px-3 py-1 rounded-md border border-slate-300 text-[11px] font-medium">Keep on file</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 gap-2">
+                <div class="p-2.5 rounded border border-slate-200 bg-slate-50 flex items-center justify-between">
+                  <div><span class="text-[10px] font-mono text-slate-400 uppercase">Phone — Sales Dept.</span> <span class="text-slate-500 ml-2">Found on your website: <b class="text-slate-800">[value found]</b></span></div>
+                  <div class="flex gap-2"><button class="px-2.5 py-1 rounded-md bg-slate-900 text-white text-[10px] font-semibold">Yes</button><button class="px-2.5 py-1 rounded-md border border-slate-300 text-[10px] font-medium">Keep on file</button></div>
+                </div>
+                <div class="p-2.5 rounded border border-slate-200 bg-slate-50 flex items-center justify-between">
+                  <div><span class="text-[10px] font-mono text-slate-400 uppercase">Phone — Service Dept.</span> <span class="text-slate-500 ml-2">Found on your website: <b class="text-slate-800">[value found]</b></span></div>
+                  <div class="flex gap-2"><button class="px-2.5 py-1 rounded-md bg-slate-900 text-white text-[10px] font-semibold">Yes</button><button class="px-2.5 py-1 rounded-md border border-slate-300 text-[10px] font-medium">Keep on file</button></div>
+                </div>
+                <div class="p-2.5 rounded border border-slate-200 bg-slate-50 flex items-center justify-between">
+                  <div><span class="text-[10px] font-mono text-slate-400 uppercase">Phone — Parts Dept.</span> <span class="text-slate-500 ml-2">Found on your website: <b class="text-slate-800">[value found]</b></span></div>
+                  <div class="flex gap-2"><button class="px-2.5 py-1 rounded-md bg-slate-900 text-white text-[10px] font-semibold">Yes</button><button class="px-2.5 py-1 rounded-md border border-slate-300 text-[10px] font-medium">Keep on file</button></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-3">
+              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Email</div>
+              <div class="p-2.5 rounded border border-slate-200 bg-slate-50 flex items-center justify-between">
+                <div><span class="text-[10px] font-mono text-slate-400 uppercase">Email</span> <span class="text-slate-500 ml-2">Found on your website: <b class="text-slate-800">[value found]</b></span></div>
+                <div class="flex gap-2"><button class="px-2.5 py-1 rounded-md bg-slate-900 text-white text-[10px] font-semibold">Yes</button><button class="px-2.5 py-1 rounded-md border border-slate-300 text-[10px] font-medium">Keep on file</button></div>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Operating Hours</div>
+              <div class="border border-slate-200 rounded-lg divide-y divide-slate-200">
+                <div>
+                  <button onclick="accordionToggle(this)" class="accordion-header w-full flex justify-between items-center p-3 font-semibold text-slate-800 bg-slate-50">
+                    <span>Sales — Mon–Sun <span class="text-slate-400 font-normal">(found on your website)</span></span>
+                    <i data-lucide="chevron-up" class="accordion-chevron w-4 h-4 text-slate-500"></i>
+                  </button>
+                  <div class="accordion-content p-3 pt-2 space-y-1.5">
+                    <div class="grid grid-cols-4 gap-2 p-1.5 rounded bg-white border border-slate-100 text-[11px] items-center"><span class="font-mono text-slate-500">Mon</span><span class="text-slate-500 col-span-2">On file: <b class="text-slate-800">— none on file —</b> · Website: <b class="text-slate-800">[hours found]</b></span><div class="flex gap-1 justify-end"><button class="px-2 py-0.5 rounded bg-slate-900 text-white text-[10px]">Yes</button><button class="px-2 py-0.5 rounded border border-slate-300 text-[10px]">Keep</button></div></div>
+                    <div class="grid grid-cols-4 gap-2 p-1.5 rounded bg-white border border-slate-100 text-[11px] items-center"><span class="font-mono text-slate-500">Tue</span><span class="text-slate-500 col-span-2">Website: <b class="text-slate-800">[hours found]</b></span><div class="flex gap-1 justify-end"><button class="px-2 py-0.5 rounded bg-slate-900 text-white text-[10px]">Yes</button><button class="px-2 py-0.5 rounded border border-slate-300 text-[10px]">Keep</button></div></div>
+                    <div class="grid grid-cols-4 gap-2 p-1.5 rounded bg-white border border-slate-100 text-[11px] items-center"><span class="font-mono text-slate-500">Wed</span><span class="text-slate-500 col-span-2">Website: <b class="text-slate-800">[hours found]</b></span><div class="flex gap-1 justify-end"><button class="px-2 py-0.5 rounded bg-slate-900 text-white text-[10px]">Yes</button><button class="px-2 py-0.5 rounded border border-slate-300 text-[10px]">Keep</button></div></div>
+                    <div class="grid grid-cols-4 gap-2 p-1.5 rounded bg-white border border-slate-100 text-[11px] items-center"><span class="font-mono text-slate-500">Thu</span><span class="text-slate-500 col-span-2">Website: <b class="text-slate-800">[hours found]</b></span><div class="flex gap-1 justify-end"><button class="px-2 py-0.5 rounded bg-slate-900 text-white text-[10px]">Yes</button><button class="px-2 py-0.5 rounded border border-slate-300 text-[10px]">Keep</button></div></div>
+                    <div class="grid grid-cols-4 gap-2 p-1.5 rounded bg-white border border-slate-100 text-[11px] items-center"><span class="font-mono text-slate-500">Fri</span><span class="text-slate-500 col-span-2">Website: <b class="text-slate-800">[hours found]</b></span><div class="flex gap-1 justify-end"><button class="px-2 py-0.5 rounded bg-slate-900 text-white text-[10px]">Yes</button><button class="px-2 py-0.5 rounded border border-slate-300 text-[10px]">Keep</button></div></div>
+                    <div class="grid grid-cols-4 gap-2 p-1.5 rounded bg-white border border-slate-100 text-[11px] items-center"><span class="font-mono text-slate-500">Sat</span><span class="text-slate-500 col-span-2">Website: <b class="text-slate-800">[hours found]</b></span><div class="flex gap-1 justify-end"><button class="px-2 py-0.5 rounded bg-slate-900 text-white text-[10px]">Yes</button><button class="px-2 py-0.5 rounded border border-slate-300 text-[10px]">Keep</button></div></div>
+                    <div class="grid grid-cols-4 gap-2 p-1.5 rounded bg-white border border-slate-100 text-[11px] items-center"><span class="font-mono text-slate-500">Sun</span><span class="text-slate-500 col-span-2">Website: <b class="text-slate-800">Closed</b></span><div class="flex gap-1 justify-end"><button class="px-2 py-0.5 rounded bg-slate-900 text-white text-[10px]">Yes</button><button class="px-2 py-0.5 rounded border border-slate-300 text-[10px]">Keep</button></div></div>
+                  </div>
+                </div>
+                <div>
+                  <button onclick="accordionToggle(this)" class="accordion-header w-full flex justify-between items-center p-3 font-semibold text-slate-700 hover:bg-slate-50">
+                    <span>Service — Mon–Sun <span class="text-slate-400 font-normal">(found on your website)</span></span>
+                    <i data-lucide="chevron-down" class="accordion-chevron w-4 h-4 text-slate-400"></i>
+                  </button>
+                  <div class="accordion-content hidden p-3 pt-0 text-slate-500">Collapsed — expand to review the day-by-day diff for Service hours.</div>
+                </div>
+                <div>
+                  <button onclick="accordionToggle(this)" class="accordion-header w-full flex justify-between items-center p-3 font-semibold text-slate-700 hover:bg-slate-50">
+                    <span>Parts — Mon–Sun <span class="text-slate-400 font-normal">(found on your website)</span></span>
+                    <i data-lucide="chevron-down" class="accordion-chevron w-4 h-4 text-slate-400"></i>
+                  </button>
+                  <div class="accordion-content hidden p-3 pt-0 text-slate-500">Collapsed — expand to review the day-by-day diff for Parts hours.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 p-2.5 rounded border border-slate-200 bg-slate-50">
+              <i data-lucide="check-circle" class="w-3.5 h-3.5 text-slate-500"></i>
+              <span class="font-medium text-slate-600">Dealership Banner Logo — ✓ Logo found on website (presence only, no thumbnail)</span>
+            </div>
+
+            <div class="flex justify-end pt-2 border-t border-slate-200">
+              <button class="px-4 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold">Confirm/Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="wf-card-hint">Want a different layout for this screen? Select the card and comment "give me a few options" instead of describing an edit.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ FLOW 3: Dealer Admin Reviews Prefill, All Fields Match ============ -->
+<div class="flow-section" id="sec-flow-3" data-loc="Flow 3: Dealer Admin Reviews Prefill, All Fields Match">
+  <div class="sec-head">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    <span class="sec-title">Flow 3: Dealer Admin Reviews Prefill, All Fields Match</span>
+  </div>
+  <div class="flow-section-desc">Dealer Admin opens the review screen and finds every scraped field matches the on-file record, confirming with only quiet checkmarks shown.</div>
+
+  <div class="wf-row">
+
+    <div class="wf-card-wrap">
+      <div class="wf-card-label"><span class="wf-card-num">2</span>Baseline Load — Loading State</div>
+      <div class="wf-already-shown">
+        <span>Already shown in Flow 2</span>
+        <a href="#sec-task-2">Jump to Task 2 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="wf-connector">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--td)"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      <div class="wf-connector-label">scrape completes —<br/>all fields match</div>
+    </div>
+
+    <div class="wf-card-wrap" style="width:620px" id="sec-task-4" data-loc="Task 4: Dealer Details Review — All-Match / No-Diff State">
+      <div class="wf-card-label"><span class="wf-card-num">4</span>All-Match / No-Diff State (quiet checkmarks only)</div>
+      <div class="wf-card">
+        <!-- Adapted from ui-kit.html #7 Textfields (editable values) + #3 Badges/quiet checkmark pattern.
+             Visually identical to the contract-only baseline aside from the checkmarks (AC-27) — no
+             comparison rows anywhere, no bulk messaging. Scrape-only fields with no confident match still
+             render as plain editable inputs (nothing to check against). -->
+        <div class="text-xs font-sans">
+          <div class="px-4 py-2 border-b border-slate-200 bg-slate-50 flex items-center gap-2 text-[11px] text-slate-500 font-mono">
+            <span>ARC</span><i data-lucide="chevron-right" class="w-3 h-3"></i><span>Configure Phase</span><i data-lucide="chevron-right" class="w-3 h-3"></i><span class="text-slate-800 font-semibold">Dealer Details Review</span>
+          </div>
+          <div class="p-5 space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="text-sm font-bold text-slate-900">Dealer Details Review</div>
+              <span class="field-tag-onfile">From your records on file</span>
+            </div>
+
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between p-2.5 rounded border border-slate-200 bg-slate-50">
+                <span class="font-medium text-slate-700">Dealer Business Name (Public)</span>
+                <span class="flex items-center gap-1 text-slate-500"><i data-lucide="check" class="w-3.5 h-3.5"></i>Matches your website</span>
+              </div>
+              <div class="flex items-center justify-between p-2.5 rounded border border-slate-200 bg-slate-50">
+                <span class="font-medium text-slate-700">Street Address 1</span>
+                <span class="flex items-center gap-1 text-slate-500"><i data-lucide="check" class="w-3.5 h-3.5"></i>Matches your website</span>
+              </div>
+              <div class="flex items-center justify-between p-2.5 rounded border border-slate-200 bg-slate-50">
+                <span class="font-medium text-slate-700">City, State, ZIP Code</span>
+                <span class="flex items-center gap-1 text-slate-500"><i data-lucide="check" class="w-3.5 h-3.5"></i>Matches your website</span>
+              </div>
+              <div class="flex items-center justify-between p-2.5 rounded border border-slate-200 bg-slate-50">
+                <span class="font-medium text-slate-700">Phone — Main</span>
+                <span class="flex items-center gap-1 text-slate-500"><i data-lucide="check" class="w-3.5 h-3.5"></i>Matches your website</span>
+              </div>
+              <div class="space-y-1.5">
+                <label class="font-medium text-slate-700 text-[11px]">DBA (Doing Business As) <span class="text-slate-400">— not found, add manually</span></label>
+                <input type="text" placeholder="Enter DBA" class="w-full px-3 py-2 rounded-md border border-slate-300 bg-white outline-none" />
+              </div>
+              <div class="space-y-1.5">
+                <label class="font-medium text-slate-700 text-[11px]">Email <span class="text-slate-400">— not found, add manually</span></label>
+                <input type="text" placeholder="Enter email" class="w-full px-3 py-2 rounded-md border border-slate-300 bg-white outline-none" />
+              </div>
+              <div class="border border-slate-200 rounded-lg divide-y divide-slate-200 text-[11px]">
+                <div class="p-2.5 flex items-center justify-between text-slate-500"><span>Operating Hours — Sales</span><span class="italic">Not found — add manually</span></div>
+                <div class="p-2.5 flex items-center justify-between text-slate-500"><span>Operating Hours — Service</span><span class="italic">Not found — add manually</span></div>
+                <div class="p-2.5 flex items-center justify-between text-slate-500"><span>Operating Hours — Parts</span><span class="italic">Not found — add manually</span></div>
+              </div>
+              <div class="flex items-center justify-between p-2.5 rounded border border-slate-200 bg-slate-50">
+                <span class="font-medium text-slate-700">Dealership Banner Logo</span>
+                <span class="text-slate-400 italic">Not found</span>
+              </div>
+            </div>
+
+            <div class="flex justify-end pt-2 border-t border-slate-200">
+              <button class="px-4 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold">Confirm/Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="wf-card-hint">Want a different layout for this screen? Select the card and comment "give me a few options" instead of describing an edit.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ FLOW 4: Dealer Admin Reviews Contract-Only Prefill (No Website) ============ -->
+<div class="flow-section" id="sec-flow-4" data-loc="Flow 4: Dealer Admin Reviews Contract-Only Prefill (No Website)">
+  <div class="sec-head">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    <span class="sec-title">Flow 4: Dealer Admin Reviews Contract-Only Prefill (No Website)</span>
+  </div>
+  <div class="flow-section-desc">Dealer Admin opens the review screen for a dealer with no website on file and confirms the fully prefilled contract data, with no degraded messaging.</div>
+
+  <div class="wf-row">
+
+    <div class="wf-card-wrap">
+      <div class="wf-card-label"><span class="wf-card-num">2</span>Baseline Load — Loading State</div>
+      <div class="wf-already-shown">
+        <span>Already shown in Flow 2</span>
+        <a href="#sec-task-2">Jump to Task 2 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="wf-connector">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--td)"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      <div class="wf-connector-label">no website URL<br/>on file</div>
+    </div>
+
+    <div class="wf-card-wrap" style="width:620px" id="sec-task-5" data-loc="Task 5: Dealer Details Review — No-Website Contract-Only State">
+      <div class="wf-card-label"><span class="wf-card-num">5</span>No-Website Contract-Only State</div>
+      <div class="wf-card">
+        <!-- Adapted from ui-kit.html #7 Textfields (single-column prefilled inputs) + #1 Button Variants
+             (outline "Try a different website"). No comparison UI, no degraded/"couldn't find" messaging
+             anywhere — absence of a website is a first-class state (AC-31). Scrape-only fields (no TOC
+             baseline, no scrape ran) render as empty inputs awaiting manual entry. -->
+        <div class="text-xs font-sans">
+          <div class="px-4 py-2 border-b border-slate-200 bg-slate-50 flex items-center gap-2 text-[11px] text-slate-500 font-mono">
+            <span>ARC</span><i data-lucide="chevron-right" class="w-3 h-3"></i><span>Configure Phase</span><i data-lucide="chevron-right" class="w-3 h-3"></i><span class="text-slate-800 font-semibold">Dealer Details Review</span>
+          </div>
+          <div class="p-5 space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="text-sm font-bold text-slate-900">Dealer Details Review</div>
+              <button class="px-3 py-1.5 rounded-md border border-slate-300 text-slate-800 text-[11px] font-medium flex items-center gap-1.5"><i data-lucide="link" class="w-3.5 h-3.5"></i>Try a different website</button>
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="font-medium text-slate-700 text-[11px]">Dealer Business Name (Public) <span class="field-tag-onfile ml-1">From your records on file</span></label>
+              <input type="text" value="[Value on file]" class="w-full px-3 py-2 rounded-md border border-slate-300 bg-slate-50 outline-none" />
+            </div>
+            <div class="space-y-1.5">
+              <label class="font-medium text-slate-700 text-[11px]">DBA (Doing Business As) <span class="text-slate-400">— not on file</span></label>
+              <input type="text" placeholder="Enter DBA" class="w-full px-3 py-2 rounded-md border border-slate-300 bg-white outline-none" />
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="space-y-1.5">
+                <label class="font-medium text-slate-700 text-[11px]">Street Address 1 <span class="field-tag-onfile ml-1">On file</span></label>
+                <input type="text" value="[Value on file]" class="w-full px-3 py-2 rounded-md border border-slate-300 bg-slate-50 outline-none" />
+              </div>
+              <div class="space-y-1.5">
+                <label class="font-medium text-slate-700 text-[11px]">Street Address 2 <span class="text-slate-400">— not on file</span></label>
+                <input type="text" placeholder="Enter Street Address 2" class="w-full px-3 py-2 rounded-md border border-slate-300 bg-white outline-none" />
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-3">
+              <div class="space-y-1.5">
+                <label class="font-medium text-slate-700 text-[11px]">City <span class="field-tag-onfile ml-1">On file</span></label>
+                <input type="text" value="[Value on file]" class="w-full px-3 py-2 rounded-md border border-slate-300 bg-slate-50 outline-none" />
+              </div>
+              <div class="space-y-1.5">
+                <label class="font-medium text-slate-700 text-[11px]">State <span class="field-tag-onfile ml-1">On file</span></label>
+                <input type="text" value="[Value on file]" class="w-full px-3 py-2 rounded-md border border-slate-300 bg-slate-50 outline-none" />
+              </div>
+              <div class="space-y-1.5">
+                <label class="font-medium text-slate-700 text-[11px]">ZIP Code <span class="field-tag-onfile ml-1">On file</span></label>
+                <input type="text" value="[Value on file]" class="w-full px-3 py-2 rounded-md border border-slate-300 bg-slate-50 outline-none" />
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="space-y-1.5">
+                <label class="font-medium text-slate-700 text-[11px]">Phone — Main <span class="field-tag-onfile ml-1">On file</span></label>
+                <input type="text" value="[Value on file]" class="w-full px-3 py-2 rounded-md border border-slate-300 bg-slate-50 outline-none" />
+              </div>
+              <div class="space-y-1.5">
+                <label class="font-medium text-slate-700 text-[11px]">Phone — Sales Dept. <span class="text-slate-400">— not on file</span></label>
+                <input type="text" placeholder="Enter phone" class="w-full px-3 py-2 rounded-md border border-slate-300 bg-white outline-none" />
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="space-y-1.5">
+                <label class="font-medium text-slate-700 text-[11px]">Phone — Service Dept. <span class="text-slate-400">— not on file</span></label>
+                <input type="text" placeholder="Enter phone" class="w-full px-3 py-2 rounded-md border border-slate-300 bg-white outline-none" />
+              </div>
+              <div class="space-y-1.5">
+                <label class="font-medium text-slate-700 text-[11px]">Phone — Parts Dept. <span class="text-slate-400">— not on file</span></label>
+                <input type="text" placeholder="Enter phone" class="w-full px-3 py-2 rounded-md border border-slate-300 bg-white outline-none" />
+              </div>
+            </div>
+            <div class="space-y-1.5">
+              <label class="font-medium text-slate-700 text-[11px]">Email <span class="text-slate-400">— not on file</span></label>
+              <input type="text" placeholder="Enter email" class="w-full px-3 py-2 rounded-md border border-slate-300 bg-white outline-none" />
+            </div>
+
+            <div class="border border-slate-200 rounded-lg divide-y divide-slate-200 text-[11px]">
+              <button onclick="accordionToggle(this)" class="accordion-header w-full flex justify-between items-center p-3 font-semibold text-slate-700">
+                <span>Operating Hours — Sales <span class="text-slate-400 font-normal">(not on file)</span></span>
+                <i data-lucide="chevron-down" class="accordion-chevron w-4 h-4 text-slate-400"></i>
+              </button>
+              <div class="accordion-content hidden p-3 pt-0 text-slate-500">Expand to enter Mon–Sun hours manually.</div>
+              <button onclick="accordionToggle(this)" class="accordion-header w-full flex justify-between items-center p-3 font-semibold text-slate-700">
+                <span>Operating Hours — Service <span class="text-slate-400 font-normal">(not on file)</span></span>
+                <i data-lucide="chevron-down" class="accordion-chevron w-4 h-4 text-slate-400"></i>
+              </button>
+              <div class="accordion-content hidden p-3 pt-0 text-slate-500">Expand to enter Mon–Sun hours manually.</div>
+              <button onclick="accordionToggle(this)" class="accordion-header w-full flex justify-between items-center p-3 font-semibold text-slate-700">
+                <span>Operating Hours — Parts <span class="text-slate-400 font-normal">(not on file)</span></span>
+                <i data-lucide="chevron-down" class="accordion-chevron w-4 h-4 text-slate-400"></i>
+              </button>
+              <div class="accordion-content hidden p-3 pt-0 text-slate-500">Expand to enter Mon–Sun hours manually.</div>
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="font-medium text-slate-700 text-[11px]">Dealership Banner Logo <span class="text-slate-400">— not on file</span></label>
+              <div class="border-2 border-dashed border-slate-300 rounded-lg p-4 text-center text-slate-400 text-[11px] flex flex-col items-center gap-1">
+                <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+                <span>Click to upload or drag and drop</span>
+              </div>
+            </div>
+
+            <div class="flex justify-end pt-2 border-t border-slate-200">
+              <button class="px-4 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold">Confirm/Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="wf-card-hint">Want a different layout for this screen? Select the card and comment "give me a few options" instead of describing an edit.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ FLOW 5: Dealer Admin Reviews Prefill After Silent Scrape Failure ============ -->
+<div class="flow-section" id="sec-flow-5" data-loc="Flow 5: Dealer Admin Reviews Prefill After Silent Scrape Failure">
+  <div class="sec-head">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    <span class="sec-title">Flow 5: Dealer Admin Reviews Prefill After Silent Scrape Failure</span>
+  </div>
+  <div class="flow-section-desc">Dealer Admin opens the review screen where a website exists but the scrape fails, times out, or is blocked, and confirms the contract-prefilled data with no error shown.</div>
+
+  <div class="wf-row">
+
+    <div class="wf-card-wrap">
+      <div class="wf-card-label"><span class="wf-card-num">2</span>Baseline Load — Loading State</div>
+      <div class="wf-already-shown">
+        <span>Already shown in Flow 2</span>
+        <a href="#sec-task-2">Jump to Task 2 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="wf-connector">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--td)"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      <div class="wf-connector-label">scrape fails, times out,<br/>or robots.txt blocks it</div>
+    </div>
+
+    <div class="wf-card-wrap" style="width:620px" id="sec-task-6" data-loc="Task 6: Dealer Details Review — Silent Scrape Failure State">
+      <div class="wf-card-label"><span class="wf-card-num">6</span>Silent Scrape Failure State (identical layout to Task 5, no message)</div>
+      <div class="wf-card">
+        <!-- Same markup pattern as Task 5's contract-only form (AC-38: functionally identical). Deliberately
+             contains NO error banner, NO "couldn't find your details" text, and NO visual difference beyond
+             this wireframe-only caption above the card — the resolved decision is that scrape failure shows
+             no message at all (AC-37). Manual re-scrape entry point (Task 8) is available from here too. -->
+        <div class="text-xs font-sans">
+          <div class="px-4 py-2 border-b border-slate-200 bg-slate-50 flex items-center gap-2 text-[11px] text-slate-500 font-mono">
+            <span>ARC</span><i data-lucide="chevron-right" class="w-3 h-3"></i><span>Configure Phase</span><i data-lucide="chevron-right" class="w-3 h-3"></i><span class="text-slate-800 font-semibold">Dealer Details Review</span>
+          </div>
+          <div class="p-5 space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="text-sm font-bold text-slate-900">Dealer Details Review</div>
+              <div class="flex gap-2">
+                <button class="p-1.5 rounded-md border border-slate-300 text-slate-700" title="Re-check website"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i></button>
+                <button class="px-3 py-1.5 rounded-md border border-slate-300 text-slate-800 text-[11px] font-medium flex items-center gap-1.5"><i data-lucide="link" class="w-3.5 h-3.5"></i>Try a different website</button>
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="font-medium text-slate-700 text-[11px]">Dealer Business Name (Public) <span class="field-tag-onfile ml-1">From your records on file</span></label>
+              <input type="text" value="[Value on file]" class="w-full px-3 py-2 rounded-md border border-slate-300 bg-slate-50 outline-none" />
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="space-y-1.5">
+                <label class="font-medium text-slate-700 text-[11px]">Street Address 1 <span class="field-tag-onfile ml-1">On file</span></label>
+                <input type="text" value="[Value on file]" class="w-full px-3 py-2 rounded-md border border-slate-300 bg-slate-50 outline-none" />
+              </div>
+              <div class="space-y-1.5">
+                <label class="font-medium text-slate-700 text-[11px]">City <span class="field-tag-onfile ml-1">On file</span></label>
+                <input type="text" value="[Value on file]" class="w-full px-3 py-2 rounded-md border border-slate-300 bg-slate-50 outline-none" />
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="space-y-1.5">
+                <label class="font-medium text-slate-700 text-[11px]">State <span class="field-tag-onfile ml-1">On file</span></label>
+                <input type="text" value="[Value on file]" class="w-full px-3 py-2 rounded-md border border-slate-300 bg-slate-50 outline-none" />
+              </div>
+              <div class="space-y-1.5">
+                <label class="font-medium text-slate-700 text-[11px]">ZIP Code <span class="field-tag-onfile ml-1">On file</span></label>
+                <input type="text" value="[Value on file]" class="w-full px-3 py-2 rounded-md border border-slate-300 bg-slate-50 outline-none" />
+              </div>
+            </div>
+            <div class="space-y-1.5">
+              <label class="font-medium text-slate-700 text-[11px]">Phone — Main <span class="field-tag-onfile ml-1">On file</span></label>
+              <input type="text" value="[Value on file]" class="w-full px-3 py-2 rounded-md border border-slate-300 bg-slate-50 outline-none" />
+            </div>
+            <div class="text-[11px] text-slate-400 italic">DBA, additional phone lines, email, operating hours, and logo remain open for manual entry — same as Task 5.</div>
+
+            <div class="flex justify-end pt-2 border-t border-slate-200">
+              <button class="px-4 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold">Confirm/Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="wf-card-hint">Want a different layout for this screen? Select the card and comment "give me a few options" instead of describing an edit.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ FLOW 6: Dealer Admin Submits Alternate URL, Passes Validation ============ -->
+<div class="flow-section" id="sec-flow-6" data-loc="Flow 6: Dealer Admin Submits Alternate URL, Passes Validation">
+  <div class="sec-head">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    <span class="sec-title">Flow 6: Dealer Admin Submits Alternate URL, Passes Validation</span>
+  </div>
+  <div class="flow-section-desc">Dealer Admin provides a corrected/alternate website URL that passes domain and business-name validation, triggering a fresh comparison (including resolving a borderline fuzzy-match confirmation).</div>
+
+  <div class="wf-row">
+
+    <div class="wf-card-wrap" style="width:620px" id="sec-task-7" data-loc="Task 7: Alternate URL Input + Validation Flow">
+      <div class="wf-card-label"><span class="wf-card-num">7</span>Alternate URL Input + Validation States</div>
+      <div class="wf-card">
+        <!-- Adapted from ui-kit.html #7 Textfields (URL input with leading icon) + #34 Confirmation Modal
+             (borderline match prompt, rendered inline rather than as an overlay) + #33 Notification Banners
+             (domain-block and name-mismatch rejections, error/red variant). All three states below are shown
+             stacked for review purposes — only one renders at a time in the live product. -->
+        <div class="text-xs font-sans">
+          <div class="px-4 py-2 border-b border-slate-200 bg-slate-50 flex items-center gap-2 text-[11px] text-slate-500 font-mono">
+            <span>ARC</span><i data-lucide="chevron-right" class="w-3 h-3"></i><span>Configure Phase</span><i data-lucide="chevron-right" class="w-3 h-3"></i><span class="text-slate-800 font-semibold">Try a different website</span>
+          </div>
+          <div class="p-5 space-y-5">
+            <div>
+              <div class="text-sm font-bold text-slate-900">Try a different website</div>
+              <p class="text-slate-500 text-[11px] mt-0.5">Enter the correct URL for your dealership's website.</p>
+            </div>
+            <div class="space-y-1.5">
+              <label class="font-medium text-slate-700">Website URL</label>
+              <div class="flex gap-2">
+                <div class="relative flex-1">
+                  <i data-lucide="link" class="w-4 h-4 absolute left-3 top-2.5 text-slate-400"></i>
+                  <input type="text" placeholder="https://www.yourdealership.com" class="w-full pl-9 pr-3 py-2 rounded-md border border-slate-300 bg-slate-50 outline-none" />
+                </div>
+                <button class="px-4 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold">Check website</button>
+              </div>
+            </div>
+
+            <div class="space-y-2 pt-2 border-t border-slate-200">
+              <div class="text-[10px] font-mono text-slate-400 uppercase">State: borderline match (0.70–0.85)</div>
+              <div class="p-4 rounded-lg border border-slate-300 bg-white shadow-sm space-y-3">
+                <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-900 flex items-center justify-center font-bold text-xs">?</div>
+                <p class="text-slate-700 text-[11px] leading-relaxed">We found <b>[scraped business name]</b> on this website — is this your dealership?</p>
+                <div class="flex justify-end gap-2">
+                  <button class="px-3 py-1.5 rounded-md border border-slate-300 font-medium bg-white text-[11px]">No, try a different URL</button>
+                  <button class="px-3 py-1.5 rounded-md bg-slate-900 text-white font-semibold text-[11px]">Yes, use this website</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-2 pt-2 border-t border-slate-200">
+              <div class="text-[10px] font-mono text-slate-400 uppercase">State: domain blocked</div>
+              <div class="p-3.5 rounded-lg border border-red-300 bg-red-50/70 flex items-start gap-2.5">
+                <i data-lucide="x-circle" class="w-4 h-4 text-red-600 shrink-0 mt-0.5"></i>
+                <div class="text-red-700 text-[11px]">This doesn't look like a dealership website.</div>
+              </div>
+            </div>
+
+            <div class="space-y-2 pt-2 border-t border-slate-200">
+              <div class="text-[10px] font-mono text-slate-400 uppercase">State: name mismatch (below 0.70)</div>
+              <div class="p-3.5 rounded-lg border border-red-300 bg-red-50/70 flex items-start gap-2.5">
+                <i data-lucide="x-circle" class="w-4 h-4 text-red-600 shrink-0 mt-0.5"></i>
+                <div class="text-red-700 text-[11px]">The website you provided doesn't appear to be for [Dealership Name]. Please check the URL and try again.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="wf-card-hint">Want a different layout for this screen? Select the card and comment "give me a few options" instead of describing an edit.</div>
+    </div>
+
+    <div class="wf-connector">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--td)"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      <div class="wf-connector-label">validation passes —<br/>fresh comparison built</div>
+    </div>
+
+    <div class="wf-card-wrap">
+      <div class="wf-card-label"><span class="wf-card-num">3</span>Website Comparison View — Diffs Found</div>
+      <div class="wf-already-shown">
+        <span>Same per-field &amp; Operating-Hours mechanics as Task 3 — old scrape data discarded, fresh map built</span>
+        <a href="#sec-task-3">Jump to Task 3 &rarr;</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ FLOW 7: Dealer Admin Submits Alternate URL, Fails Validation ============ -->
+<div class="flow-section" id="sec-flow-7" data-loc="Flow 7: Dealer Admin Submits Alternate URL, Fails Validation">
+  <div class="sec-head">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    <span class="sec-title">Flow 7: Dealer Admin Submits Alternate URL, Fails Validation</span>
+  </div>
+  <div class="flow-section-desc">Dealer Admin provides an alternate website URL that is blocked by the domain list or fails business-name matching (including a borderline match the Dealer Admin rejects), and must retry.</div>
+
+  <div class="wf-row">
+
+    <div class="wf-card-wrap">
+      <div class="wf-card-label"><span class="wf-card-num">7</span>Alternate URL Input + Validation States</div>
+      <div class="wf-already-shown">
+        <span>Same screen as Flow 6 — this flow exercises its domain-block, name-mismatch, and borderline-reject states</span>
+        <a href="#sec-task-7">Jump to Task 7 &rarr;</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ FLOW 8: Dealer Admin Manually Re-Triggers Scrape ============ -->
+<div class="flow-section" id="sec-flow-8" data-loc="Flow 8: Dealer Admin Manually Re-Triggers Scrape">
+  <div class="sec-head">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    <span class="sec-title">Flow 8: Dealer Admin Manually Re-Triggers Scrape</span>
+  </div>
+  <div class="flow-section-desc">Dealer Admin invokes a manual re-scrape (/prefill-dealer-details) of the on-file website to refresh the comparison, subject to a 5-minute rate limit.</div>
+
+  <div class="wf-row">
+
+    <div class="wf-card-wrap" style="width:620px" id="sec-task-8" data-loc="Task 8: Manual Re-Scrape Trigger + Rate Limit">
+      <div class="wf-card-label"><span class="wf-card-num">8</span>Manual Re-Scrape Trigger + Rate-Limit Feedback</div>
+      <div class="wf-card">
+        <!-- Adapted from ui-kit.html #2 Button Groups & Icons (icon-only toolbar action) + #33 Notification
+             Banners (warn/amber variant for the rate-limit message). Static message only — no countdown
+             timer (AC-53, Assumption). -->
+        <div class="text-xs font-sans">
+          <div class="px-4 py-2 border-b border-slate-200 bg-slate-50 flex items-center gap-2 text-[11px] text-slate-500 font-mono">
+            <span>ARC</span><i data-lucide="chevron-right" class="w-3 h-3"></i><span>Configure Phase</span><i data-lucide="chevron-right" class="w-3 h-3"></i><span class="text-slate-800 font-semibold">Dealer Details Review</span>
+          </div>
+          <div class="p-5 space-y-5">
+            <div class="flex items-center justify-between">
+              <div class="text-sm font-bold text-slate-900">Dealer Details Review</div>
+              <button class="px-3 py-1.5 rounded-md border border-slate-300 text-slate-800 text-[11px] font-medium flex items-center gap-1.5">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>Re-check website
+              </button>
+            </div>
+            <p class="text-slate-500 text-[11px]">Manually re-scrapes the on-file (or currently active) URL via <code class="font-mono text-[10px] bg-slate-100 px-1 rounded">/prefill-dealer-details</code>.</p>
+
+            <div class="space-y-2 pt-2 border-t border-slate-200">
+              <div class="text-[10px] font-mono text-slate-400 uppercase">State: rate-limited (within 5 minutes of last scrape)</div>
+              <div class="p-3.5 rounded-lg border border-amber-300 bg-amber-50/70 flex items-start gap-2.5">
+                <i data-lucide="clock" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>
+                <div class="text-amber-800 text-[11px]">Please wait before retrying.</div>
+              </div>
+              <button disabled class="px-3 py-1.5 rounded-md bg-slate-100 text-slate-400 text-[11px] font-medium cursor-not-allowed border border-slate-200 flex items-center gap-1.5 w-fit">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>Re-check website
+              </button>
+            </div>
+
+            <div class="space-y-2 pt-2 border-t border-slate-200">
+              <div class="text-[10px] font-mono text-slate-400 uppercase">State: re-scrape succeeds (≥1 field ≥0.80 confidence)</div>
+              <p class="text-slate-600 text-[11px]">Refreshed comparison map replaces the prior comparison state entirely — same per-field layout as <a href="#sec-task-3" class="text-blue-700 underline">Task 3</a>.</p>
+            </div>
+
+            <div class="space-y-2 pt-2 border-t border-slate-200">
+              <div class="text-[10px] font-mono text-slate-400 uppercase">State: re-scrape fails or times out</div>
+              <p class="text-slate-600 text-[11px]">Silent fallback — screen remains on its current contract-only or existing-comparison view, no error shown. Same layout as <a href="#sec-task-5" class="text-blue-700 underline">Task 5</a> / <a href="#sec-task-6" class="text-blue-700 underline">Task 6</a>.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="wf-card-hint">Want a different layout for this screen? Select the card and comment "give me a few options" instead of describing an edit.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ FLOW 9: Dealer Admin Blocked by Incomplete or Failed TOC Sync ============ -->
+<div class="flow-section" id="sec-flow-9" data-loc="Flow 9: Dealer Admin Blocked by Incomplete or Failed TOC Sync">
+  <div class="sec-head">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    <span class="sec-title">Flow 9: Dealer Admin Blocked by Incomplete or Failed TOC Sync</span>
+  </div>
+  <div class="flow-section-desc">Dealer Admin opens the review screen before TOC sync has completed (or after it fails) and sees a blocked loading state until the always-present baseline is ready.</div>
+
+  <div class="wf-row">
+
+    <div class="wf-card-wrap">
+      <div class="wf-card-label"><span class="wf-card-num">2</span>Baseline Load — Loading State</div>
+      <div class="wf-already-shown">
+        <span>Already shown in Flow 2 — this is the "Pending, in progress" state, polled automatically</span>
+        <a href="#sec-task-2">Jump to Task 2 &rarr;</a>
+      </div>
+    </div>
+
+    <div class="wf-connector">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--td)"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      <div class="wf-connector-label err">sync fails, retries<br/>exhausted</div>
+    </div>
+
+    <div class="wf-card-wrap" style="width:520px" id="sec-task-9" data-loc="Task 9: TOC Sync Blocked / Loading / Persistent Failure + Escalation">
+      <div class="wf-card-label"><span class="wf-card-num">9</span>TOC Sync — Persistent Failure + Escalation</div>
+      <div class="wf-card">
+        <!-- Adapted from ui-kit.html #23 Empty States (icon + heading + body + CTA pattern, repurposed as
+             a blocked-state panel) + #1 Button Variants (outline "Contact Support"). No raw error code or
+             technical detail shown — "still preparing" framing only (AC-62, Assumption). -->
+        <div class="text-xs font-sans">
+          <div class="px-4 py-2 border-b border-slate-200 bg-slate-50 flex items-center gap-2 text-[11px] text-slate-500 font-mono">
+            <span>ARC</span><i data-lucide="chevron-right" class="w-3 h-3"></i><span>Configure Phase</span><i data-lucide="chevron-right" class="w-3 h-3"></i><span class="text-slate-800 font-semibold">Dealer Details Review</span>
+          </div>
+          <div class="border-2 border-dashed border-slate-200 rounded-xl p-8 m-5 flex flex-col items-center text-center bg-slate-50/50">
+            <div class="w-14 h-14 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-slate-500 mb-4">
+              <i data-lucide="clock" class="w-7 h-7"></i>
+            </div>
+            <h3 class="font-bold text-sm text-slate-900 mb-2">Still preparing your details</h3>
+            <p class="text-xs text-slate-500 max-w-xs mb-5 leading-relaxed">We're taking longer than usual to sync your records. Automatic retries have been exhausted for now.</p>
+            <div class="flex flex-col items-center gap-2">
+              <button class="px-4 py-2 border border-slate-300 rounded-md text-xs font-medium bg-white flex items-center gap-1.5"><i data-lucide="life-buoy" class="w-3.5 h-3.5"></i>Contact Support</button>
+              <p class="text-[10px] text-slate-400">Your Implementation Manager can also escalate this on your behalf.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="wf-card-hint">Want a different layout for this screen? Select the card and comment "give me a few options" instead of describing an edit.</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="doc-footer">Powered by Tekion Design</div>
+
+<div id="toc-fab">
+  <div id="toc-menu">
+    <a href="#sec-flow-1">Flow 1: IM Provisioning Preview</a>
+    <a href="#sec-task-1" class="toc-sub">Task 1: IM Dealer List</a>
+    <a href="#sec-flow-2">Flow 2: Reviews Prefill With Diffs</a>
+    <a href="#sec-task-2" class="toc-sub">Task 2: Baseline Loading</a>
+    <a href="#sec-task-3" class="toc-sub">Task 3: Comparison View — Diffs</a>
+    <a href="#sec-flow-3">Flow 3: All Fields Match</a>
+    <a href="#sec-task-4" class="toc-sub">Task 4: All-Match State</a>
+    <a href="#sec-flow-4">Flow 4: Contract-Only (No Website)</a>
+    <a href="#sec-task-5" class="toc-sub">Task 5: No-Website State</a>
+    <a href="#sec-flow-5">Flow 5: Silent Scrape Failure</a>
+    <a href="#sec-task-6" class="toc-sub">Task 6: Silent Failure State</a>
+    <a href="#sec-flow-6">Flow 6: Alt URL Passes Validation</a>
+    <a href="#sec-task-7" class="toc-sub">Task 7: Alternate URL + Validation</a>
+    <a href="#sec-flow-7">Flow 7: Alt URL Fails Validation</a>
+    <a href="#sec-flow-8">Flow 8: Manual Re-Scrape</a>
+    <a href="#sec-task-8" class="toc-sub">Task 8: Re-Scrape + Rate Limit</a>
+    <a href="#sec-flow-9">Flow 9: TOC Sync Blocked</a>
+    <a href="#sec-task-9" class="toc-sub">Task 9: Sync Failure + Escalation</a>
+  </div>
+  <button id="toc-btn" onclick="document.getElementById('toc-menu').classList.toggle('open')" title="Jump to section">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+  </button>
+</div>
+
+</div>
+
+<div class="side-toc">
+  <div class="side-toc-title">Jump to section</div>
+  <div class="side-toc-list" id="side-toc-list">
+    <div class="side-toc-indicator" id="side-toc-indicator"></div>
+    <a href="#sec-flow-1" class="active">Flow 1: IM Provisioning Preview</a>
+    <a href="#sec-task-1" class="side-toc-sub">Task 1: IM Dealer List</a>
+    <a href="#sec-flow-2">Flow 2: Reviews Prefill With Diffs</a>
+    <a href="#sec-task-2" class="side-toc-sub">Task 2: Baseline Loading</a>
+    <a href="#sec-task-3" class="side-toc-sub">Task 3: Comparison View — Diffs</a>
+    <a href="#sec-flow-3">Flow 3: All Fields Match</a>
+    <a href="#sec-task-4" class="side-toc-sub">Task 4: All-Match State</a>
+    <a href="#sec-flow-4">Flow 4: Contract-Only (No Website)</a>
+    <a href="#sec-task-5" class="side-toc-sub">Task 5: No-Website State</a>
+    <a href="#sec-flow-5">Flow 5: Silent Scrape Failure</a>
+    <a href="#sec-task-6" class="side-toc-sub">Task 6: Silent Failure State</a>
+    <a href="#sec-flow-6">Flow 6: Alt URL Passes Validation</a>
+    <a href="#sec-task-7" class="side-toc-sub">Task 7: Alternate URL + Validation</a>
+    <a href="#sec-flow-7">Flow 7: Alt URL Fails Validation</a>
+    <a href="#sec-flow-8">Flow 8: Manual Re-Scrape</a>
+    <a href="#sec-task-8" class="side-toc-sub">Task 8: Re-Scrape + Rate Limit</a>
+    <a href="#sec-flow-9">Flow 9: TOC Sync Blocked</a>
+    <a href="#sec-task-9" class="side-toc-sub">Task 9: Sync Failure + Escalation</a>
+  </div>
+</div>
+
+</div>
+
+<!-- ============ Click-to-annotate widgets ============ -->
+<button id="annot-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Add comment</button>
+
+<div id="annot-popover">
+  <div class="annot-quote" id="annot-popover-quote"></div>
+  <div style="font-size:10.5px;color:var(--tm);margin-bottom:6px;line-height:1.5">Describe a change, <b>or</b> ask for layout options instead (e.g. "give me a few directions for this task") — either works here.</div>
+  <textarea id="annot-popover-input" placeholder="e.g. &quot;move the button below the link&quot; — or — &quot;give me 3 layout options for this&quot;"></textarea>
+  <div class="annot-popover-actions">
+    <button class="annot-btn-sm annot-btn-cancel" id="annot-cancel-btn">Cancel</button>
+    <button class="annot-btn-sm annot-btn-save" id="annot-save-btn">Save</button>
+  </div>
+</div>
+
+<div id="feedback-fab" onclick="toggleFeedbackPanel()">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+  <span>Feedback</span>
+  <span class="fb-count" id="fb-count">0</span>
+</div>
+
+<div id="feedback-panel">
+  <div id="feedback-panel-head">
+    <span>Feedback</span>
+    <button onclick="toggleFeedbackPanel()" style="background:none;border:none;cursor:pointer;color:var(--tm);display:flex;align-items:center;justify-content:center;padding:2px">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div id="feedback-list"><div class="fb-empty">No annotations yet. Select any card to add one.</div></div>
+  <div id="feedback-panel-foot">
+    <button id="copy-feedback-btn" onclick="copyFeedback()">Copy Feedback (0)</button>
+  </div>
+</div>
+
+
+<script>
+document.querySelectorAll('.side-toc-list a, #toc-menu a').forEach(function(a){
+  a.addEventListener('click',function(e){
+    e.preventDefault();
+    var target=document.querySelector(a.getAttribute('href'));
+    if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
+    var menu=document.getElementById('toc-menu');
+    if(menu)menu.classList.remove('open');
+  });
+});
+document.addEventListener('click',function(e){
+  if(!e.target.closest('#toc-fab')){
+    var menu=document.getElementById('toc-menu');
+    if(menu)menu.classList.remove('open');
+  }
+});
+
+(function(){
+  var sectionIds=['sec-flow-1','sec-task-1','sec-flow-2','sec-task-2','sec-task-3','sec-flow-3','sec-task-4','sec-flow-4','sec-task-5','sec-flow-5','sec-task-6','sec-flow-6','sec-task-7','sec-flow-7','sec-flow-8','sec-task-8','sec-flow-9','sec-task-9'];
+  var links=Array.from(document.querySelectorAll('.side-toc-list a'));
+  var indicator=document.getElementById('side-toc-indicator');
+  var listEl=document.getElementById('side-toc-list');
+  var REFERENCE_Y=110;
+
+  function setActive(id){
+    links.forEach(function(l){l.classList.toggle('active',l.getAttribute('href')==='#'+id);});
+    var activeLink=links.find(function(l){return l.getAttribute('href')==='#'+id;});
+    if(activeLink&&indicator&&listEl){
+      var listRect=listEl.getBoundingClientRect();
+      var linkRect=activeLink.getBoundingClientRect();
+      indicator.style.top=(linkRect.top-listRect.top)+'px';
+      indicator.style.height=linkRect.height+'px';
+    }
+  }
+
+  function onScroll(){
+    var atBottom=(window.innerHeight+window.scrollY)>=document.documentElement.scrollHeight-2;
+    if(atBottom){
+      setActive(sectionIds[sectionIds.length-1]);
+      return;
+    }
+    var current=sectionIds[0];
+    for(var i=0;i<sectionIds.length;i++){
+      var el=document.getElementById(sectionIds[i]);
+      if(!el)continue;
+      var top=el.getBoundingClientRect().top;
+      if(top<=REFERENCE_Y){
+        current=sectionIds[i];
+      } else {
+        break;
+      }
+    }
+    setActive(current);
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',onScroll);
+  onScroll();
+})();
+
+(function(){
+  var titleEl=document.getElementById('page-title');
+  var header=document.getElementById('sticky-header');
+  if(!titleEl||!header)return;
+  function check(){
+    var rect=titleEl.getBoundingClientRect();
+    header.classList.toggle('vis',rect.bottom<0);
+  }
+  window.addEventListener('scroll',check,{passive:true});
+  window.addEventListener('resize',check);
+  check();
+})();
+
+// Accordion toggle for Operating Hours collapsible department rows (adapted from ui-kit.html #22)
+function accordionToggle(btn){
+  var content = btn.nextElementSibling;
+  if(!content) return;
+  var isHidden = content.classList.contains('hidden');
+  content.classList.toggle('hidden');
+  var chevron = btn.querySelector('.accordion-chevron');
+  if(chevron){
+    chevron.setAttribute('data-lucide', isHidden ? 'chevron-up' : 'chevron-down');
+    if(window.lucide && window.lucide.createIcons){ window.lucide.createIcons(); }
+  }
+}
+
+if(window.lucide && window.lucide.createIcons){ window.lucide.createIcons(); }
+</script>
+
+<script>
+(function(){
+  var annotations = [];
+  var nextId = 1;
+  var pendingRange = null;
+
+  var annotBtn = document.getElementById('annot-btn');
+  var popover = document.getElementById('annot-popover');
+  var popoverQuote = document.getElementById('annot-popover-quote');
+  var popoverInput = document.getElementById('annot-popover-input');
+  var pageMain = document.querySelector('.page-main');
+
+  function nearestLoc(node){
+    var el = node.nodeType === 3 ? node.parentElement : node;
+    while(el && el !== document.body){
+      if(el.hasAttribute && el.hasAttribute('data-loc')) return el.getAttribute('data-loc');
+      el = el.parentElement;
+    }
+    return 'Document';
+  }
+
+  function truncate(s, n){
+    s = s.trim().replace(/\s+/g,' ');
+    return s.length > n ? s.slice(0, n) + '…' : s;
+  }
+
+  document.addEventListener('mouseup', function(e){
+    if(e.target.closest('#annot-popover') || e.target.closest('#annot-btn')) return;
+    setTimeout(function(){
+      var sel = window.getSelection();
+      if(!sel || sel.isCollapsed || !sel.toString().trim()){
+        annotBtn.classList.remove('show');
+        return;
+      }
+      var anchorEl = sel.anchorNode && (sel.anchorNode.nodeType === 3 ? sel.anchorNode.parentElement : sel.anchorNode);
+      if(!anchorEl || !pageMain.contains(anchorEl)){
+        annotBtn.classList.remove('show');
+        return;
+      }
+      var range = sel.getRangeAt(0);
+      pendingRange = range.cloneRange();
+      var rect = range.getBoundingClientRect();
+      annotBtn.style.left = (window.scrollX + rect.left + rect.width/2 - 60) + 'px';
+      annotBtn.style.top = (window.scrollY + rect.top - 40) + 'px';
+      annotBtn.classList.add('show');
+    }, 10);
+  });
+
+  annotBtn.addEventListener('click', function(){
+    if(!pendingRange) return;
+    var rect = pendingRange.getBoundingClientRect();
+    popoverQuote.textContent = '"' + truncate(pendingRange.toString(), 200) + '"';
+    popoverInput.value = '';
+    popover.style.left = (window.scrollX + rect.left) + 'px';
+    popover.style.top = (window.scrollY + rect.bottom + 8) + 'px';
+    popover.classList.add('show');
+    annotBtn.classList.remove('show');
+    popoverInput.focus();
+  });
+
+  document.getElementById('annot-cancel-btn').addEventListener('click', function(){
+    popover.classList.remove('show');
+    pendingRange = null;
+  });
+
+  document.getElementById('annot-save-btn').addEventListener('click', function(){
+    if(!pendingRange) return;
+    var comment = popoverInput.value.trim();
+    if(!comment){ popoverInput.focus(); return; }
+
+    var quote = truncate(pendingRange.toString(), 200);
+    var loc = nearestLoc(pendingRange.commonAncestorContainer);
+    var id = nextId++;
+
+    try{
+      var mark = document.createElement('mark');
+      mark.className = 'annot-mark';
+      mark.dataset.annotId = id;
+      var sup = document.createElement('sup');
+      sup.textContent = id;
+      pendingRange.surroundContents(mark);
+      mark.appendChild(sup);
+    } catch(err){
+    }
+
+    annotations.push({id: id, loc: loc, quote: quote, comment: comment});
+    renderFeedbackList();
+    popover.classList.remove('show');
+    pendingRange = null;
+    window.getSelection().removeAllRanges();
+  });
+
+  window.removeAnnotation = function(id){
+    annotations = annotations.filter(function(a){ return a.id !== id; });
+    var mark = document.querySelector('.annot-mark[data-annot-id="'+id+'"]');
+    if(mark){
+      var parent = mark.parentNode;
+      while(mark.firstChild && mark.firstChild.tagName === 'SUP') mark.removeChild(mark.firstChild);
+      while(mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+      parent.removeChild(mark);
+    }
+    renderFeedbackList();
+  };
+
+  function renderFeedbackList(){
+    var list = document.getElementById('feedback-list');
+    var countEls = [document.getElementById('fb-count')];
+    var copyBtn = document.getElementById('copy-feedback-btn');
+    countEls.forEach(function(el){ el.textContent = annotations.length; });
+    copyBtn.textContent = 'Copy Feedback (' + annotations.length + ')';
+
+    if(!annotations.length){
+      list.innerHTML = '<div class="fb-empty">No annotations yet. Select any card to add one.</div>';
+      return;
+    }
+    list.innerHTML = annotations.map(function(a, i){
+      return '<div class="fb-item">' +
+        '<button class="fb-item-del" onclick="removeAnnotation(' + a.id + ')">remove</button>' +
+        '<div class="fb-item-loc">' + (i+1) + '. ' + escapeHtml(a.loc) + '</div>' +
+        '<div class="fb-item-quote">"' + escapeHtml(a.quote) + '"</div>' +
+        '<div class="fb-item-comment">' + escapeHtml(a.comment) + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function escapeHtml(s){
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function buildFeedbackText(){
+    var lines = ['Feedback (' + annotations.length + ' items)', ''];
+    annotations.forEach(function(a, i){
+      lines.push((i+1) + '. Location: ' + a.loc);
+      lines.push('   Quote: "' + a.quote + '"');
+      lines.push('   Comment: ' + a.comment);
+      lines.push('');
+    });
+    return lines.join('\n').trim();
+  }
+
+  window.toggleFeedbackPanel = function(){
+    document.getElementById('feedback-panel').classList.toggle('open');
+  };
+
+  window.copyFeedback = function(){
+    var btn = document.getElementById('copy-feedback-btn');
+    if(!annotations.length){
+      btn.textContent = 'No annotations yet';
+      setTimeout(renderFeedbackList, 1400);
+      return;
+    }
+    var text = buildFeedbackText();
+
+    function settle(ok){
+      btn.textContent = ok ? 'Copied — paste it into chat' : 'Could not copy — select the list above and press Cmd/Ctrl+C';
+      setTimeout(renderFeedbackList, ok ? 1600 : 3000);
+    }
+
+    function manualCopy(){
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try{ ok = document.execCommand('copy'); } catch(err){}
+      document.body.removeChild(ta);
+      settle(ok);
+    }
+
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ settle(true); }).catch(manualCopy);
+    } else {
+      manualCopy();
+    }
+  };
+})();
+</script>
+
+</body>
+</html>
