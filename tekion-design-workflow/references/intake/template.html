@@ -248,7 +248,7 @@ body{font-family:var(--font-body);color:var(--t);line-height:1.65;font-size:14px
 <div class="meta-line" style="margin-bottom:20px">Sources: [Confluence URL / Jira ticket / filename(s) / "pasted content"]</div>
 
 <div class="approval-banner">
-  This is what Claude gathered from your sources, grouped only — nothing has been scored or written to disk yet. Click-and-drag over any text to annotate it, or use the <b>Copy Feedback</b> button (bottom-left) to consolidate your notes into a pasteable block. Reply in chat — describe changes, paste the feedback block, or say "approved" — this page regenerates until you approve, then <code>design-brief-[slug].md</code> is written.
+  Your docs have been read and the key design info pulled out. Check it over — tell me what's wrong or say you're good.
 </div>
 
 <!-- ============ OVERVIEW ============ -->
@@ -521,7 +521,7 @@ body{font-family:var(--font-body);color:var(--t);line-height:1.65;font-size:14px
   </div>
   <div id="feedback-list"><div class="fb-empty">No annotations yet. Select any text to add one.</div></div>
   <div id="feedback-panel-foot">
-    <button id="copy-feedback-btn" onclick="copyFeedback()">Copy Feedback (0)</button>
+    <button type="button" id="copy-feedback-btn" onclick="copyFeedback()">Copy Feedback (0)</button>
   </div>
 </div>
 

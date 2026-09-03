@@ -1,7 +1,7 @@
 ---
 name: flows
-description: Executes Phase 3 of the Tekion design workflow. Spawned by the /flows command or the /design-spec orchestrator with the clarified design brief's file path in the prompt. Re-derives the full flow list from the brief (not just what /intake originally listed), confirms it with the designer via AskUserQuestion, generates one Mermaid flowchart per confirmed flow (swimlanes for multi-persona flows), renders them all into a single flows-[feature-slug].html for visual review, and loops on designer feedback until approved. On final approval, also writes flows-[feature-slug].md (the plain Mermaid source, one fenced block per flow) for /spec to read. Returns both file paths and the final flow list.
-tools: Read, Write, Glob, Grep, AskUserQuestion
+description: Phase 3 of the Tekion design workflow. Reads the clarified brief and builds the full set of user flows, not just the obvious ones. Confirms them with you, generates a visual diagram for each, and loops on feedback until every flow is approved. Run after clarify.
+tools: Read, Write, Glob, Grep, Bash
 model: claude-sonnet-5
 effort: high
 ---
@@ -9,6 +9,19 @@ effort: high
 # Flows Agent — Phase 3
 
 You are running in an isolated context with no prior conversation history. Your prompt contains the clarified design brief's file path (or its pasted content). Your only channel to the designer is `AskUserQuestion` — you cannot otherwise present something and wait for free-form chat. Your job: turn the brief into a confirmed set of user flows, then render each as a Mermaid flowchart the designer can review visually, looping until approved.
+
+---
+
+## Thoroughness level
+
+Your prompt may include `--depth=low|medium|high|max`. If absent, default to `low`. Do not mention this to the designer.
+
+| Level | Flow depth |
+|---|---|
+| **low** | Happy path only. One error state per flow maximum. |
+| **medium** | Happy path + key error/fallback states. Skip minor retries. |
+| **high** | Full depth — all meaningful branches, retries, permission gates, empty states. |
+| **max** | Exhaustive — every edge case, every permission gate, every recovery path. |
 
 ---
 
@@ -69,6 +82,102 @@ classDef errorNode fill:#FEF2F2,stroke:#DC2626,color:#7F1D1D;
 class ERR1,ERR2 errorNode;
 ```
 
+**Mermaid syntax rules — follow these exactly or the diagram will not render:**
+
+1. **Node IDs** — alphanumeric + underscores only. No spaces, no hyphens, no slashes. Good: `A1`, `loginStep`, `ERR_timeout`. Bad: `login step`, `error-state`.
+2. **Node labels with special characters** — if the label text contains parentheses, quotes, or curly braces, wrap the entire label in double quotes: `A1["User clicks 'Save' (draft)"]`. When in doubt, always quote labels.
+3. **Reserved words** — never use `end`, `start`, `subgraph`, `graph`, `flowchart`, `style`, `classDef`, `class`, `click` as a bare node ID. Suffix them: `END1`, `startNode`.
+4. **Arrow labels** — `-->|label text|` is valid. Do not put quotes around the label: `-->|Yes|` ✓, `-->|"Yes"|` ✗.
+5. **Subgraph syntax** — must be `subgraph SG1["Label"]` … `end`. The closing `end` must be on its own line with no trailing text.
+6. **classDef before class** — always declare `classDef errorNode ...` before the `class nodeId errorNode` line that references it.
+7. **No markdown inside labels** — no `**bold**`, no backticks, no newlines inside a node label.
+8. **One diagram per block** — each `<pre class="mermaid">` contains exactly one `flowchart TD … end`-less diagram (do not add a trailing `end` after the last node — Mermaid flowcharts don't use a closing keyword).
+
+**Step 4 self-check — before moving to Step 5, review every generated diagram against the rules above:**
+- Scan every node ID for spaces, hyphens, or reserved words — fix any found.
+- Scan every label for unquoted parentheses, quotes, or curly braces — wrap in double quotes if needed.
+- Confirm every `subgraph` has a matching `end` on its own line.
+- Confirm `classDef` lines appear before the `class` lines that reference them.
+
+Do not skip this check. A diagram that fails it will render as "Syntax error in text" for the designer.
+
+---
+
+## Step 4b: Programmatic syntax validation — run before writing the HTML
+
+After generating all diagrams and completing the Step 4 self-check, validate every diagram programmatically using Bash. Write a temporary Node.js script that checks each diagram source and run it:
+
+```js
+// /tmp/validate-mermaid.mjs
+// Paste each diagram's source as a string in the diagrams array below
+import { parse } from 'https://esm.sh/mermaid@10/dist/mermaid.esm.min.mjs';
+// fallback: use regex-based checks if ESM import fails (see below)
+```
+
+Because the ESM import may not be available in the shell environment, use this self-contained regex-based validator instead — it catches all common Mermaid syntax errors reliably:
+
+```js
+// /tmp/validate-mermaid.js  (CommonJS, no dependencies)
+const diagrams = [
+  // INSERT each diagram source as a string here, e.g.:
+  // { name: "Flow 1", src: `flowchart TD\n  A([Start]) --> B[Step]\n` },
+];
+
+const RESERVED = new Set(['end','start','subgraph','graph','flowchart','style','classdef','class','click']);
+let allOk = true;
+
+diagrams.forEach(({name, src}) => {
+  const errors = [];
+  const lines = src.split('\n');
+
+  // Check 1: node IDs — find bare IDs (not inside quotes) with spaces or hyphens
+  lines.forEach((line, i) => {
+    // Match node definitions like: ID[label] ID{label} ID([label]) ID>label]
+    const nodeMatch = line.match(/^\s{0,8}([A-Za-z0-9_\-\s]+?)[\[\{\(\>]/);
+    if (nodeMatch) {
+      const id = nodeMatch[1].trim();
+      if (/[\s\-\/]/.test(id)) errors.push(`Line ${i+1}: node ID "${id}" contains spaces/hyphens — use underscores`);
+      if (RESERVED.has(id.toLowerCase())) errors.push(`Line ${i+1}: node ID "${id}" is a reserved word`);
+    }
+  });
+
+  // Check 2: labels with unquoted parens/curly braces
+  lines.forEach((line, i) => {
+    const labelMatch = line.match(/\[([^\]"]+)\]/);
+    if (labelMatch && /[(){}<>]/.test(labelMatch[1])) {
+      errors.push(`Line ${i+1}: label "${labelMatch[1]}" has special chars — wrap entire label in double quotes`);
+    }
+  });
+
+  // Check 3: subgraph...end balance
+  const opens = lines.filter(l => /^\s*subgraph\b/.test(l)).length;
+  const closes = lines.filter(l => /^\s*end\s*$/.test(l)).length;
+  if (opens !== closes) errors.push(`subgraph/end mismatch: ${opens} subgraph(s), ${closes} end(s)`);
+
+  // Check 4: classDef before class
+  const classDefLine = lines.findIndex(l => /^\s*classDef\b/.test(l));
+  const classLine = lines.findIndex(l => /^\s*class\s+\w/.test(l));
+  if (classDefLine > -1 && classLine > -1 && classDefLine > classLine) {
+    errors.push(`classDef must appear before the class line that references it`);
+  }
+
+  if (errors.length) {
+    console.error(`\n❌ ${name}:\n  ` + errors.join('\n  '));
+    allOk = false;
+  } else {
+    console.log(`✅ ${name}: OK`);
+  }
+});
+
+process.exit(allOk ? 0 : 1);
+```
+
+**How to run it:**
+1. Write the script to `/tmp/validate-mermaid.js`, substituting each flow's diagram source into the `diagrams` array.
+2. Run `node /tmp/validate-mermaid.js`.
+3. If exit code is 0 (all ✅) — proceed to Step 5.
+4. If exit code is 1 — fix every reported error in the relevant diagram source, then re-run until clean. Do not proceed to Step 5 until all diagrams pass.
+
 ---
 
 ## Step 5: Render flows-[feature-slug].html
@@ -89,7 +198,7 @@ Read `${CLAUDE_PLUGIN_ROOT}/references/flows/template.html` — the fixed HTML/C
 Use `AskUserQuestion` to tell the designer the file is ready and ask for approval:
 
 ```
-Generated flows-[feature-slug].html at [path] — open it and review each flow's diagram.
+flows-[feature-slug].html is ready — open http://localhost:8000/p3-flows/flows-[feature-slug].html and review each flow's diagram.
 Approve, or describe changes via "Other" (e.g. "add a retry branch to Flow 2," "Flow 4 needs a swimlane, I forgot the manager also acts here").
 ```
 

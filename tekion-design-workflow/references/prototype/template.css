@@ -1,0 +1,67 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Tekion Design Workflow — Prototype Chrome
+   Copy to projects/[slug]/[Slug].css. Never edit the bar rules.
+   Add feature-specific layout below the INJECT:LAYOUT marker.
+───────────────────────────────────────────────────────────────────────────── */
+
+/* ── Dark prototype chrome bar ── */
+.prj-proto-bar {
+  position: sticky; top: 0; z-index: 100;
+  height: 40px; background: #13151F;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 1px 0 rgba(0,0,0,.3);
+  display: flex; align-items: center; padding: 0 16px;
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+}
+.prj-proto-project  { font-size: 13px; font-weight: 600; color: #E5E7EB; white-space: nowrap; flex-shrink: 0; }
+.prj-proto-sep      { width: 1px; height: 16px; background: rgba(255,255,255,.1); margin: 0 12px; flex-shrink: 0; }
+.prj-proto-flows-label {
+  font-size: 10px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: #4B5563; margin-right: 8px; flex-shrink: 0;
+}
+.prj-proto-flows    { display: flex; align-items: center; gap: 4px; flex: 1; min-width: 0; overflow-x: auto; }
+.prj-proto-flow-pill {
+  font-size: 12.5px; font-weight: 500; color: #6B7280;
+  cursor: pointer; padding: 4px 11px; border-radius: 5px;
+  white-space: nowrap; transition: background .12s, color .12s; flex-shrink: 0;
+}
+.prj-proto-flow-pill:hover             { color: #D1D5DB; background: rgba(255,255,255,.06); }
+.prj-proto-flow-pill--active           { color: #fff; font-weight: 600; background: #4F46E5; }
+.prj-proto-hide-btn {
+  width: 26px; height: 26px; border-radius: 5px;
+  border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.04);
+  color: #6B7280; margin-left: 10px; display: flex;
+  align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
+}
+.prj-proto-hide-btn:hover { background: rgba(255,255,255,.08); color: #9CA3AF; }
+
+/* Restore tab — centered drop-down from top edge, shown when bar is hidden */
+.prj-proto-restore {
+  position: fixed; top: 0;
+  left: 50%; transform: translateX(-50%);
+  z-index: 100; background: #13151F;
+  border: 1px solid rgba(99,102,241,.32);
+  border-top: none; border-radius: 0 0 7px 7px;
+  font-size: 11.5px; font-weight: 600; color: #C4B5FD;
+  padding: 5px 12px 5px 10px;
+  cursor: pointer; display: flex; align-items: center; gap: 5px;
+  white-space: nowrap; font-family: 'IBM Plex Sans', system-ui, sans-serif;
+}
+.prj-proto-restore:hover { background: #1a1d2e; }
+
+/* ── Page layout ── */
+.prj-flow-page  { flex: 1; display: flex; flex-direction: column; background: var(--bg, #F9FAFB); min-height: 0; }
+.prj-page-header {
+  background: var(--surface, #fff);
+  border-bottom: 1px solid var(--border, #E5E7EB);
+  padding: 0 32px; display: flex; align-items: center;
+  height: 52px; flex-shrink: 0;
+}
+.prj-page-title  { font-size: 14px; font-weight: 600; color: var(--text-1, #111827); }
+.prj-task-wrap   { flex: 1; overflow: auto; padding: var(--semantic-spacing-space-400, 24px); }
+
+/* ── INJECT:LAYOUT ────────────────────────────────────────────────────────────
+   Add feature-specific layout rules below this line.
+   Rules here must use the prj- prefix and token-only values (var(--semantic-*)).
+   No raw hex, px, rem, or font-family strings.
+─────────────────────────────────────────────────────────────────────────── */

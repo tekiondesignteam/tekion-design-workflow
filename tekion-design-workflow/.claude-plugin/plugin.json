@@ -1,7 +1,7 @@
 {
   "name": "tekion-design-workflow",
-  "version": "0.5.0",
-  "description": "From brief to prototype - the full Tekion design workflow, phase by phase.",
+  "version": "0.6.0",
+  "description": "The complete Tekion design workflow, built into your editor. Brief to prototype, every phase, no context lost.",
   "author": {
     "name": "Tekion Design"
   },

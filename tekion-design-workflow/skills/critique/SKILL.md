@@ -1,6 +1,6 @@
 ---
 name: critique
-description: Phase 7 entry point (STUB). Spawns the `critique` agent, which is pending the Phase 7 interview. Run against a completed design once implemented.
+description: The honest final check. Reviews a completed design against the spec and ALLOY component guidelines before it reaches engineering. Currently in development.
 ---
 
 # /tekion-design-workflow:critique — Design Critique

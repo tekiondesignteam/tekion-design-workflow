@@ -1,6 +1,6 @@
 ---
 name: prototype
-description: Phase 6 entry point — confirms the approved wireframes manifest, product kit, and DS repo path, then spawns the prototype agent and relays the project path, prototype manifest, and Figma URL.
+description: Ship a working prototype, not a mockup. Builds a React project with real ALLOY components and design tokens from the approved lo-fi. Run after /tekion-design-workflow:lo-fi.
 ---
 
 # /tekion-design-workflow:prototype Command — Phase 6 Entry Point

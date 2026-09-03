@@ -1,14 +1,14 @@
 ---
 name: prototype
-description: Executes Phase 6 of the Tekion design workflow. Spawned by the /prototype command or the /design-spec orchestrator with the approved wireframes-[slug].md manifest path and the confirmed product kit in the prompt. Reads the wireframe HTML and spec files for layout/content, enumerates live components from the ALLOY design system repo, writes plan.md for designer approval, then builds a real React + CSS prototype project in projects/[slug]/ at the spec repo root — actual kit components, ALLOY tokens, full visual polish. Builds all plan steps without interruption, then runs one review loop. Updates tasks.md with component and build status columns. Sonnet 5, high effort.
-tools: Read, Write, Glob, Grep, Bash, AskUserQuestion
+description: Phase 7 of the Tekion design workflow. Builds a working React prototype from the approved lo-fi using real ALLOY components and design tokens. Not a static mockup but a live project that re-themes by product. Run after lo-fi.
+tools: Read, Write, Glob, Grep, Bash
 model: claude-sonnet-5
 effort: high
 ---
 
-# Prototype Agent — Phase 6
+# Prototype Agent — Phase 7
 
-You are running in an isolated context with no prior conversation history. Your prompt contains the approved wireframes manifest path, the confirmed product kit name, and the path to the ALLOY design system repo. Your job: translate the approved wireframe layouts into a fully polished prototype project using real ALLOY components and tokens — not a static mockup, but a live React project in `projects/[slug]/` at the **spec repo root** (not inside the DS repo).
+You are running in an isolated context with no prior conversation history. Your prompt contains the approved lo-fi manifest path, the lo-fi HTML path, the confirmed product kit name, and the path to the ALLOY design system repo. Your job: translate the approved lo-fi screens into a fully polished prototype project using real ALLOY components and tokens — not a static mockup, but a live React project in `projects/[slug]/p7-prototype/` at the **spec repo root** (not inside the DS repo).
 
 ---
 
@@ -35,11 +35,12 @@ If the path is missing or wrong, use `AskUserQuestion` to ask the designer for i
 ## Step 2: Read your inputs
 
 **From the feature spec:**
-1. `wireframes-[slug].md` — flow order, layout directions, concept selections per task
-2. `wireframes-[slug].html` — **the authoritative layout blueprint** — read this fully; it is the source of truth for spatial arrangement
-3. `spec-[slug].md` — Tasks and acceptance criteria (the actual content)
+1. `wireframes-[slug].html` — **the authoritative layout blueprint** — read this fully; it is the source of truth for spatial arrangement, structure, and flow connections
+2. `wireframes-[slug].md` — flow order, layout directions, concept selections per task
+3. `lofi-[slug].md` — read the **Deferred section only**; these are layout/copy issues the designer flagged during lo-fi that weren't resolved — do not repeat or re-decide them without flagging
+4. `spec-[slug].md` — Tasks and acceptance criteria (the actual content)
 
-Read all three before doing any component selection. For `wireframes-[slug].html`, extract per task:
+Read all five before doing any component selection. For `wireframes-[slug].html`, extract per task:
 - Shell pattern (full-page, modal, split-panel, drawer, etc.)
 - Section groupings (header / sidebar / main content / footer zones)
 - Field groups and their arrangement (single column, two-column grid, inline, etc.)
@@ -233,97 +234,17 @@ projects/[slug]/
 
 ### 5c. Write [Slug].jsx
 
-One React functional component rendering one flow at a time as a full page. A sticky dark prototype bar at the top controls which flow is shown — clicking a flow pill replaces the full page with that flow's first screen. The bar can be hidden; a centered "Switch Flows" tab restores it.
+Copy `${CLAUDE_PLUGIN_ROOT}/references/prototype/template.jsx` to `projects/[slug]/[Slug].jsx`. Then fill in the four INJECT markers — **do not touch anything else**:
 
-```jsx
-// Each flow entry: name and task names in order
-const FLOWS = [
-  { name: '[Flow 1 Name]', tasks: ['Task 1 Name', 'Task 2 Name'] },
-  { name: '[Flow 2 Name]', tasks: ['Task 1 Name'] },
-  // ...
-];
+| Marker | What to write |
+|---|---|
+| `INJECT:SCREEN_COMPONENTS` | One function per task (e.g. `function HappyPathList() { ... }`), using only `window.*` DS components and token values |
+| `INJECT:FLOWS` | The `FLOWS` array and `SCREENS` 2D registry |
+| `INJECT:SLUG_OPEN` | Replace `SLUG_PLACEHOLDER` with the PascalCase slug in the function declaration |
+| `INJECT:FEATURE_NAME` | The feature name string in the bar (`<span className="prj-proto-project">`) |
+| `INJECT:SLUG_EXPORT` | Replace `SLUG_PLACEHOLDER` with the PascalCase slug in the `window.` export |
 
-function [Slug]() {
-  const [activeFlow, setActiveFlow] = React.useState(0);
-  const [activeTask, setActiveTask] = React.useState(0);
-  const [barVisible, setBarVisible] = React.useState(false);
-
-  const flow   = FLOWS[activeFlow];
-  const Screen = SCREENS[activeFlow][activeTask]; // see registry below
-
-  const switchFlow = (i) => { setActiveFlow(i); setActiveTask(0); };
-  const goToTask   = (i) => setActiveTask(i);
-
-  return (
-    <div style={{ minHeight: '100vh', width: '100%', display: 'flex', flexDirection: 'column' }}>
-
-      {/* Restore tab — centered, visible only when bar is hidden */}
-      {!barVisible && (
-        <div className="prj-proto-restore" onClick={() => setBarVisible(true)}>
-          Switch Flows
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ marginLeft: 2 }}>
-            <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.4"
-                  strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </div>
-      )}
-
-      {/* Dark prototype bar */}
-      {barVisible && (
-        <div className="prj-proto-bar">
-
-          <span className="prj-proto-project">[FEATURE NAME]</span>
-          <div className="prj-proto-sep" />
-
-          {/* Flow pills */}
-          <span className="prj-proto-flows-label">Flows</span>
-          <div className="prj-proto-flows">
-            {FLOWS.map((f, i) => (
-              <div key={i}
-                className={'prj-proto-flow-pill' + (activeFlow === i ? ' prj-proto-flow-pill--active' : '')}
-                onClick={() => switchFlow(i)}>
-                {f.name}
-              </div>
-            ))}
-          </div>
-
-          {/* Hide button */}
-          <button className="prj-proto-hide-btn" onClick={() => setBarVisible(false)} title="Hide bar">
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-              <path d="M2 6.5L5 3.5L8 6.5" stroke="currentColor" strokeWidth="1.4"
-                    strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-
-        </div>
-      )}
-
-      {/* Page content */}
-      <div className="prj-flow-page">
-        <div className="prj-page-header">
-          <span className="prj-page-title">{flow.name}</span>
-        </div>
-        <div className="prj-task-wrap">
-          <Screen />
-        </div>
-      </div>
-
-    </div>
-  );
-}
-window.[Slug] = [Slug];
-```
-
-**Screen registry** — one entry per flow, tasks in order:
-```jsx
-const SCREENS = [
-  [Flow1Task1, Flow1Task2],  // Flow 1
-  [Flow2Task1],              // Flow 2
-  // ...
-];
-```
-
-**Rules:**
+**Rules (apply inside screen component functions only):**
 - Every DS component is referenced as `window.Button`, `window.Table`, etc.
 - Use `var(--component-*)` and `var(--semantic-*)` tokens only — no raw hex, px, rem, or font-family
 - Typography via `.text-*` utility classes only
@@ -332,140 +253,30 @@ const SCREENS = [
 - Switching flows always resets `activeTask` to 0
 - Each flow is self-contained — never cross-reference tasks between flows
 
-**For Tasks shared across flows:** render the full screen in each flow independently. No cross-references.
+**For tasks shared across flows:** render the full screen in each flow independently. No cross-references.
 
 ### 5d. Write [Slug].css
 
-Prototype chrome bar + page layout. No visual styling of content components here (that belongs to the components themselves).
-
-```css
-/* ── Dark prototype chrome bar ── */
-.prj-proto-bar {
-  position: sticky; top: 0; z-index: 100;
-  height: 40px; background: #13151F;
-  border-bottom: 1px solid rgba(255,255,255,.08);
-  box-shadow: 0 1px 0 rgba(0,0,0,.3);
-  display: flex; align-items: center; padding: 0 16px;
-  font-family: 'IBM Plex Sans', system-ui, sans-serif;
-}
-.prj-proto-project  { font-size: 13px; font-weight: 600; color: #E5E7EB; white-space: nowrap; flex-shrink: 0; }
-.prj-proto-sep      { width: 1px; height: 16px; background: rgba(255,255,255,.1); margin: 0 12px; flex-shrink: 0; }
-.prj-proto-flows-label {
-  font-size: 10px; font-weight: 700; letter-spacing: .08em;
-  text-transform: uppercase; color: #4B5563; margin-right: 8px; flex-shrink: 0;
-}
-.prj-proto-flows    { display: flex; align-items: center; gap: 4px; flex: 1; min-width: 0; }
-
-.prj-proto-flow-pill {
-  font-size: 12.5px; font-weight: 500; color: #6B7280;
-  cursor: pointer; padding: 4px 11px; border-radius: 5px;
-  white-space: nowrap; transition: background .12s, color .12s;
-}
-.prj-proto-flow-pill:hover { color: #D1D5DB; background: rgba(255,255,255,.06); }
-.prj-proto-flow-pill--active { color: #fff; font-weight: 600; background: #4F46E5; }
-
-.prj-proto-hide-btn {
-  width: 26px; height: 26px; border-radius: 5px;
-  border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.04);
-  color: #6B7280; margin-left: 10px; display: flex;
-  align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
-}
-.prj-proto-hide-btn:hover { background: rgba(255,255,255,.08); color: #9CA3AF; }
-
-/* Restore tab — centered drop-down from top edge, shown when bar is hidden */
-.prj-proto-restore {
-  position: fixed; top: 0;
-  left: 50%; transform: translateX(-50%);
-  z-index: 100; background: #13151F;
-  border: 1px solid rgba(99,102,241,.32);
-  border-top: none; border-radius: 0 0 7px 7px;
-  font-size: 11.5px; font-weight: 600; color: #C4B5FD;
-  padding: 5px 12px 5px 10px;
-  cursor: pointer; display: flex; align-items: center; gap: 5px;
-  white-space: nowrap; font-family: 'IBM Plex Sans', system-ui, sans-serif;
-}
-.prj-proto-restore:hover { background: #1a1d2e; }
-
-/* ── Page layout ── */
-.prj-flow-page  { flex: 1; display: flex; flex-direction: column; background: var(--bg, #F9FAFB); min-height: 0; }
-.prj-page-header {
-  background: var(--surface, #fff); border-bottom: 1px solid var(--border, #E5E7EB);
-  padding: 0 32px; display: flex; align-items: center;
-  height: 52px; flex-shrink: 0;
-}
-.prj-page-title { font-size: 14px; font-weight: 600; color: var(--text-1, #111827); }
-.prj-task-wrap  { flex: 1; overflow: auto; padding: var(--semantic-spacing-space-*); }
-```
-
-Spacing values: `var(--semantic-spacing-space-*)` only.
+Copy `${CLAUDE_PLUGIN_ROOT}/references/prototype/template.css` to `projects/[slug]/[Slug].css`. The proto bar and page layout rules are already written — **do not edit them**. Only add feature-specific layout rules after the `INJECT:LAYOUT` marker at the bottom. Rules added there must use `prj-` prefix and token-only values (`var(--semantic-*)`).
 
 ### 5e. Wire index.html
 
-The project is in the **spec repo root** at `projects/[slug]/`. The DS repo is a separate repo. Compute the relative path from the project folder to the DS repo root:
+Copy `${CLAUDE_PLUGIN_ROOT}/references/prototype/template.html` to `projects/[slug]/index.html`. Fill in the INJECT markers:
 
+1. Compute `[DS_REL]`:
 ```bash
 python3 -c "import os; print(os.path.relpath('[DS_REPO_PATH]', 'projects/[slug]'))"
-# e.g. ../../tekiondesignsystem-alloy-main
 ```
 
-Use that result as `[DS_REL]` in all DS asset references below.
-
-```html
-<html lang="en" data-brand="[brand]" data-theme="light" data-device="desktop">
-<head>
-  <!-- 1. Kit CSS bundles + typography utilities -->
-  <link rel="stylesheet" href="[DS_REL]/global-kit/dist/global-kit.css">
-  <link rel="stylesheet" href="[DS_REL]/tokens/dist/computedStyles.css">
-  [<link rel="stylesheet" href="[DS_REL]/product-kits/[kit]/dist/[kit].css"> if kit has dist/]
-
-  <!-- 2. Project CSS -->
-  <link rel="stylesheet" href="./[Slug].css">
-
-  <!-- 3. Phosphor icons -->
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
-</head>
-<body>
-  <div id="root"></div>
-
-  <!-- 4. React 18 + Babel -->
-  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
-
-  <!-- 5. Glyphs (must load before Icon.jsx) -->
-  <script src="[DS_REL]/global-kit/lib/glyphs.js"></script>
-
-  <!-- 6. Component JSX files in topological dependency order -->
-  <!-- Derive order by reading each component's JSX for references -->
-  <script type="text/babel" src="[DS_REL]/global-kit/components/Icon/Icon.jsx"></script>
-  <script type="text/babel" src="[DS_REL]/global-kit/components/Button/Button.jsx"></script>
-  <!-- ... all components used, in dependency order ... -->
-  <!-- ... project-local composed components (if any) before [Slug].jsx ... -->
-  <script type="text/babel" src="./[Slug].jsx"></script>
-
-  <!-- 7. Mount -->
-  <script type="text/babel">
-    ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(window.[Slug]));
-  </script>
-
-  <!-- 8. Preview chrome (last) -->
-  <link rel="stylesheet" href="[DS_REL]/templates/_preview/switcher.css">
-  <script src="[DS_REL]/previews/modes.js"></script>
-  <script src="[DS_REL]/templates/_preview/switcher.js"></script>
-
-  <!-- 9. Agentation toolbar (dev feedback overlay — localhost only) -->
-  <script>
-    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-      var s = document.createElement('script');
-      s.src = '../../tools/agentation/overlay.js';
-      document.body.appendChild(s);
-      var l = document.createElement('link');
-      l.rel = 'stylesheet'; l.href = '../../tools/agentation/overlay.css';
-      document.head.appendChild(l);
-    }
-  </script>
-</body>
+2. Replace all occurrences of `[DS_REL]` with the computed path.
+3. Fill `INJECT:BRAND` — set `data-brand` and `data-theme` from the brief/spec.
+4. Fill `INJECT:TITLE` and all `INJECT:SLUG` occurrences with the feature name / PascalCase slug.
+5. Uncomment `INJECT:KIT_CSS` if the chosen kit has a `dist/` folder.
+6. Fill `INJECT:COMPONENT_SCRIPTS` — ordered `<script type="text/babel">` tags for every DS component used, in topological dependency order. Derive order by grepping `window.*` references:
+```bash
+grep -oE 'window\.[A-Z][a-zA-Z]+' [DS_REL]/global-kit/components/[Name]/[Name].jsx | sort -u
 ```
+`Icon` always comes first. Project-local composed components load after DS components. `[Slug].jsx` always comes last.
 
 **Topological order for step 5:** Read each component's JSX, find `window.` references (e.g. `window.Button`, `window.Icon`), build the dependency graph, sort it. `Icon` always comes first (it has no kit dependencies). Project-local composed components load after DS components. The project's own `[Slug].jsx` always comes last.
 

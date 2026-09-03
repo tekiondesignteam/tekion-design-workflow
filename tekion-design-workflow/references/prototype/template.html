@@ -1,0 +1,85 @@
+<!-- ──────────────────────────────────────────────────────────────────────────
+     Tekion Design Workflow — Prototype index.html Template
+     Copy to projects/[slug]/index.html. Fill every INJECT marker.
+     Never write to the DS repo — all output stays in projects/[slug]/.
+─────────────────────────────────────────────────────────────────────────── -->
+<!doctype html>
+<!-- INJECT:BRAND  Replace [brand] and [theme] with values from brief/spec.
+     e.g. data-brand="tekion" data-theme="light" data-device="desktop"      -->
+<html lang="en" data-brand="[brand]" data-theme="light" data-device="desktop">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- INJECT:TITLE  Replace [Feature Name] -->
+  <title>[Feature Name]</title>
+
+  <!-- INJECT:DS_REL  Replace [DS_REL] throughout with the relative path to the
+       DS repo root from this file (e.g. ../../tekiondesignsystem-alloy-main).
+       Compute with:
+         python3 -c "import os; print(os.path.relpath('[DS_REPO_PATH]', 'projects/[slug]'))"  -->
+
+  <!-- 1. Kit CSS bundles + typography utilities -->
+  <link rel="stylesheet" href="[DS_REL]/global-kit/dist/global-kit.css">
+  <link rel="stylesheet" href="[DS_REL]/tokens/dist/computedStyles.css">
+  <!-- INJECT:KIT_CSS  Include only if the chosen product kit has a dist/ folder.
+       <link rel="stylesheet" href="[DS_REL]/product-kits/[kit]/dist/[kit].css">  -->
+
+  <!-- 2. Project CSS (proto bar + feature layout) -->
+  <!-- INJECT:SLUG  Replace [Slug] -->
+  <link rel="stylesheet" href="./[Slug].css">
+
+  <!-- 3. Phosphor icons -->
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- 4. React 18 + Babel standalone -->
+  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
+
+  <!-- 5. DS glyphs (must load before Icon.jsx) -->
+  <script src="[DS_REL]/global-kit/lib/glyphs.js"></script>
+
+  <!-- INJECT:COMPONENT_SCRIPTS
+       One <script type="text/babel"> per DS component used, in topological order.
+       Icon always comes first. Project-local composed components load after DS
+       components and before [Slug].jsx. Derive order by grepping window.* refs:
+         grep -oE 'window\.[A-Z][a-zA-Z]+' [DS_REL]/global-kit/components/[Name]/[Name].jsx | sort -u
+
+       Example order:
+         <script type="text/babel" src="[DS_REL]/global-kit/components/Icon/Icon.jsx"></script>
+         <script type="text/babel" src="[DS_REL]/global-kit/components/Button/Button.jsx"></script>
+         <script type="text/babel" src="[DS_REL]/global-kit/components/Table/Table.jsx"></script>
+         ...
+         <script type="text/babel" src="./components/MyComposed/MyComposed.jsx"></script>
+  -->
+
+  <!-- INJECT:SLUG  Replace [Slug] — must be last script -->
+  <script type="text/babel" src="./[Slug].jsx"></script>
+
+  <!-- 7. Mount -->
+  <!-- INJECT:SLUG  Replace [Slug] in both places below -->
+  <script type="text/babel">
+    ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(window.[Slug]));
+  </script>
+
+  <!-- 8. DS preview chrome (brand/theme switcher) -->
+  <link rel="stylesheet" href="[DS_REL]/templates/_preview/switcher.css">
+  <script src="[DS_REL]/previews/modes.js"></script>
+  <script src="[DS_REL]/templates/_preview/switcher.js"></script>
+
+  <!-- 9. Agentation toolbar (dev feedback overlay — localhost only) -->
+  <script>
+    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+      var s = document.createElement('script');
+      s.src = '../../tools/agentation/overlay.js';
+      document.body.appendChild(s);
+      var l = document.createElement('link');
+      l.rel = 'stylesheet'; l.href = '../../tools/agentation/overlay.css';
+      document.head.appendChild(l);
+    }
+  </script>
+</body>
+</html>

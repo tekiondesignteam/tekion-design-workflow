@@ -1,6 +1,6 @@
 ---
 name: intake
-description: Phase 1 entry point. Gathers requirements input from the designer conversationally, then spawns the `intake` agent (Sonnet 5, high effort), which drafts the brief, renders design-brief-[slug].html for a click-to-annotate review loop, and writes the approved brief. Run this first whenever a designer is starting a new feature or screen.
+description: Start a new design project. Collects the feature name, product, and requirement sources, then produces a structured design brief ready for your review and approval. Run this first whenever you start a new feature or screen.
 ---
 
 # /tekion-design-workflow:intake — Requirements Intake

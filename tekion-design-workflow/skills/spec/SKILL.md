@@ -1,6 +1,6 @@
 ---
 name: spec
-description: Phase 4 entry point. Confirms the designer has the clarified brief and an approved flows-[feature-slug].md (from /tekion-design-workflow:flows), spawns the `spec` agent (Sonnet 5, high effort) to derive tasks and acceptance criteria and run the click-to-annotate review loop, and relays the final PRD score and spec file path. Run after /tekion-design-workflow:flows.
+description: Turn approved flows into a spec your whole team can build from. Derives every task and acceptance criterion from confirmed sources, reviews it with you, and produces a single clean spec. Run after /tekion-design-workflow:flows.
 ---
 
 # /tekion-design-workflow:spec — Spec Generation
@@ -25,6 +25,6 @@ The agent returns `spec-[feature-slug].md`'s file path, the PRD score and band, 
 
 Tell the designer:
 
-> "Spec approved — `spec-[feature-slug].md` is ready. Phase 5 (design generation) isn't built yet, so this is currently the end of the pipeline."
+> "Spec locked ✓ — starting wireframes."
 
 If the designer wants to adjust anything at this point, make the change directly (you have file access) rather than re-running the whole agent for a small edit.

@@ -1,6 +1,6 @@
 ---
 name: critique
-description: Executes Phase 7 of the Tekion design workflow — reviews a completed design for spec compliance and ALLOY component compliance. STUB, pending the Phase 7 interview. Spawned by the /critique command with the design output, spec.md, and ALLOY manifest referenced in the prompt. Returns a not-yet-implemented notice rather than a critique report.
+description: Phase 8 of the Tekion design workflow. Reviews a completed design for spec compliance and correct ALLOY component usage. The honest final check before a design reaches engineering. Currently in development.
 tools: Read, Write
 model: claude-sonnet-5
 effort: high

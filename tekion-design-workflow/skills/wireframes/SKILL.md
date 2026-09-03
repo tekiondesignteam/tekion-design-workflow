@@ -1,6 +1,6 @@
 ---
 name: wireframes
-description: Phase 5 entry point. Confirms the designer has an approved spec-[feature-slug].md (from /tekion-design-workflow:spec), spawns the `wireframes` agent (Sonnet 5, high effort) to render flow-ordered swimlane wireframes, handle on-demand concept-exploration requests inline via the feedback loop, and run the click-to-annotate review loop, and relays the final wireframes file paths. Run after /tekion-design-workflow:spec.
+description: Structure every screen before a pixel of color. Produces flow-ordered swimlane wireframes from the approved spec, with on-demand layout exploration for any screen. Run after /tekion-design-workflow:spec.
 ---
 
 # /tekion-design-workflow:wireframes — Wireframe Generation
@@ -25,6 +25,6 @@ The agent returns `wireframes-[feature-slug].html`'s and `wireframes-[feature-sl
 
 Tell the designer:
 
-> "Wireframes approved. Hi-fi (design generation) isn't built yet, so this is currently the end of the pipeline."
+> "Wireframes approved ✓ — kicking off Phase 6 (Prototype) now."
 
 If the designer wants to adjust anything at this point, make the change directly (you have file access) rather than re-running the whole agent for a small edit. If the agent flagged that some feedback implied a flow or mechanism change rather than a layout change, tell the designer that needs to go back through `/tekion-design-workflow:flows`/`/tekion-design-workflow:spec` first.

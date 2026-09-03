@@ -1,6 +1,6 @@
 ---
 name: clarify
-description: Phase 2 entry point. Confirms the brief with the designer, then spawns the `clarify` agent (Sonnet 5, high effort) to score it and — if there are no critical gaps — render clarify-[slug].html (a real answer form for all questions) while also asking directly via AskUserQuestion, updating the brief and clarifications log from whichever channel the designer uses. Run after /tekion-design-workflow:intake.
+description: Sharpen the design brief before work begins. Scores it for completeness, surfaces the gaps that matter, asks the right questions to fill them, and writes the answers back in. Run after /tekion-design-workflow:intake.
 ---
 
 # /tekion-design-workflow:clarify — Clarify Requirements

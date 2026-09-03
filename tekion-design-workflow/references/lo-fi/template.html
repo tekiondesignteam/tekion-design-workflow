@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><!-- INJECT:FEATURE_NAME --> · Lo-fi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    /* ── INJECT:FONTS ──────────────────────────────────────────────────────
+       Paste the exact @font-face block from design.md § Assets → Fonts here.
+       Example:
+         @font-face {
+           font-family: 'YourFont';
+           src: url('../../../../Assets/fonts/YourFont-Regular.woff2') format('woff2');
+           font-weight: 400; font-style: normal;
+         }
+    ─────────────────────────────────────────────────────────────────────── */
+
+    /* ── INJECT:TOKENS ─────────────────────────────────────────────────────
+       Declare the product's color tokens as CSS custom properties.
+       Map values from design.md to the lf-* variable names below.
+       Example:
+         :root {
+           --lf-bg:        #F5F5F5;
+           --lf-surface:   #FFFFFF;
+           --lf-border:    #E0E0E0;
+           --lf-text-1:    #111827;
+           --lf-text-2:    #6B7280;
+           --lf-action:    #1A56DB;
+           --lf-action-fg: #FFFFFF;
+         }
+    ─────────────────────────────────────────────────────────────────────── */
+
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; background: var(--lf-bg, #F9FAFB); font-family: 'IBM Plex Sans', system-ui, sans-serif; }
+
+    /* ── Dark proto bar ── */
+    .lf-proto-bar {
+      position: sticky; top: 0; z-index: 100;
+      height: 40px; background: #13151F;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 1px 0 rgba(0,0,0,.3);
+      display: flex; align-items: center; padding: 0 16px;
+      font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    }
+    .lf-proto-project   { font-size: 13px; font-weight: 600; color: #E5E7EB; white-space: nowrap; flex-shrink: 0; }
+    .lf-proto-sep       { width: 1px; height: 16px; background: rgba(255,255,255,.1); margin: 0 12px; flex-shrink: 0; }
+    .lf-proto-flows-label {
+      font-size: 10px; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: #4B5563; margin-right: 8px; flex-shrink: 0;
+    }
+    .lf-proto-flows     { display: flex; align-items: center; gap: 4px; flex: 1; min-width: 0; overflow-x: auto; }
+    .lf-proto-flow-pill {
+      font-size: 12.5px; font-weight: 500; color: #6B7280;
+      cursor: pointer; padding: 4px 11px; border-radius: 5px;
+      white-space: nowrap; transition: background .12s, color .12s; flex-shrink: 0;
+    }
+    .lf-proto-flow-pill:hover              { color: #D1D5DB; background: rgba(255,255,255,.06); }
+    .lf-proto-flow-pill.lf-pill-active     { color: #fff; font-weight: 600; background: #4F46E5; }
+    .lf-proto-hide-btn {
+      width: 26px; height: 26px; border-radius: 5px;
+      border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.04);
+      color: #6B7280; margin-left: 10px; display: flex;
+      align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
+    }
+    .lf-proto-hide-btn:hover { background: rgba(255,255,255,.08); color: #9CA3AF; }
+
+    /* ── Restore tab ── */
+    .lf-proto-restore {
+      position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+      z-index: 100; background: #13151F;
+      border: 1px solid rgba(99,102,241,.32); border-top: none;
+      border-radius: 0 0 7px 7px;
+      font-size: 11.5px; font-weight: 600; color: #C4B5FD;
+      padding: 5px 12px 5px 10px;
+      cursor: pointer; display: flex; align-items: center; gap: 5px;
+      white-space: nowrap; font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    }
+    .lf-proto-restore:hover { background: #1a1d2e; }
+
+    /* ── Flow sections ── */
+    .lf-flow-section           { display: none; flex-direction: column; min-height: calc(100vh - 40px); }
+    .lf-flow-section.lf-active { display: flex; }
+
+    /* ── Page header (below bar, inside each flow) ── */
+    .lf-page-header {
+      background: var(--lf-surface, #fff);
+      border-bottom: 1px solid var(--lf-border, #E5E7EB);
+      padding: 0 32px; display: flex; align-items: center;
+      height: 52px; flex-shrink: 0;
+    }
+    .lf-page-title { font-size: 14px; font-weight: 600; color: var(--lf-text-1, #111827); }
+
+    /* ── Screens stacked vertically ── */
+    .lf-screen { padding: 24px 32px; border-bottom: 1px solid var(--lf-border, #E5E7EB); }
+    .lf-screen:last-child { border-bottom: none; }
+    .lf-screen-label {
+      font-size: 10px; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: #9CA3AF; margin-bottom: 16px;
+    }
+
+    /* ── INJECT:PRODUCT_CSS ─────────────────────────────────────────────────
+       Add any product-specific overrides here (e.g. sidebar widths, nav heights,
+       component radius corrections) that can't be captured in :root tokens.
+    ─────────────────────────────────────────────────────────────────────── */
+  </style>
+</head>
+<body>
+
+  <!-- Restore tab — visible by default; bar starts hidden (matches prototype) -->
+  <div class="lf-proto-restore" id="lf-restore" onclick="showBar()">
+    Switch Flows
+    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style="margin-left:2px">
+      <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.4"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <!-- Dark proto bar — starts hidden -->
+  <div class="lf-proto-bar" id="lf-bar" style="display:none">
+    <span class="lf-proto-project"><!-- INJECT:FEATURE_NAME --></span>
+    <div class="lf-proto-sep"></div>
+    <span class="lf-proto-flows-label">Flows</span>
+    <div class="lf-proto-flows" id="lf-flow-pills">
+      <!-- INJECT:FLOW_PILLS
+           One div per flow, in order. Example:
+             <div class="lf-proto-flow-pill" onclick="switchFlow(0)">Happy Path</div>
+             <div class="lf-proto-flow-pill" onclick="switchFlow(1)">Error State</div>
+      -->
+    </div>
+    <button class="lf-proto-hide-btn" onclick="hideBar()" title="Hide bar">
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+        <path d="M2 6.5L5 3.5L8 6.5" stroke="currentColor" stroke-width="1.4"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- INJECT:FLOW_SECTIONS
+       One .lf-flow-section per flow. Example structure:
+
+       <div class="lf-flow-section" data-flow="0">
+         <div class="lf-page-header">
+           <span class="lf-page-title">Happy Path</span>
+         </div>
+
+         <div class="lf-screen">
+           <div class="lf-screen-label">Task 1 · List View</div>
+           (full task screen content here, styled with var(--lf-*) tokens)
+         </div>
+
+         <div class="lf-screen">
+           <div class="lf-screen-label">Task 2 · Detail View</div>
+           (...)
+         </div>
+       </div>
+
+       <div class="lf-flow-section" data-flow="1">
+         ...
+       </div>
+  -->
+
+  <!-- INJECT:ANNOTATE
+       Copy the click-to-annotate + Copy Feedback component verbatim from
+       wireframes-[slug].html. It must appear after all flow sections.
+  -->
+
+  <script>
+    function switchFlow(i) {
+      document.querySelectorAll('.lf-flow-section').forEach(function(s, j) {
+        s.classList.toggle('lf-active', j === i);
+      });
+      document.querySelectorAll('.lf-proto-flow-pill').forEach(function(p, j) {
+        p.classList.toggle('lf-pill-active', j === i);
+      });
+    }
+
+    function hideBar() {
+      document.getElementById('lf-bar').style.display = 'none';
+      document.getElementById('lf-restore').style.display = 'flex';
+    }
+
+    function showBar() {
+      document.getElementById('lf-bar').style.display = 'flex';
+      document.getElementById('lf-restore').style.display = 'none';
+    }
+
+    // Activate first flow on load
+    document.addEventListener('DOMContentLoaded', function() {
+      var sections = document.querySelectorAll('.lf-flow-section');
+      var pills    = document.querySelectorAll('.lf-proto-flow-pill');
+      if (sections.length) sections[0].classList.add('lf-active');
+      if (pills.length)    pills[0].classList.add('lf-pill-active');
+    });
+
+    // Init Lucide icons if present
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  </script>
+
+</body>
+</html>

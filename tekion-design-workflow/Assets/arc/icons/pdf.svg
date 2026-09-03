@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    
+    <title>@1xPDF</title>
+    <desc>Created with Sketch.</desc>
+    <g id="PDF" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pdf-2-copy-2" transform="translate(2.000000, 0.000000)">
+            <path d="M2.91666667,0 C2.4125,0 2,0.45 2,1 L2,15 C2,15.55 2.4125,16 2.91666667,16 L12.0833333,16 C12.5875,16 13,15.55 13,15 L13,4 L9.33333333,0 L2.91666667,0 Z" id="Path" fill="#EDEEF0"></path>
+            <path d="M10,4 L13,4 L9,0 L9,3 C9,3.55 9.45,4 10,4 Z" id="Path" fill="#969AA3"></path>
+            <polygon id="Path" fill="#D4D5D6" points="13 7 10 4 13 4"></polygon>
+            <path d="M11,12.5 C11,12.775 10.79375,13 10.5416667,13 L0.458333333,13 C0.20625,13 0,12.775 0,12.5 L0,7.5 C0,7.225 0.20625,7 0.458333333,7 L10.5416667,7 C10.79375,7 11,7.225 11,7.5 L11,12.5 Z" id="Path" fill="#F52908"></path>
+            <path d="M10.55,13.5 L2,13.5 L2,14 L10.55,14 C10.7975,14 11,13.775 11,13.5 L11,13 C11,13.275 10.7975,13.5 10.55,13.5 Z" id="Path" fill="#D4D5D6"></path>
+        </g>
+        <text font-family="ProximaNova-Semibold, Proxima Nova" font-size="4" font-weight="500" letter-spacing="0.0857142857" fill="#FFFFFF">
+            <tspan x="4" y="12">PDF</tspan>
+        </text>
+    </g>
+</svg>

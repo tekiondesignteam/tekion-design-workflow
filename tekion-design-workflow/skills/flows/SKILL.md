@@ -1,6 +1,6 @@
 ---
 name: flows
-description: Phase 3 entry point. Confirms the designer has a clarified brief (from /tekion-design-workflow:clarify, gate passed or explicitly overridden), spawns the `flows` agent to re-derive and confirm the flow list, generate Mermaid diagrams, and loop with the designer on flows-[feature-slug].html until approved — writing flows-[feature-slug].md on final approval. Run after /tekion-design-workflow:clarify.
+description: Map every user journey before touching a single screen. Confirms the full flow set from the brief, generates visual flow diagrams, and loops on feedback until approved. Run after /tekion-design-workflow:clarify.
 ---
 
 # /tekion-design-workflow:flows — User Flow Generation

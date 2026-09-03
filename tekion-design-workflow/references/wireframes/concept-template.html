@@ -124,7 +124,7 @@ body{font-family:var(--font-body);color:var(--t);line-height:1.65;font-size:14px
 
 <div class="hdr" id="page-title">Concepts for Task [N]: [Task/Screen Name]</div>
 <div class="sub">[Feature Name] &middot; [Product] &middot; generated [Date]</div>
-<div class="kept-note">Review the options above, then select the one you like — or leave a comment asking for changes.</div>
+<div class="kept-note">Browse directions using the tabs. When you've decided, click <strong>Select this direction</strong> — it copies a short block to your clipboard. Paste it into this chat and I'll update the wireframe.</div>
 
 <div class="segment-row">
   <button class="segment-btn active" id="seg-A" onclick="switchDirection('A')">A &middot; Standard stacked form</button>
@@ -145,7 +145,7 @@ body{font-family:var(--font-body);color:var(--t);line-height:1.65;font-size:14px
   <div class="direction-actions">
     <button class="select-btn" onclick="selectDirection(this,'A','Standard stacked form')">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-      Select this direction
+      Select — copies to clipboard
     </button>
     <div class="select-status"></div>
     <div class="actions-divider">or</div>
@@ -153,7 +153,7 @@ body{font-family:var(--font-body);color:var(--t);line-height:1.65;font-size:14px
       <div class="comment-box-label">Ask for a change to this direction</div>
       <textarea placeholder="e.g. &quot;move the button below the field&quot;"></textarea>
       <div class="comment-box-foot">
-        <button class="comment-btn" onclick="sendConceptFeedback(this,'A')">Copy comment</button>
+        <button class="comment-btn" onclick="sendConceptFeedback(this,'A')">Copy feedback — then paste into chat</button>
       </div>
       <div class="comment-status"></div>
     </div>
@@ -177,7 +177,7 @@ body{font-family:var(--font-body);color:var(--t);line-height:1.65;font-size:14px
   <div class="direction-actions">
     <button class="select-btn" onclick="selectDirection(this,'B','Split-screen with brand panel')">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-      Select this direction
+      Select — copies to clipboard
     </button>
     <div class="select-status"></div>
     <div class="actions-divider">or</div>
@@ -185,7 +185,7 @@ body{font-family:var(--font-body);color:var(--t);line-height:1.65;font-size:14px
       <div class="comment-box-label">Ask for a change to this direction</div>
       <textarea placeholder="e.g. &quot;move the button below the field&quot;"></textarea>
       <div class="comment-box-foot">
-        <button class="comment-btn" onclick="sendConceptFeedback(this,'B')">Copy comment</button>
+        <button class="comment-btn" onclick="sendConceptFeedback(this,'B')">Copy feedback — then paste into chat</button>
       </div>
       <div class="comment-status"></div>
     </div>
@@ -204,7 +204,7 @@ body{font-family:var(--font-body);color:var(--t);line-height:1.65;font-size:14px
   <div class="direction-actions">
     <button class="select-btn" onclick="selectDirection(this,'C','Progressive disclosure')">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-      Select this direction
+      Select — copies to clipboard
     </button>
     <div class="select-status"></div>
     <div class="actions-divider">or</div>
@@ -212,7 +212,7 @@ body{font-family:var(--font-body);color:var(--t);line-height:1.65;font-size:14px
       <div class="comment-box-label">Ask for a change to this direction</div>
       <textarea placeholder="e.g. &quot;move the button below the field&quot;"></textarea>
       <div class="comment-box-foot">
-        <button class="comment-btn" onclick="sendConceptFeedback(this,'C')">Copy comment</button>
+        <button class="comment-btn" onclick="sendConceptFeedback(this,'C')">Copy feedback — then paste into chat</button>
       </div>
       <div class="comment-status"></div>
     </div>
@@ -255,29 +255,11 @@ function featureAndTask(){
 }
 
 function copyText(text, statusEl){
-  function done(ok){
-    statusEl.textContent = ok ? 'Copied — paste it into chat.' : 'Could not copy automatically — select this text and press Cmd/Ctrl+C: ' + text;
-  }
-  function manualCopy(){
-    var ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.left = '-9999px';
-    document.body.appendChild(ta);
-    ta.select();
-    var ok = false;
-    try{ ok = document.execCommand('copy'); } catch(err){}
-    document.body.removeChild(ta);
-    done(ok);
-  }
-  // Always try navigator.clipboard first, but fall back to the execCommand path on ANY failure
-  // (permission denied, insecure/file:// context, etc.) instead of giving up — a clipboard.writeText
-  // rejection does not mean copying is impossible, just that this path didn't work.
-  if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(function(){ done(true); }).catch(manualCopy);
-  } else {
-    manualCopy();
-  }
+  navigator.clipboard.writeText(text).then(function(){
+    statusEl.textContent = '✓ Copied! Paste it into this chat.';
+  }).catch(function(){
+    statusEl.textContent = 'Couldn\'t copy — select and copy this manually: ' + text;
+  });
 }
 
 function selectDirection(btn, letter, label){

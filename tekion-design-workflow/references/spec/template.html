@@ -291,7 +291,7 @@ body{font-family:var(--font-body);color:var(--t);line-height:1.65;font-size:14px
 </div>
 
 <div class="approval-banner">
-  Click-and-drag over any text below to annotate it, or use the <b>Copy Feedback</b> button (bottom-left) to consolidate your notes into a pasteable block. Reply in chat — describe changes, paste the feedback block, or say "approved" — this page regenerates until you approve. There is no approve button here on purpose.
+  This is the blueprint for your feature — every screen, task, and rule in one place. Review and flag anything that's off.
 </div>
 
 <!-- ============ OVERVIEW ============ -->
@@ -448,7 +448,8 @@ body{font-family:var(--font-body);color:var(--t);line-height:1.65;font-size:14px
 </div>
 
 <!-- One .flow-block per flow, same order + same Mermaid source as the approved flows-[slug].md -->
-<div class="flow-block" data-loc="Flow 1: [Name]">
+<!-- Each .flow-block MUST have id="sec-flow-N" for the side-toc sub-links to work. -->
+<div class="flow-block" id="sec-flow-1" data-loc="Flow 1: [Name]">
   <div class="flow-block-head">
     <div class="flow-block-name"><span class="flow-block-num">1</span>[Flow name]</div>
     <div class="flow-block-desc">[One-liner, identical to the approved flows doc.]</div>
@@ -477,7 +478,8 @@ flowchart TD
 </div>
 
 <!-- One .task-block per Task, numbered per the deterministic node-derivation rules -->
-<div class="task-block" data-loc="Task 1: [Screen/State Name]">
+<!-- Each .task-block MUST have id="sec-task-N" for the side-toc sub-links to work. -->
+<div class="task-block" id="sec-task-1" data-loc="Task 1: [Screen/State Name]">
   <div class="task-block-head">
     <div class="task-block-name"><span class="task-block-num">1</span>[Screen/State Name]</div>
   </div>
@@ -561,7 +563,11 @@ flowchart TD
     <!-- One toc-sub link per .surface-block, same order as the elements above. -->
     <a href="#sec-data">Content &amp; Data</a>
     <a href="#sec-flows">User Flows</a>
+    <a href="#sec-flow-1" class="toc-sub">[Flow 1 name]</a>
+    <!-- One toc-sub per .flow-block: href="#sec-flow-N", text = flow name. -->
     <a href="#sec-tasks">Tasks &amp; AC</a>
+    <a href="#sec-task-1" class="toc-sub">[Task 1 name]</a>
+    <!-- One toc-sub per .task-block: href="#sec-task-N", text = screen/state name. -->
     <a href="#sec-constraints">Constraints</a>
     <a href="#sec-outofscope">Out of Scope</a>
     <a href="#sec-risks">Risks &amp; Trade-offs</a>
@@ -589,7 +595,11 @@ flowchart TD
     <!-- One side-toc-sub link per .surface-block, same order as the elements above. -->
     <a href="#sec-data">Content &amp; Data</a>
     <a href="#sec-flows">User Flows</a>
+    <a href="#sec-flow-1" class="side-toc-sub">[Flow 1 name]</a>
+    <!-- One side-toc-sub per .flow-block: href="#sec-flow-N", text = flow name. -->
     <a href="#sec-tasks">Tasks &amp; AC</a>
+    <a href="#sec-task-1" class="side-toc-sub">[Task 1 name]</a>
+    <!-- One side-toc-sub per .task-block: href="#sec-task-N", text = screen/state name. -->
     <a href="#sec-constraints">Constraints</a>
     <a href="#sec-outofscope">Out of Scope</a>
     <a href="#sec-risks">Risks &amp; Trade-offs</a>
@@ -628,7 +638,7 @@ flowchart TD
   </div>
   <div id="feedback-list"><div class="fb-empty">No annotations yet. Select any text to add one.</div></div>
   <div id="feedback-panel-foot">
-    <button id="copy-feedback-btn" onclick="copyFeedback()">Copy Feedback (0)</button>
+    <button type="button" id="copy-feedback-btn" onclick="copyFeedback()">Copy Feedback (0)</button>
   </div>
 </div>
 
@@ -673,7 +683,9 @@ document.addEventListener('click',function(e){
   // section isn't present in the clarified brief, and list every per-surface id (sec-surface-1,
   // sec-surface-2, ...) right after 'sec-surfaces', in the same order as their .surface-block
   // elements and their toc-sub/side-toc-sub links — same mechanic as references/intake/template.html.
-  var sectionIds=['sec-overview','sec-context','sec-personas','sec-tvd','sec-surfaces','sec-surface-1','sec-data','sec-flows','sec-tasks','sec-constraints','sec-outofscope','sec-risks','sec-conflicts','sec-assumptions','sec-success'];
+  // When filling this template: insert 'sec-flow-1','sec-flow-2',... after 'sec-flows'
+  // and 'sec-task-1','sec-task-2',... after 'sec-tasks' — one entry per block, same order.
+  var sectionIds=['sec-overview','sec-context','sec-personas','sec-tvd','sec-surfaces','sec-surface-1','sec-data','sec-flows','sec-flow-1','sec-tasks','sec-task-1','sec-constraints','sec-outofscope','sec-risks','sec-conflicts','sec-assumptions','sec-success'];
   var links=Array.from(document.querySelectorAll('.side-toc-list a'));
   var indicator=document.getElementById('side-toc-indicator');
   var listEl=document.getElementById('side-toc-list');
